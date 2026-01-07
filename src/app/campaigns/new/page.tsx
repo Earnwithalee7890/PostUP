@@ -228,11 +228,47 @@ export default function NewCampaignPage() {
         );
     }
 
+    // RENDER: Service/Action Selection (if Platform selected)
+    if (platform) {
+        // Fall through to main form
+    } else {
+        // RENDER: Platform Selection
+        return (
+            <div className={styles.container}>
+                <header className={styles.header}>
+                    <h1>Select Platform</h1>
+                    <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>Choose where to grow your audience</p>
+                </header>
+
+                <div className={styles.platformGrid}>
+                    {SUPPORTED_PLATFORMS.map(p => (
+                        <div
+                            key={p.id}
+                            className={styles.platformCard}
+                            onClick={() => handlePlatformSelect(p.id)}
+                        >
+                            <div className={styles.platformIconWrapper}>
+                                <p.logo />
+                            </div>
+                            <div className={styles.platformContent}>
+                                <div className={styles.platformName}>{p.label}</div>
+                                <div className={styles.platformDesc}>{p.description}</div>
+                            </div>
+                            <ChevronRight className={styles.arrowIcon} />
+                        </div>
+                    ))}
+                </div>
+
+                {/* PROMOTION CONTACT */}
+                <div className={styles.promotionContact}>
+                    Need help or promotion? Contact <a href="https://warpcast.com/aleekhoso" target="_blank" rel="noreferrer" className={styles.promotionLink}>@aleekhoso</a> (Dev) or <a href="https://warpcast.com/tipsdeck" target="_blank" rel="noreferrer" className={styles.promotionLink}>@tipsdeck</a> (Admin) on Farcaster.
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.container}>
-            {/* ... Existing JSX ... */}
-            );
-}
             <button onClick={() => setPlatform(null)} className={styles.backButton}>
                 <ArrowLeft size={16} /> Back to Platforms
             </button>
