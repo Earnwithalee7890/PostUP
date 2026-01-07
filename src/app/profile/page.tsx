@@ -50,9 +50,13 @@ export default function ProfilePage() {
 
     const { disconnect } = useDisconnect();
 
+    // Auto-detect address: Wallet > Farcaster Verified > Empty
+    const displayAddress = address || stats?.verifications?.[0] || '';
+    const isWalletConnected = !!address;
+
     const copyAddress = () => {
-        if (address) {
-            navigator.clipboard.writeText(address);
+        if (displayAddress) {
+            navigator.clipboard.writeText(displayAddress);
             alert('Address copied!');
         }
     };
@@ -92,7 +96,7 @@ export default function ProfilePage() {
                         </h2>
                         <div style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             @{context?.user?.username || 'user'}
-                            {address && (
+                            {displayAddress && (
                                 <span style={{
                                     background: 'rgba(255,255,255,0.1)',
                                     padding: '2px 6px',
@@ -101,8 +105,9 @@ export default function ProfilePage() {
                                     display: 'flex', alignItems: 'center', gap: '4px',
                                     cursor: 'pointer'
                                 }} onClick={copyAddress}>
-                                    {address.slice(0, 6)}...{address.slice(-4)}
+                                    {displayAddress.slice(0, 6)}...{displayAddress.slice(-4)}
                                     <Copy size={10} />
+                                    {!isWalletConnected && <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>(Auto)</span>}
                                 </span>
                             )}
                         </div>

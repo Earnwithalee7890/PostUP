@@ -68,5 +68,6 @@ export interface UserStats {
     rank: number;
     followers: number;
     neynarScore: number;
+    verifications: string[]; // Added for auto-wallet detection
     history: TaskHistoryItem[];
 }

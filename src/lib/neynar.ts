@@ -27,6 +27,7 @@ export const NeynarService = {
                 rank: 0,
                 followers: user.follower_count || 0,
                 neynarScore: Math.round((user.active_status === 'active' ? 100 : 50)),
+                verifications: user.verifications || [],
                 history: []
             };
         } catch (error) {
@@ -38,6 +39,7 @@ export const NeynarService = {
                 rank: 0,
                 followers: 0,
                 neynarScore: 0,
+                verifications: [],
                 history: []
             };
         }
