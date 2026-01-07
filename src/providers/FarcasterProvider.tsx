@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import sdk from '@farcaster/frame-sdk';
 
 // Infers the context type directly from the SDK, avoiding import errors
-type FrameContext = Awaited<ReturnType<typeof sdk.context>>;
+type FrameContext = Awaited<typeof sdk.context>;
 
 interface FarcasterContextType {
     isSDKLoaded: boolean;
