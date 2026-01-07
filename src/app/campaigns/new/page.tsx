@@ -146,12 +146,63 @@ export default function NewCampaignPage() {
     };
 
     const { isConnected } = useAccount();
-
     const { writeContract, data: hash, isPending: isConfirming } = useWriteContract();
 
-    // ... (keep existing verify logic)
+    const { isLoading: isConfirmed } = useWaitForTransactionReceipt({
+        hash,
+    });
 
-    // Check for wallet connection BEFORE showing form
+    // Effect to handle success after transaction confirmation
+    if (isConfirmed && hash) {
+        // Here we would normally call the backend APIs to persist the campaign
+        // For now, we simulate success
+        // createMutation.mutate(...)
+        alert(`Campaign created! Transaction Hash: ${hash}`);
+        router.push('/campaigns');
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!isBudgetValid || !platform) return;
+
+        // Ensure user is on Base Sepolia? (Wagmi handles chain switching request usually if configured, or fails)
+
+        try {
+            writeContract({
+                address: DISTRIBUTOR_ADDRESS as `0x${string}`,
+                abi: DISTRIBUTOR_ABI,
+                functionName: 'createCampaign',
+                args: [
+                    '0x0000000000000000000000000000000000000000000000000000000000000000' // Initial empty root
+                ],
+                value: parseEther(totalBudget)
+            });
+        } catch (err) {
+            console.error(err);
+            alert('Failed to create campaign on-chain');
+        }
+    };
+
+    const visibleTokens = showAllTokens ? SUPPORTED_TOKENS : SUPPORTED_TOKENS.slice(0, 2);
+
+    // Compute which URLs are needed
+    const needsProfileUrl = category === 'Follow' || category === 'MiniApp' || (category === 'Multi' && selectedMultiTasks.includes('Follow'));
+    const needsCastUrl = category === 'Boost' || (category === 'Multi' && (selectedMultiTasks.includes('Like') || selectedMultiTasks.includes('Repost') || selectedMultiTasks.includes('Comment')));
+
+    // Get input labels based on platform
+    const getProfileLabel = () => {
+        if (category === 'MiniApp') return 'Mini App URL';
+        if (platform === 'X') return 'X Username / Profile Link';
+        if (platform === 'Base') return 'Base Wallet / Profile';
+        return 'Farcaster Profile URL';
+    };
+
+    const getCastLabel = () => {
+        if (platform === 'X') return 'X Post Link';
+        return 'Cast URL';
+    };
+
+    // RENDER: Check for wallet connection
     if (!isConnected) {
         return (
             <div className={styles.container}>
@@ -169,7 +220,7 @@ export default function NewCampaignPage() {
         );
     }
 
-    // RENDER: Platform Selection (Only if connected)
+    // RENDER: Platform Selection
     if (!platform) {
         return (
             <div className={styles.container}>
@@ -205,68 +256,7 @@ export default function NewCampaignPage() {
         );
     }
 
-    const { isConnected } = useAccount();
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        // ... (existing submit logic)
-    };
-
-    // ... (rest of the code)
-
     // RENDER: Campaign Details Form
-    if (!isConnected) {
-        return (
-            <div className={styles.container}>
-                <header className={styles.header}>
-                    <h1>Connect Wallet</h1>
-                    <p style={{ color: 'var(--muted-foreground)' }}>You need to connect a wallet to fund and create a campaign.</p>
-                </header>
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
-                    <ConnectButton />
-                </div>
-            </div>
-        );
-    }
-
-    // RENDER: Service/Action Selection (if Platform selected)
-    if (platform) {
-        // Fall through to main form
-    } else {
-        // RENDER: Platform Selection
-        return (
-            <div className={styles.container}>
-                <header className={styles.header}>
-                    <h1>Select Platform</h1>
-                    <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>Choose where to grow your audience</p>
-                </header>
-
-                <div className={styles.platformGrid}>
-                    {SUPPORTED_PLATFORMS.map(p => (
-                        <div
-                            key={p.id}
-                            className={styles.platformCard}
-                            onClick={() => handlePlatformSelect(p.id)}
-                        >
-                            <div className={styles.platformIconWrapper}>
-                                <p.logo />
-                            </div>
-                            <div className={styles.platformContent}>
-                                <div className={styles.platformName}>{p.label}</div>
-                                <div className={styles.platformDesc}>{p.description}</div>
-                            </div>
-                            <ChevronRight className={styles.arrowIcon} />
-                        </div>
-                    ))}
-                </div>
-
-                {/* PROMOTION CONTACT */}
-                <div className={styles.promotionContact}>
-                    Need help or promotion? Contact <a href="https://warpcast.com/aleekhoso" target="_blank" rel="noreferrer" className={styles.promotionLink}>@aleekhoso</a> (Dev) or <a href="https://warpcast.com/tipsdeck" target="_blank" rel="noreferrer" className={styles.promotionLink}>@tipsdeck</a> (Admin) on Farcaster.
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className={styles.container}>
             <button onClick={() => setPlatform(null)} className={styles.backButton}>
@@ -482,7 +472,6 @@ export default function NewCampaignPage() {
                     </div>
                 )}
 
-                {/* SUBMIT */}
                 {/* SUBMIT */}
                 <button
                     type="submit"
