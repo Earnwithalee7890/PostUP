@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { parseEther } from 'viem';
+import { DISTRIBUTOR_ADDRESS } from '@/lib/config';
+import { DISTRIBUTOR_ABI } from '@/lib/abi';
 import { SUPPORTED_TOKENS, TaskType, Platform, CampaignCategory } from '@/lib/types';
 import { UserPlus, Heart, Zap, Hash, Grid3x3, Smartphone, ArrowLeft, ChevronRight, Clock } from 'lucide-react';
 import styles from './new.module.css';
@@ -140,33 +144,41 @@ export default function NewCampaignPage() {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const { writeContract, data: hash, isPending: isConfirming } = useWriteContract();
+
+    const { isLoading: isConfirmed } = useWaitForTransactionReceipt({
+        hash,
+    });
+
+    // Effect to handle success after transaction confirmation
+    if (isConfirmed && hash) {
+        // Here we would normally call the backend APIs to persist the campaign
+        // For now, we simulate success
+        // createMutation.mutate(...)
+        alert(`Campaign created! Transaction Hash: ${hash}`);
+        router.push('/campaigns');
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!isBudgetValid || !platform) return;
 
-        const selectedCat = CATEGORIES.find(c => c.id === category);
-        const finalTasks = category === 'Multi' ? selectedMultiTasks : (selectedCat?.tasks || []);
+        // Ensure user is on Base Sepolia? (Wagmi handles chain switching request usually if configured, or fails)
 
-        createMutation.mutate({
-            platform,
-            category,
-            postUrl,
-            castUrl: castUrl || undefined,
-            tasks: finalTasks,
-            rewardToken: rewardToken as any,
-            rewardAmountPerTask: 0.5,
-            totalBudget: budget,
-            platformFee,
-            netBudget,
-            minFollowers: require200Followers ? 200 : 0,
-            requirePro,
-            creator: '0xMe'
-        }, {
-            onSuccess: () => {
-                alert(`Campaign created on ${platform}! You would now approve ${budget} ${rewardToken} for the contract.`);
-                router.push('/campaigns');
-            }
-        });
+        try {
+            writeContract({
+                address: DISTRIBUTOR_ADDRESS as `0x${string}`,
+                abi: DISTRIBUTOR_ABI,
+                functionName: 'createCampaign',
+                args: [
+                    '0x0000000000000000000000000000000000000000000000000000000000000000' // Initial empty root
+                ],
+                value: parseEther(totalBudget)
+            });
+        } catch (err) {
+            console.error(err);
+            alert('Failed to create campaign on-chain');
+        }
     };
 
     const visibleTokens = showAllTokens ? SUPPORTED_TOKENS : SUPPORTED_TOKENS.slice(0, 2);
@@ -445,9 +457,14 @@ export default function NewCampaignPage() {
                 <button
                     type="submit"
                     className={styles.submitBtn}
-                    disabled={createMutation.isPending || !isBudgetValid || !totalBudget}
+                    disabled={isConfirming || isConfirmed || !isBudgetValid || !totalBudget}
                 >
-                    {createMutation.isPending ? 'Approving...' : `Create Task (${budget.toFixed(4)} ${rewardToken})`}
+                    {isConfirming
+                        ? 'Confirming in Wallet...'
+                        : isConfirmed
+                            ? 'Transaction Pending...'
+                            : `Create Task (${budget.toFixed(4)} ${rewardToken})`
+                    }
                 </button>
 
                 {category === 'MiniApp' && (

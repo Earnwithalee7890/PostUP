@@ -7,3 +7,6 @@ export const config = getDefaultConfig({
   chains: [base, baseSepolia, optimism, arbitrum, mainnet],
   ssr: false, // If your dApp uses server side rendering (SSR)
 });
+
+export const DISTRIBUTOR_ADDRESS = '0xE7B16C2E34Fc3a347e3243FBEb3518830AfE647b';
+
