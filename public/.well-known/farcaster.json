@@ -1,0 +1,18 @@
+{
+    "accountAssociation": {
+        "header": "eyJmaWQiOjExMTExMSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIwe...",
+        "payload": "eyJkb21haW4iOiJwb3N0LXVwLXpldGEudmVyY2VsLmFwcCJ9",
+        "signature": "MHhl..."
+    },
+    "frame": {
+        "version": "1",
+        "name": "Post Up",
+        "iconUrl": "https://post-up-zeta.vercel.app/logos/farcaster.png",
+        "homeUrl": "https://post-up-zeta.vercel.app",
+        "imageUrl": "https://post-up-zeta.vercel.app/og-image.png",
+        "buttonTitle": "Launch Post Up",
+        "splashImageUrl": "https://post-up-zeta.vercel.app/logos/base.png",
+        "splashBackgroundColor": "#000000",
+        "webhookUrl": "https://post-up-zeta.vercel.app/api/webhook"
+    }
+}
