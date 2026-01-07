@@ -64,6 +64,15 @@ export const MockService = {
     },
 
     /**
+     * Complete a specific task for a campaign
+     */
+    completeTask: async (campaignId: string, taskType: any) => {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        // For now, just return success. In a real app, this would verify the specific task action.
+        return { success: true };
+    },
+
+    /**
      * End campaign and calculate all rewards via merkle tree
      */
     endCampaign: async (campaignId: string) => {
