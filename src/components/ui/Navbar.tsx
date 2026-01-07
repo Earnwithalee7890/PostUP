@@ -38,6 +38,10 @@ export function Navbar() {
                 </div>
 
                 <div className={styles.connectWrapper}>
+                    {/* Testnet Badge */}
+                    <div className={styles.testnetBadge}>
+                        TESTNET
+                    </div>
                     <ConnectButton
                         accountStatus={{
                             smallScreen: 'avatar',

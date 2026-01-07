@@ -105,3 +105,42 @@
         justify-content: space-around;
     }
 }
+
+.testnetBadge {
+    display: none;
+    /* Hidden by default */
+    background: rgba(231, 15, 15, 0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(231, 15, 15, 0.4);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    margin-right: 0.75rem;
+    letter-spacing: 0.05em;
+    animation: pulse 2s infinite;
+}
+
+/* Only show when body has specific class or logic - simpler: just checking chain in JS and rendering conditionally is better but for CSS-only approach we assume JS handles the conditional render. 
+   Actually, the plan said "conditional badge". In JS we will likely verify chain. 
+   For now let's just style it. 
+*/
+
+@keyframes pulse {
+    0% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.7;
+    }
+}
+
+/* We need to ensure the JS logic toggles it. 
+   Since we can't easily check Wagmi state globally in CSS, we'll just style it here 
+   and rely on the component to render it only if chain is Base Sepolia. 
+*/

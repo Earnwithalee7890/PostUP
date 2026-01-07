@@ -305,47 +305,61 @@
 .durationGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
 .durationBtn {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
     color: var(--muted-foreground);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
 }
 
 .durationBtn:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
 .durationActive {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, rgba(123, 63, 228, 0.2) 0%, rgba(123, 63, 228, 0.05) 100%);
+    border-color: var(--primary);
     color: white;
+    box-shadow: 0 4px 20px rgba(123, 63, 228, 0.15);
+}
+
+.durationActive .clock {
+    color: var(--primary-light);
+    transform: scale(1.1);
 }
 
 .clock {
-    font-size: 1rem;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    margin-bottom: 0.25rem;
 }
 
 /* FEE BREAKDOWN */
 .breakdown {
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 1rem;
+    border-radius: 16px;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    backdrop-filter: blur(10px);
 }
 
 .breakdownRow {
@@ -378,6 +392,7 @@
     color: #2ecc71;
     font-family: monospace;
     font-weight: 700;
+    text-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
 }
 
 .usdValue {
@@ -390,25 +405,68 @@
 .submitBtn {
     width: 100%;
     padding: 1.25rem;
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, #5b21b6 100%);
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 16px;
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 1rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-top: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.02em;
 }
 
 .submitBtn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(123, 63, 228, 0.3);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 15px 35px rgba(123, 63, 228, 0.4);
+}
+
+.submitBtn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(255, 255, 255, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.submitBtn:hover::after {
+    opacity: 1;
 }
 
 .submitBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    filter: grayscale(0.8);
+}
+
+/* PROMOTION CONTACT */
+.promotionContact {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+    line-height: 1.6;
+}
+
+.promotionLink {
+    color: var(--primary-light);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.promotionLink:hover {
+    color: white;
+    text-decoration: underline;
 }
 
 .approvalNote {

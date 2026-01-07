@@ -4,14 +4,22 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
 import { SUPPORTED_TOKENS, TaskType, Platform, CampaignCategory } from '@/lib/types';
-import { UserPlus, Heart, Zap, Hash, Grid3x3, Smartphone, ArrowLeft, ChevronRight } from 'lucide-react';
+import { UserPlus, Heart, Zap, Hash, Grid3x3, Smartphone, ArrowLeft, ChevronRight, Clock } from 'lucide-react';
 import styles from './new.module.css';
 
 // Platform Logos
+import Image from 'next/image';
+
+// Platform Logos
 const FarcasterLogo = () => (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M6.66663 26.6667V14.6667H10.6666V26.6667H16V18.6667H21.3333V26.6667H26.6666V5.33334H6.66663" stroke="currentColor" strokeWidth="2.5" />
-    </svg>
+    <div style={{ position: 'relative', width: 32, height: 32 }}>
+        <Image
+            src="/logos/farcaster.png"
+            alt="Farcaster"
+            fill
+            style={{ objectFit: 'contain' }}
+        />
+    </div>
 );
 
 const XLogo = () => (
@@ -21,10 +29,14 @@ const XLogo = () => (
 );
 
 const BaseLogo = () => (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="16" r="13" stroke="currentColor" strokeWidth="3" />
-        <path d="M12 16H20" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-    </svg>
+    <div style={{ position: 'relative', width: 32, height: 32 }}>
+        <Image
+            src="/logos/base.png"
+            alt="Base"
+            fill
+            style={{ objectFit: 'contain', borderRadius: '4px' }}
+        />
+    </div>
 );
 
 
@@ -202,6 +214,11 @@ export default function NewCampaignPage() {
                             <ChevronRight className={styles.arrowIcon} />
                         </div>
                     ))}
+                </div>
+
+                {/* PROMOTION CONTACT */}
+                <div className={styles.promotionContact}>
+                    Need help or promotion? Contact <a href="https://warpcast.com/aleekhoso" target="_blank" rel="noreferrer" className={styles.promotionLink}>@aleekhoso</a> (Dev) or <a href="https://warpcast.com/tipsdeck" target="_blank" rel="noreferrer" className={styles.promotionLink}>@tipsdeck</a> (Admin) on Farcaster.
                 </div>
             </div>
         );
@@ -389,14 +406,16 @@ export default function NewCampaignPage() {
                         onClick={() => setDuration(1)}
                         className={`${styles.durationBtn} ${duration === 1 ? styles.durationActive : ''}`}
                     >
-                        <span className={styles.clock}>○</span> 1 Day
+                        <Clock className={styles.clock} size={24} />
+                        <span>1 Day</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setDuration(3)}
                         className={`${styles.durationBtn} ${duration === 3 ? styles.durationActive : ''}`}
                     >
-                        <span className={styles.clock}>○</span> 3 Days
+                        <Clock className={styles.clock} size={24} />
+                        <span>3 Days</span>
                     </button>
                 </div>
 
@@ -422,6 +441,7 @@ export default function NewCampaignPage() {
                 )}
 
                 {/* SUBMIT */}
+                {/* SUBMIT */}
                 <button
                     type="submit"
                     className={styles.submitBtn}
@@ -435,6 +455,11 @@ export default function NewCampaignPage() {
                         Users will open your mini app and submit a screenshot as proof
                     </p>
                 )}
+
+                {/* PROMOTION CONTACT */}
+                <div className={styles.promotionContact}>
+                    Need help or promotion? Contact <a href="https://warpcast.com/aleekhoso" target="_blank" rel="noreferrer" className={styles.promotionLink}>@aleekhoso</a> (Dev) or <a href="https://warpcast.com/tipsdeck" target="_blank" rel="noreferrer" className={styles.promotionLink}>@tipsdeck</a> (Admin) on Farcaster.
+                </div>
             </form>
         </div>
     );
