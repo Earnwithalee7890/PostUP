@@ -188,6 +188,7 @@ export const MockService = {
             rank: 0,
             followers: 0,
             neynarScore: 0,
+            verifications: [],
             history: []
         };
     },
