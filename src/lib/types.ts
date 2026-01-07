@@ -54,3 +54,19 @@ export const SUPPORTED_TOKENS = [
     { symbol: 'OP', label: 'OP (Optimism)', chain: 'Optimism' },
     { symbol: 'OP_USDC', label: 'USDC (Optimism)', chain: 'Optimism' },
 ];
+
+export interface TaskHistoryItem {
+    task: string;
+    platform: string;
+    date: number;
+    reward: number;
+}
+
+export interface UserStats {
+    totalEarnedUSD: number;
+    totalTasks: number;
+    rank: number;
+    followers: number;
+    neynarScore: number;
+    history: TaskHistoryItem[];
+}
