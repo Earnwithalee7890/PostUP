@@ -83,27 +83,56 @@
     margin-left: 0.5rem;
 }
 
-@media (max-width: 640px) {
-    .navbarWrapper {
-        top: auto;
-        bottom: 1.5rem;
-    }
+.navbarWrapper {
+    top: auto;
+    bottom: 1rem;
+    padding: 0 1rem;
+}
 
-    .navbar {
-        width: calc(100% - 2rem);
-        justify-content: space-between;
-        padding: 0.75rem 1rem;
-    }
+.navbar {
+    width: 100%;
+    max-width: 400px;
+    /* Prevent it from being too wide on slightly larger screens */
+    justify-content: space-between;
+    padding: 0.5rem 0.5rem;
+    gap: 0;
+}
 
-    .logo {
-        display: none;
-    }
+.logo {
+    display: none;
+}
 
-    .navLinks {
-        display: flex;
-        width: 100%;
-        justify-content: space-around;
-    }
+.navLinks {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 0;
+}
+
+.navLink {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.2rem;
+    flex: 1;
+    font-size: 0.65rem;
+    border-radius: 12px;
+    gap: 4px;
+    /* Space between icon and text */
+}
+
+.navLink svg {
+    margin-right: 0 !important;
+    /* Override inline style */
+    width: 20px;
+    height: 20px;
+}
+
+.connectWrapper {
+    display: none;
+    /* Hide connect button on mobile navbar to save space, rely on Profile page */
+}
 }
 
 .testnetBadge {
