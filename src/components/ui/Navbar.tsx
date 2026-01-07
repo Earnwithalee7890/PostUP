@@ -15,6 +15,9 @@ export function Navbar() {
         <div className={styles.navbarWrapper}>
             <nav className={styles.navbar}>
                 <Link href="/" className={styles.logo}>
+                    <div style={{ position: 'relative', width: 28, height: 28, marginRight: 8 }}>
+                        <img src="/logos/logo-blue-arrow.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    </div>
                     <span>POST</span>
                     <span className={styles.logoHighlight}>UP</span>
                 </Link>

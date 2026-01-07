@@ -18,7 +18,7 @@ import Image from 'next/image';
 const FarcasterLogo = () => (
     <div style={{ position: 'relative', width: 32, height: 32 }}>
         <Image
-            src="/logos/farcaster.png"
+            src="/logos/logo-purple-frame.png"
             alt="Farcaster"
             fill
             style={{ objectFit: 'contain' }}

@@ -21,6 +21,9 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Post Up | Onchain Promotion Engine",
   description: "Task-based onchain growth engine for social posts.",
+  other: {
+    'base:app_id': '695ecd383ee38216e9af4b12',
+  },
 };
 
 export default function RootLayout({

@@ -4,23 +4,34 @@ import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useQuery } from '@tanstack/react-query';
 import { MockService } from '@/lib/mockService';
+import { NeynarService } from '@/lib/neynar';
+import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { User, CheckCircle, TrendingUp, History } from 'lucide-react';
 
 export default function ProfilePage() {
     const { address, isConnected } = useAccount();
+    const { context } = useFarcasterContext();
 
     const { data: stats } = useQuery({
-        queryKey: ['userStats', address],
-        queryFn: () => MockService.getUserStats(address || ''),
-        enabled: !!address
+        queryKey: ['userStats', address, context?.user?.fid],
+        queryFn: async () => {
+            if (context?.user?.fid) {
+                return NeynarService.getUserStats(context.user.fid);
+            }
+            if (address) {
+                return NeynarService.getUserStats(address);
+            }
+            return MockService.getUserStats('');
+        },
+        enabled: !!address || !!context?.user?.fid
     });
 
-    if (!isConnected) {
+    if (!isConnected && !context?.user) {
         return (
             <main className="container flex-center" style={{ minHeight: '80vh', flexDirection: 'column', gap: '2rem' }}>
                 <h1 className="gradient-text">Profile</h1>
                 <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center' }}>
-                    <p style={{ marginBottom: '1.5rem', color: 'var(--muted-foreground)' }}>Connect wallet to view your task history and earnings.</p>
+                    <p style={{ marginBottom: '1.5rem', color: 'var(--muted-foreground)' }}>Connect wallet or open in Farcaster to view your task history.</p>
                     <div className="flex-center">
                         <ConnectButton />
                     </div>
@@ -67,36 +78,42 @@ export default function ProfilePage() {
                 </h3>
 
                 <div className="glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
-                    {stats?.history.map((item, i) => (
-                        <div key={i} style={{
-                            padding: '1.25rem',
-                            borderBottom: '1px solid var(--border)',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{
-                                    width: '36px', height: '36px',
-                                    borderRadius: '8px',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                }}>
-                                    <CheckCircle size={18} color={i === 0 ? '#2ecc71' : 'var(--muted-foreground)'} />
-                                </div>
-                                <div>
-                                    <div style={{ fontWeight: 600 }}>{item.task} on {item.platform}</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
-                                        {new Date(item.date).toLocaleDateString()}
+                    {stats?.history && stats.history.length > 0 ? (
+                        stats.history.map((item, i) => (
+                            <div key={i} style={{
+                                padding: '1.25rem',
+                                borderBottom: '1px solid var(--border)',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{
+                                        width: '36px', height: '36px',
+                                        borderRadius: '8px',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        <CheckCircle size={18} color={i === 0 ? '#2ecc71' : 'var(--muted-foreground)'} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: 600 }}>{item.task} on {item.platform}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                                            {new Date(item.date).toLocaleDateString()}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div style={{ fontWeight: 700, color: 'var(--secondary)' }}>
-                                +{item.reward}
+                                <div style={{ fontWeight: 700, color: 'var(--secondary)' }}>
+                                    +{item.reward}
+                                </div>
                             </div>
+                        ))
+                    ) : (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+                            No history yet. Start a task!
                         </div>
-                    ))}
+                    )}
                 </div>
             </section>
         </main>
