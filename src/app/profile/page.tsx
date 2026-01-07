@@ -10,7 +10,7 @@ import { User, CheckCircle, TrendingUp, History, LogOut, Copy } from 'lucide-rea
 
 export default function ProfilePage() {
     const { address, isConnected } = useAccount();
-    const { context } = useFarcasterContext();
+    const { context, isLoadingContext } = useFarcasterContext();
 
     const { data: stats } = useQuery({
         queryKey: ['userStats', address, context?.user?.fid],
@@ -25,6 +25,14 @@ export default function ProfilePage() {
         },
         enabled: !!address || !!context?.user?.fid
     });
+
+    if (isLoadingContext) {
+        return (
+            <main className="container flex-center" style={{ minHeight: '80vh', flexDirection: 'column' }}>
+                <div style={{ color: 'var(--muted-foreground)' }}>Loading Farcaster Context...</div>
+            </main>
+        );
+    }
 
     if (!isConnected && !context?.user) {
         return (
