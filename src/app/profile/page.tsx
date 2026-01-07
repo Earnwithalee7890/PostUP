@@ -1,12 +1,12 @@
 'use client';
 
-import { useAccount } from 'wagmi';
+import { useAccount, useDisconnect } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useQuery } from '@tanstack/react-query';
 import { MockService } from '@/lib/mockService';
 import { NeynarService } from '@/lib/neynar';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { User, CheckCircle, TrendingUp, History } from 'lucide-react';
+import { User, CheckCircle, TrendingUp, History, LogOut, Copy } from 'lucide-react';
 
 export default function ProfilePage() {
     const { address, isConnected } = useAccount();
@@ -40,20 +40,97 @@ export default function ProfilePage() {
         );
     }
 
+    const { disconnect } = useDisconnect();
+
+    const copyAddress = () => {
+        if (address) {
+            navigator.clipboard.writeText(address);
+            alert('Address copied!');
+        }
+    };
+
     return (
         <main className="container" style={{ padding: '2rem 1rem' }}>
-            <header style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h1 className="gradient-text" style={{ fontSize: '2rem' }}>My Profile</h1>
-                <span style={{
-                    padding: '0.4rem 0.8rem',
-                    background: 'rgba(123, 63, 228, 0.2)',
-                    border: '1px solid var(--primary)',
-                    borderRadius: '99px',
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    color: 'var(--primary-light)'
-                }}>PRO USER</span>
-            </header>
+            {/* PROFILE HEADER CARD */}
+            <div className="glass-panel" style={{
+                marginBottom: '2rem',
+                padding: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '1rem'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    {/* AVATAR */}
+                    <div style={{
+                        width: '64px', height: '64px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        background: 'var(--primary)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        {context?.user?.pfpUrl ? (
+                            <img src={context.user.pfpUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                            <User size={32} color="#fff" />
+                        )}
+                    </div>
+
+                    {/* USER DETAILS */}
+                    <div>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0, lineHeight: 1.2 }}>
+                            {context?.user?.displayName || 'Unknown User'}
+                        </h2>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            @{context?.user?.username || 'user'}
+                            {address && (
+                                <span style={{
+                                    background: 'rgba(255,255,255,0.1)',
+                                    padding: '2px 6px',
+                                    borderRadius: '4px',
+                                    fontSize: '0.75rem',
+                                    display: 'flex', alignItems: 'center', gap: '4px',
+                                    cursor: 'pointer'
+                                }} onClick={copyAddress}>
+                                    {address.slice(0, 6)}...{address.slice(-4)}
+                                    <Copy size={10} />
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* ACTIONS */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{
+                        padding: '0.4rem 0.8rem',
+                        background: 'rgba(123, 63, 228, 0.2)',
+                        border: '1px solid var(--primary)',
+                        borderRadius: '99px',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        color: 'var(--primary-light)',
+                        height: 'fit-content'
+                    }}>PRO</div>
+
+                    <button
+                        onClick={() => disconnect()}
+                        style={{
+                            padding: '0.6rem',
+                            borderRadius: '50%',
+                            background: 'rgba(255, 73, 74, 0.1)',
+                            border: '1px solid rgba(255, 73, 74, 0.2)',
+                            color: '#FF494A',
+                            cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}
+                        title="Logout"
+                    >
+                        <LogOut size={18} />
+                    </button>
+                </div>
+            </div>
 
             {/* STATS GRID */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '3rem' }}>
