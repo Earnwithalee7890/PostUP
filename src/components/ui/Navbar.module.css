@@ -1,0 +1,107 @@
+.navbarWrapper {
+    position: fixed;
+    top: 1.5rem;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.navbar {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(10, 10, 15, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.logo {
+    font-family: var(--font-space);
+    font-weight: 800;
+    line-height: 0.8;
+    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    text-decoration: none;
+    margin-right: 1.5rem;
+
+    /* Text Design */
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+}
+
+.logo span {
+    color: white;
+}
+
+.logoHighlight {
+    color: #a5a6f6 !important;
+    background: linear-gradient(90deg, #fff 0%, #a5a6f6 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.navLinks {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ... existing nav link styles ... */
+.navLink {
+    padding: 0.5rem 1rem;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    transition: all 0.2s ease;
+}
+
+.navLink:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.connectWrapper {
+    margin-left: 0.5rem;
+}
+
+@media (max-width: 640px) {
+    .navbarWrapper {
+        top: auto;
+        bottom: 1.5rem;
+    }
+
+    .navbar {
+        width: calc(100% - 2rem);
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .navLinks {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+    }
+}
