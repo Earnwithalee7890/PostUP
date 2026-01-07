@@ -21,12 +21,21 @@ export const NeynarService = {
 
             if (!user) throw new Error('User not found');
 
+            // Improved score logic: specific Score > Active Status > Default
+            let calculatedScore = 50;
+            if (user.experimental?.neynar_user_score) {
+                calculatedScore = Math.round(user.experimental.neynar_user_score * 100);
+            } else if (user.active_status === 'active') {
+                calculatedScore = 85;
+            }
+
             return {
                 totalEarnedUSD: 0,
                 totalTasks: 0,
                 rank: 0,
+                isPro: user.power_badge || false, // Check for Power Badge (Farcaster Pro/Active)
                 followers: user.follower_count || 0,
-                neynarScore: Math.round((user.active_status === 'active' ? 100 : 50)),
+                neynarScore: calculatedScore,
                 verifications: user.verifications || [],
                 history: []
             };
@@ -37,6 +46,7 @@ export const NeynarService = {
                 totalEarnedUSD: 0,
                 totalTasks: 0,
                 rank: 0,
+                isPro: false,
                 followers: 0,
                 neynarScore: 0,
                 verifications: [],

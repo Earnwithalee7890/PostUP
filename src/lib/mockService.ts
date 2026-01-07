@@ -186,6 +186,7 @@ export const MockService = {
             totalEarnedUSD: totalEarned,
             totalTasks: completedTasks,
             rank: 0,
+            isPro: false,
             followers: 0,
             neynarScore: 0,
             verifications: [],

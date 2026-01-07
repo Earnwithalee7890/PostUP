@@ -116,16 +116,18 @@ export default function ProfilePage() {
 
                 {/* ACTIONS */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{
-                        padding: '0.4rem 0.8rem',
-                        background: 'rgba(123, 63, 228, 0.2)',
-                        border: '1px solid var(--primary)',
-                        borderRadius: '99px',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        color: 'var(--primary-light)',
-                        height: 'fit-content'
-                    }}>PRO</div>
+                    {stats?.isPro && (
+                        <div style={{
+                            padding: '0.4rem 0.8rem',
+                            background: 'rgba(123, 63, 228, 0.2)',
+                            border: '1px solid var(--primary)',
+                            borderRadius: '99px',
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            color: 'var(--primary-light)',
+                            height: 'fit-content'
+                        }}>PRO</div>
+                    )}
 
                     <button
                         onClick={() => disconnect()}
