@@ -3,6 +3,7 @@ import { Outfit, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import '@rainbow-me/rainbowkit/styles.css';
 import { Providers } from "@/lib/providers";
+import FarcasterProvider from "@/providers/FarcasterProvider";
 import { Navbar } from "@/components/ui/Navbar";
 
 const outfit = Outfit({
@@ -31,10 +32,12 @@ export default function RootLayout({
     <html lang="en" className={`${outfit.variable} ${spaceGrotesk.variable}`}>
       <body>
         <Providers>
-          <Navbar />
-          <div className="full-screen">
-            {children}
-          </div>
+          <FarcasterProvider>
+            <Navbar />
+            <div className="full-screen">
+              {children}
+            </div>
+          </FarcasterProvider>
         </Providers>
       </body>
     </html>
