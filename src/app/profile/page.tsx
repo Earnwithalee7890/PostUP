@@ -129,21 +129,23 @@ export default function ProfilePage() {
                         }}>PRO</div>
                     )}
 
-                    <button
-                        onClick={() => disconnect()}
-                        style={{
-                            padding: '0.6rem',
-                            borderRadius: '50%',
-                            background: 'rgba(255, 73, 74, 0.1)',
-                            border: '1px solid rgba(255, 73, 74, 0.2)',
-                            color: '#FF494A',
-                            cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}
-                        title="Logout"
-                    >
-                        <LogOut size={18} />
-                    </button>
+                    {isConnected && (
+                        <button
+                            onClick={() => disconnect()}
+                            style={{
+                                padding: '0.6rem',
+                                borderRadius: '50%',
+                                background: 'rgba(255, 73, 74, 0.1)',
+                                border: '1px solid rgba(255, 73, 74, 0.2)',
+                                color: '#FF494A',
+                                cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}
+                            title="Disconnect Wallet"
+                        >
+                            <LogOut size={18} />
+                        </button>
+                    )}
                 </div>
             </div>
 

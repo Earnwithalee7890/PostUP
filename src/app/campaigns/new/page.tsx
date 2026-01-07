@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { parseEther } from 'viem';
 import { DISTRIBUTOR_ADDRESS } from '@/lib/config';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
@@ -144,63 +145,31 @@ export default function NewCampaignPage() {
         }
     };
 
+    const { isConnected } = useAccount();
+
     const { writeContract, data: hash, isPending: isConfirming } = useWriteContract();
 
-    const { isLoading: isConfirmed } = useWaitForTransactionReceipt({
-        hash,
-    });
+    // ... (keep existing verify logic)
 
-    // Effect to handle success after transaction confirmation
-    if (isConfirmed && hash) {
-        // Here we would normally call the backend APIs to persist the campaign
-        // For now, we simulate success
-        // createMutation.mutate(...)
-        alert(`Campaign created! Transaction Hash: ${hash}`);
-        router.push('/campaigns');
+    // Check for wallet connection BEFORE showing form
+    if (!isConnected) {
+        return (
+            <div className={styles.container}>
+                <button onClick={() => router.push('/')} className={styles.backButton}>
+                    <ArrowLeft size={16} /> Back
+                </button>
+                <header className={styles.header} style={{ marginTop: '2rem' }}>
+                    <h1>Connect Wallet</h1>
+                    <p style={{ color: 'var(--muted-foreground)' }}>You need to connect a wallet to fund and create a campaign.</p>
+                </header>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', background: 'rgba(255,255,255,0.03)', borderRadius: '1rem' }}>
+                    <ConnectButton />
+                </div>
+            </div>
+        );
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!isBudgetValid || !platform) return;
-
-        // Ensure user is on Base Sepolia? (Wagmi handles chain switching request usually if configured, or fails)
-
-        try {
-            writeContract({
-                address: DISTRIBUTOR_ADDRESS as `0x${string}`,
-                abi: DISTRIBUTOR_ABI,
-                functionName: 'createCampaign',
-                args: [
-                    '0x0000000000000000000000000000000000000000000000000000000000000000' // Initial empty root
-                ],
-                value: parseEther(totalBudget)
-            });
-        } catch (err) {
-            console.error(err);
-            alert('Failed to create campaign on-chain');
-        }
-    };
-
-    const visibleTokens = showAllTokens ? SUPPORTED_TOKENS : SUPPORTED_TOKENS.slice(0, 2);
-
-    // Compute which URLs are needed
-    const needsProfileUrl = category === 'Follow' || category === 'MiniApp' || (category === 'Multi' && selectedMultiTasks.includes('Follow'));
-    const needsCastUrl = category === 'Boost' || (category === 'Multi' && (selectedMultiTasks.includes('Like') || selectedMultiTasks.includes('Repost') || selectedMultiTasks.includes('Comment')));
-
-    // Get input labels based on platform
-    const getProfileLabel = () => {
-        if (category === 'MiniApp') return 'Mini App URL';
-        if (platform === 'X') return 'X Username / Profile Link';
-        if (platform === 'Base') return 'Base Wallet / Profile';
-        return 'Farcaster Profile URL';
-    };
-
-    const getCastLabel = () => {
-        if (platform === 'X') return 'X Post Link';
-        return 'Cast URL';
-    };
-
-    // RENDER: Platform Selection
+    // RENDER: Platform Selection (Only if connected)
     if (!platform) {
         return (
             <div className={styles.container}>
@@ -236,9 +205,34 @@ export default function NewCampaignPage() {
         );
     }
 
+    const { isConnected } = useAccount();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        // ... (existing submit logic)
+    };
+
+    // ... (rest of the code)
+
     // RENDER: Campaign Details Form
+    if (!isConnected) {
+        return (
+            <div className={styles.container}>
+                <header className={styles.header}>
+                    <h1>Connect Wallet</h1>
+                    <p style={{ color: 'var(--muted-foreground)' }}>You need to connect a wallet to fund and create a campaign.</p>
+                </header>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+                    <ConnectButton />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.container}>
+            {/* ... Existing JSX ... */}
+            );
+}
             <button onClick={() => setPlatform(null)} className={styles.backButton}>
                 <ArrowLeft size={16} /> Back to Platforms
             </button>
