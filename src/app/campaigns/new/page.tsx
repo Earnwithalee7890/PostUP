@@ -482,9 +482,9 @@ export default function NewCampaignPage() {
                             type="number"
                             value={totalBudget}
                             onChange={(e) => setTotalBudget(e.target.value)}
-                            placeholder="14"
+                            placeholder="20"
                             required
-                            min="10"
+                            min="0.01"
                             className={styles.budgetField}
                         />
                     </div>
