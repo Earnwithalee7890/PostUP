@@ -7,11 +7,11 @@
     "frame": {
         "version": "1",
         "name": "Post Up",
-        "iconUrl": "https://post-up-zeta.vercel.app/logos/farcaster.png",
+        "iconUrl": "https://post-up-zeta.vercel.app/logos/postup_p.png",
         "homeUrl": "https://post-up-zeta.vercel.app",
         "imageUrl": "https://post-up-zeta.vercel.app/og-image.png",
         "buttonTitle": "Launch Post Up",
-        "splashImageUrl": "https://post-up-zeta.vercel.app/logos/base.png",
+        "splashImageUrl": "https://post-up-zeta.vercel.app/logos/postup_p.png",
         "splashBackgroundColor": "#000000",
         "webhookUrl": "https://post-up-zeta.vercel.app/api/webhook"
     }

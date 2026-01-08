@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
@@ -210,7 +210,20 @@ export default function NewCampaignPage() {
 
     // RENDER: Check for wallet connection
     const { context } = useFarcasterContext();
-    const isAutoConnecting = context?.user && !isConnected;
+    const [autoConnectTimedOut, setAutoConnectTimedOut] = useState(false);
+
+    // Only auto-connect if we haven't timed out
+    const isAutoConnecting = context?.user && !isConnected && !autoConnectTimedOut;
+
+    // Timeout effect
+    useEffect(() => {
+        if (context?.user && !isConnected) {
+            const timer = setTimeout(() => {
+                setAutoConnectTimedOut(true);
+            }, 6000); // 6 seconds timeout
+            return () => clearTimeout(timer);
+        }
+    }, [context?.user, isConnected]);
 
     if (!isConnected) {
         return (
@@ -232,7 +245,15 @@ export default function NewCampaignPage() {
                             <Clock className="spin" size={32} style={{ opacity: 0.5 }} />
                         </div>
                     ) : (
-                        <ConnectButton />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                            <ConnectButton />
+                            {autoConnectTimedOut && (
+                                <p style={{ fontSize: '0.8rem', color: '#ff4444', opacity: 0.8 }}>
+                                    Could not auto-connect. Please connect manually.
+                                </p>
+                            )}
+                        </div>
+
                     )}
                 </div>
             </div>
