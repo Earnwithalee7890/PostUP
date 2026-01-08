@@ -55,19 +55,16 @@ export const metadata: Metadata = {
   },
   other: {
     'base:app_id': '695ecd383ee38216e9af4b12',
-    // Farcaster Mini App tags
-    'of:version': 'vNext',
-    'of:accepts:farcaster': 'vNext',
-    'of:image': 'https://post-up-zeta.vercel.app/og-image.png',
-    'of:button:1': 'Launch Post Up',
-    'of:button:1:action': 'link',
-    'of:button:1:target': 'https://post-up-zeta.vercel.app',
-    // Legacy Frame tags for compatibility
-    'fc:frame': 'vNext',
-    'fc:frame:image': 'https://post-up-zeta.vercel.app/og-image.png',
-    'fc:frame:button:1': 'Launch Post Up',
-    'fc:frame:button:1:action': 'link',
-    'fc:frame:button:1:target': 'https://post-up-zeta.vercel.app',
+    'fc:miniapp': JSON.stringify({
+      version: "1",
+      name: "Post Up",
+      iconUrl: "https://post-up-zeta.vercel.app/logos/postup_p.png",
+      homeUrl: "https://post-up-zeta.vercel.app",
+      imageUrl: "https://post-up-zeta.vercel.app/og-image.png",
+      buttonTitle: "Launch Post Up",
+      splashImageUrl: "https://post-up-zeta.vercel.app/logos/postup_p.png",
+      splashBackgroundColor: "#000000",
+    }),
   },
 };
 
