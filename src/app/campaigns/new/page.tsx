@@ -210,20 +210,7 @@ export default function NewCampaignPage() {
 
     // RENDER: Check for wallet connection
     const { context } = useFarcasterContext();
-    const [autoConnectTimedOut, setAutoConnectTimedOut] = useState(false);
-
-    // Only auto-connect if we haven't timed out
-    const isAutoConnecting = context?.user && !isConnected && !autoConnectTimedOut;
-
-    // Timeout effect
-    useEffect(() => {
-        if (context?.user && !isConnected) {
-            const timer = setTimeout(() => {
-                setAutoConnectTimedOut(true);
-            }, 6000); // 6 seconds timeout
-            return () => clearTimeout(timer);
-        }
-    }, [context?.user, isConnected]);
+    const isFarcasterUser = !!context?.user;
 
     if (!isConnected) {
         return (
@@ -232,28 +219,21 @@ export default function NewCampaignPage() {
                     <ArrowLeft size={16} /> Back
                 </button>
                 <header className={styles.header} style={{ marginTop: '2rem' }}>
-                    <h1>{isAutoConnecting ? 'Connecting...' : 'Connect Wallet'}</h1>
+                    <h1>{isFarcasterUser ? 'Verifying Identity...' : 'Connect Wallet'}</h1>
                     <p style={{ color: 'var(--muted-foreground)' }}>
-                        {isAutoConnecting
-                            ? 'Detecting your Farcaster wallet...'
+                        {isFarcasterUser
+                            ? 'Syncing with your Farcaster client...'
                             : 'You need to connect a wallet to fund and create a campaign.'}
                     </p>
                 </header>
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', background: 'rgba(255,255,255,0.03)', borderRadius: '1rem' }}>
-                    {isAutoConnecting ? (
-                        <div className="flex-center">
+                    {isFarcasterUser ? (
+                        <div className="flex-center" style={{ flexDirection: 'column', gap: '1rem' }}>
                             <Clock className="spin" size={32} style={{ opacity: 0.5 }} />
+                            <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Please approve the connection in your wallet if prompted.</span>
                         </div>
                     ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                            <ConnectButton />
-                            {autoConnectTimedOut && (
-                                <p style={{ fontSize: '0.8rem', color: '#ff4444', opacity: 0.8 }}>
-                                    Could not auto-connect. Please connect manually.
-                                </p>
-                            )}
-                        </div>
-
+                        <ConnectButton />
                     )}
                 </div>
             </div>
