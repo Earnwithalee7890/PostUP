@@ -62,6 +62,13 @@ export const metadata: Metadata = {
       homeUrl: "https://post-up-zeta.vercel.app",
       imageUrl: "https://post-up-zeta.vercel.app/og-image.png",
       buttonTitle: "Launch Post Up",
+      button: {
+        title: "Launch Post Up",
+        action: {
+          type: "link",
+          target: "https://post-up-zeta.vercel.app"
+        }
+      },
       splashImageUrl: "https://post-up-zeta.vercel.app/logos/postup_p.png",
       splashBackgroundColor: "#000000",
     }),
