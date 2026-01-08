@@ -1,18 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MockService } from '@/lib/mockService';
+import { SupabaseService } from '@/lib/supabaseService';
 import { Campaign } from '@/lib/types';
 
 export function useCampaigns() {
     return useQuery({
         queryKey: ['campaigns'],
-        queryFn: MockService.getCampaigns,
+        queryFn: SupabaseService.getCampaigns,
     });
 }
 
 export function useCampaign(id: string) {
     return useQuery({
         queryKey: ['campaign', id],
-        queryFn: () => MockService.getCampaign(id),
+        queryFn: () => SupabaseService.getCampaign(id),
         enabled: !!id,
     });
 }
@@ -21,7 +21,7 @@ export function useCreateCampaign() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: MockService.createCampaign,
+        mutationFn: SupabaseService.createCampaign,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['campaigns'] });
         },
@@ -31,6 +31,6 @@ export function useCreateCampaign() {
 export function useCompleteTask() {
     return useMutation({
         mutationFn: ({ campaignId, taskType }: { campaignId: string, taskType: any }) =>
-            MockService.completeTask(campaignId, taskType),
+            SupabaseService.completeTask(campaignId, taskType),
     });
 }
