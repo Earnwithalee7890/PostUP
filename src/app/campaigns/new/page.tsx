@@ -171,8 +171,9 @@ export default function NewCampaignPage() {
         }
     });
 
-    const currentAllowance = allowanceData ? Number(allowanceData) / 1e6 : 0; // USDC/USDT both use 6 decimals
-    const needsApproval = (rewardToken === 'USDC' || rewardToken === 'USDT') && currentAllowance < budget;
+    const currentAllowance = allowanceData ? BigInt(allowanceData.toString()) : BigInt(0);
+    const requiredAmount = parseUnits(totalBudget, 6);
+    const needsApproval = (rewardToken === 'USDC' || rewardToken === 'USDT') && currentAllowance < requiredAmount;
 
     const { isLoading: isConfirmed } = useWaitForTransactionReceipt({
         hash,

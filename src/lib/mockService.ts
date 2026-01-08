@@ -4,33 +4,14 @@ import { calculateQualityScore } from './qualityScore';
 import { calculateWeightedDistribution } from './distribution';
 import { generateMerkleDistribution } from './merkle';
 
-// Use localStorage for persistence across sessions
-const CAMPAIGNS_KEY = 'post_up_campaigns';
-const CLAIMS_KEY = 'post_up_claims';
-
-const loadCampaigns = (): Campaign[] => {
-    if (typeof window === 'undefined') return [];
-    try {
-        const stored = localStorage.getItem(CAMPAIGNS_KEY);
-        return stored ? JSON.parse(stored) : [];
-    } catch {
-        return [];
-    }
-};
-
-const saveCampaigns = (campaigns: Campaign[]) => {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem(CAMPAIGNS_KEY, JSON.stringify(campaigns));
-    }
-};
-
-let campaigns: Campaign[] = loadCampaigns();
-let claimedRewards = new Map<string, Set<string>>(); // campaignId -> Set of addresses
+// MockService is deprecated - using SupabaseService now
+// Keeping minimal version to avoid breaking imports
+let campaigns: Campaign[] = [];
+let claimedRewards = new Map<string, Set<string>>();
 
 export const MockService = {
     getCampaigns: async (): Promise<Campaign[]> => {
         await new Promise(resolve => setTimeout(resolve, 500));
-        campaigns = loadCampaigns(); // Always load fresh from localStorage
         return [...campaigns];
     },
     getCampaign: async (id: string): Promise<Campaign | undefined> => {
@@ -40,7 +21,6 @@ export const MockService = {
 
     createCampaign: async (campaignData: Omit<Campaign, 'id' | 'createdAt' | 'remainingBudget' | 'status' | 'participants'>) => {
         await new Promise(resolve => setTimeout(resolve, 800));
-        campaigns = loadCampaigns(); // Load latest
         const newCampaign: Campaign = {
             ...campaignData,
             id: Math.random().toString(36).substr(2, 9),
@@ -50,7 +30,6 @@ export const MockService = {
             participants: [],
         };
         campaigns.unshift(newCampaign);
-        saveCampaigns(campaigns); // Persist to localStorage
         return newCampaign;
     },
 
