@@ -153,7 +153,8 @@ export default function NewCampaignPage() {
     };
 
     const { isConnected, address } = useAccount();
-    const { writeContract, data: hash, isPending: isConfirming } = useWriteContract();
+    const { writeContract, data: hash, isPending: isConfirming, reset } = useWriteContract();
+    const [lastAction, setLastAction] = useState<'approve' | 'create' | null>(null);
 
     // Check USDC Allowance
     const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
@@ -174,25 +175,18 @@ export default function NewCampaignPage() {
     });
 
     // Effect to handle success after transaction confirmation
-    if (isConfirmed && hash) {
-        if (!needsApproval) {
-            // Only redirect if we finished the creation (not just approval)
-            // But wait, if we just finished approval, we need to refetch allowance!
-            refetchAllowance();
-            // We can't distinguish easily without local state, so we'll check logic below or just alert
-        } else {
-            // If we just approved, we refetch to update UI
-            refetchAllowance();
-        }
-    }
-
-    // Secondary effect to route after creation (approximate check)
     useEffect(() => {
-        if (isConfirmed && !needsApproval && hash) {
-            alert(`Campaign created! Transaction Hash: ${hash}`);
-            router.push('/campaigns');
+        if (isConfirmed && hash) {
+            if (lastAction === 'approve') {
+                refetchAllowance();
+                reset(); // Clear hash so we don't trigger again
+                setLastAction(null);
+            } else if (lastAction === 'create') {
+                alert(`Campaign created! Transaction Hash: ${hash}`);
+                router.push('/campaigns');
+            }
         }
-    }, [isConfirmed, needsApproval, hash, router]);
+    }, [isConfirmed, hash, lastAction, refetchAllowance, reset, router]);
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -202,6 +196,7 @@ export default function NewCampaignPage() {
         try {
             if (needsApproval) {
                 // APPROVE FLOW
+                setLastAction('approve');
                 writeContract({
                     address: USDC_ADDRESS as `0x${string}`,
                     abi: ERC20_ABI,
@@ -210,6 +205,7 @@ export default function NewCampaignPage() {
                 });
             } else {
                 // CREATE FLOW
+                setLastAction('create');
                 // Determine value logic: If USDC, value is 0. If ETH, value is budget (18 dec)
                 const isUSDC = rewardToken === 'USDC';
                 const msgValue = isUSDC ? BigInt(0) : parseEther(totalBudget);
@@ -227,6 +223,7 @@ export default function NewCampaignPage() {
         } catch (err) {
             console.error(err);
             alert('Failed to execute transaction');
+            setLastAction(null);
         }
     };
 
