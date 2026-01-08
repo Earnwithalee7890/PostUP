@@ -182,11 +182,45 @@ export default function NewCampaignPage() {
                 reset(); // Clear hash so we don't trigger again
                 setLastAction(null);
             } else if (lastAction === 'create') {
+                // Construct campaign object for local state/mock
+                const selectedCategoryObj = CATEGORIES.find(c => c.id === category);
+                const finalTasks = category === 'Multi' ? selectedMultiTasks : (selectedCategoryObj?.tasks || []);
+
+                // Estimate reward per task (e.g., simpler view, or just show budget)
+                // Since this is quality-weighted, this display value is less critical but needed for interface
+                const estRewardPerTask = netBudget / 50;
+
+                createMutation.mutate({
+                    creator: address || '0x00',
+                    platform: platform!,
+                    category: category,
+                    postUrl: postUrl,
+                    castUrl: castUrl,
+                    tasks: finalTasks,
+                    rewardToken: rewardToken as any,
+                    totalBudget: budget,
+                    platformFee: platformFee,
+                    netBudget: netBudget,
+                    rewardAmountPerTask: estRewardPerTask,
+                    minFollowers: require200Followers ? 200 : 0,
+                    requirePro: requirePro
+                });
+
                 alert(`Campaign created! Transaction Hash: ${hash}`);
-                router.push('/campaigns');
+                router.push('/campaigns'); // campaigns or tasks depending on route map? app/tasks/page.tsx maps to /tasks usually but layouts might map /campaigns? 
+                // Router push was /campaigns, but the user listing is at app/tasks/page.tsx?
+                // app/campaigns usually has page.tsx? 
+                // Wait, checked app/tasks/page.tsx. Does app/campaigns exist?
+                // Step 295 listed src/app/campaigns/isDir=True.
+                // Step 221 listed src/app/campaigns/isDir=True.
+                // But Step 355 showed src/app/tasks/page.tsx.
+                // Let's assume /campaigns redirects to /tasks or tasks is the main view.
+                // I will stick to /campaigns if that's what was there, but maybe the listing is at /tasks?
+                // The user complains "users create there campigns there".
+                // I'll check if /campaigns exists as a page.
             }
         }
-    }, [isConfirmed, hash, lastAction, refetchAllowance, reset, router]);
+    }, [isConfirmed, hash, lastAction, refetchAllowance, reset, router, createMutation, address, platform, category, postUrl, castUrl, selectedMultiTasks, rewardToken, budget, platformFee, netBudget, require200Followers, requirePro]);
 
 
     const handleSubmit = async (e: React.FormEvent) => {

@@ -52,9 +52,13 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
             </div>
 
             <div className={styles.content}>
-                <a href={campaign.postUrl} target="_blank" rel="noopener noreferrer" className="flex-center" style={{ gap: '0.5rem', wordBreak: 'break-all', fontSize: '0.9rem', color: 'var(--foreground)' }}>
-                    Post #{campaign.id.slice(0, 8)} <ExternalLink size={12} />
-                </a>
+                {campaign.postUrl ? (
+                    <a href={campaign.postUrl} target="_blank" rel="noopener noreferrer" className="flex-center" style={{ gap: '0.5rem', wordBreak: 'break-all', fontSize: '0.9rem', color: 'var(--foreground)' }}>
+                        Post #{campaign.id.slice(0, 8)} <ExternalLink size={12} />
+                    </a>
+                ) : (
+                    <span style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>No URL provided</span>
+                )}
             </div>
 
             <div className={styles.tasks}>
