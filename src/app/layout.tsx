@@ -55,6 +55,14 @@ export const metadata: Metadata = {
   },
   other: {
     'base:app_id': '695ecd383ee38216e9af4b12',
+    // Farcaster Mini App tags
+    'of:version': 'vNext',
+    'of:accepts:farcaster': 'vNext',
+    'of:image': 'https://post-up-zeta.vercel.app/og-image.png',
+    'of:button:1': 'Launch Post Up',
+    'of:button:1:action': 'link',
+    'of:button:1:target': 'https://post-up-zeta.vercel.app',
+    // Legacy Frame tags for compatibility
     'fc:frame': 'vNext',
     'fc:frame:image': 'https://post-up-zeta.vercel.app/og-image.png',
     'fc:frame:button:1': 'Launch Post Up',
