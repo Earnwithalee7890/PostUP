@@ -156,19 +156,23 @@ export default function NewCampaignPage() {
     const { writeContract, data: hash, isPending: isConfirming, reset } = useWriteContract();
     const [lastAction, setLastAction] = useState<'approve' | 'create' | null>(null);
 
-    // Check USDC Allowance
+    // Check USDC/USDT Allowance
+    const tokenAddress = rewardToken === 'USDC'
+        ? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'  // Base USDC
+        : '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2'; // Base USDT
+
     const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
-        address: USDC_ADDRESS as `0x${string}`,
+        address: tokenAddress as `0x${string}`,
         abi: ERC20_ABI,
         functionName: 'allowance',
         args: [address as `0x${string}`, DISTRIBUTOR_ADDRESS as `0x${string}`],
         query: {
-            enabled: !!address && rewardToken === 'USDC',
+            enabled: !!address && (rewardToken === 'USDC' || rewardToken === 'USDT'),
         }
     });
 
-    const currentAllowance = allowanceData ? Number(allowanceData) / 1e6 : 0; // USDC has 6 decimals
-    const needsApproval = rewardToken === 'USDC' && currentAllowance < budget;
+    const currentAllowance = allowanceData ? Number(allowanceData) / 1e6 : 0; // USDC/USDT both use 6 decimals
+    const needsApproval = (rewardToken === 'USDC' || rewardToken === 'USDT') && currentAllowance < budget;
 
     const { isLoading: isConfirmed } = useWaitForTransactionReceipt({
         hash,
@@ -236,8 +240,13 @@ export default function NewCampaignPage() {
             if (needsApproval) {
                 // APPROVE FLOW
                 setLastAction('approve');
+
+                const tokenAddress = rewardToken === 'USDC'
+                    ? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'  // Base USDC
+                    : '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2'; // Base USDT
+
                 writeContract({
-                    address: USDC_ADDRESS as `0x${string}`,
+                    address: tokenAddress as `0x${string}`,
                     abi: ERC20_ABI,
                     functionName: 'approve',
                     args: [DISTRIBUTOR_ADDRESS as `0x${string}`, parseUnits(totalBudget, 6)]
@@ -245,18 +254,23 @@ export default function NewCampaignPage() {
             } else {
                 // CREATE FLOW
                 setLastAction('create');
-                // Determine value logic: If USDC, value is 0. If ETH, value is budget (18 dec)
-                const isUSDC = rewardToken === 'USDC';
-                const msgValue = isUSDC ? BigInt(0) : parseEther(totalBudget);
+
+                // Get token address based on selection
+                const tokenAddress = rewardToken === 'USDC'
+                    ? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'  // Base USDC
+                    : '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2'; // Base USDT
+
+                const amountInDecimals = parseUnits(totalBudget, 6); // USDC/USDT both use 6 decimals
 
                 writeContract({
                     address: DISTRIBUTOR_ADDRESS as `0x${string}`,
                     abi: DISTRIBUTOR_ABI,
                     functionName: 'createCampaign',
                     args: [
-                        '0x0000000000000000000000000000000000000000000000000000000000000000' // Initial empty root
+                        '0x0000000000000000000000000000000000000000000000000000000000000000', // Initial empty root
+                        tokenAddress as `0x${string}`, // Token address
+                        amountInDecimals // Amount in token decimals
                     ],
-                    value: msgValue
                 });
             }
         } catch (err) {
