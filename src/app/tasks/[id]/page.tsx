@@ -91,7 +91,7 @@ export default function TaskExecutionPage() {
                     // Determine the link URL based on task type
                     const getTaskUrl = () => {
                         if (task === 'Follow') return campaign.postUrl; // Profile URL
-                        if (task === 'Like' || task === 'Recast' || task === 'Comment') return campaign.castUrl || campaign.postUrl;
+                        if (task === 'Like' || task === 'Repost' || task === 'Comment') return campaign.castUrl || campaign.postUrl;
                         return null;
                     };
 
