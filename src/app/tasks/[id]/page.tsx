@@ -46,6 +46,32 @@ export default function TaskExecutionPage() {
                 </div>
             </div>
 
+            <div className={`glass-panel`} style={{ marginBottom: '1rem', padding: '1rem' }}>
+                <h4 style={{ margin: '0 0 0.5rem 0' }}>Campaign Info</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: 'var(--muted-foreground)' }}>Category</span>
+                        <span>{campaign.category}</span>
+                    </div>
+                    {campaign.minFollowers > 0 && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: 'var(--muted-foreground)' }}>Min Followers</span>
+                            <span>{campaign.minFollowers}</span>
+                        </div>
+                    )}
+                    {campaign.requirePro && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: 'var(--muted-foreground)' }}>Requirement</span>
+                            <span>Farcaster Pro Only</span>
+                        </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: 'var(--muted-foreground)' }}>Remaining Budget</span>
+                        <span>{campaign.remainingBudget.toFixed(2)} {campaign.rewardToken}</span>
+                    </div>
+                </div>
+            </div>
+
             <div className={styles.postPreview}>
                 <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem' }}>TARGET POST</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

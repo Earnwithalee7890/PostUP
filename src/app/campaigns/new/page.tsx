@@ -19,7 +19,7 @@ import Image from 'next/image';
 const FarcasterLogo = () => (
     <div style={{ position: 'relative', width: 32, height: 32 }}>
         <Image
-            src="/logos/logo-purple-frame.png"
+            src="/logos/farcaster_v2.png"
             alt="Farcaster"
             fill
             style={{ objectFit: 'contain' }}
@@ -28,15 +28,20 @@ const FarcasterLogo = () => (
 );
 
 const XLogo = () => (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
+    <div style={{ position: 'relative', width: 32, height: 32 }}>
+        <Image
+            src="/logos/logo_1.png"
+            alt="X"
+            fill
+            style={{ objectFit: 'contain' }}
+        />
+    </div>
 );
 
 const BaseLogo = () => (
     <div style={{ position: 'relative', width: 32, height: 32 }}>
         <Image
-            src="/logos/base.png"
+            src="/logos/base_v2.png"
             alt="Base"
             fill
             style={{ objectFit: 'contain', borderRadius: '4px' }}
@@ -91,7 +96,7 @@ export default function NewCampaignPage() {
     const [category, setCategory] = useState<CampaignCategory>('Follow');
     const [postUrl, setPostUrl] = useState('');
     const [castUrl, setCastUrl] = useState('');
-    const [rewardToken, setRewardToken] = useState('ETH');
+    const [rewardToken, setRewardToken] = useState('USDC');
     const [totalBudget, setTotalBudget] = useState('');
     const [require200Followers, setRequire200Followers] = useState(false);
     const [requirePro, setRequirePro] = useState(false);
@@ -105,9 +110,9 @@ export default function NewCampaignPage() {
     const platformFee = budget * 0.18;
     const netBudget = budget - platformFee;
 
-    const MINIMUM_BUDGET = 10;
-    const isBudgetValid = budget >= MINIMUM_BUDGET;
-    const budgetError = totalBudget && budget < MINIMUM_BUDGET ? `Minimum budget is $${MINIMUM_BUDGET}` : '';
+    const MINIMUM_BUDGET = 15;
+    const isBudgetValid = budget > MINIMUM_BUDGET;
+    const budgetError = totalBudget && budget <= MINIMUM_BUDGET ? `Type any amount higher then ${MINIMUM_BUDGET}` : '';
 
     // Filter categories based on platform
     const visibleCategories = CATEGORIES.filter(cat => {

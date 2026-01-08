@@ -67,6 +67,62 @@ export default function Home() {
               </div>
             </>
           )}
+
+          <div style={{ marginTop: '2rem' }}>
+            <button
+              onClick={() => (document.getElementById('about-modal') as HTMLDialogElement)?.showModal()}
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border)',
+                color: 'var(--muted-foreground)',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                fontSize: '0.8rem'
+              }}
+            >
+              About Platform
+            </button>
+          </div>
+
+          <dialog id="about-modal" style={{
+            padding: '2rem',
+            borderRadius: '1rem',
+            border: '1px solid var(--border)',
+            background: 'var(--background)',
+            color: 'var(--foreground)',
+            maxWidth: '400px',
+            width: '90%'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: 0 }}>About Post Up</h3>
+              <form method="dialog">
+                <button style={{ background: 'none', border: 'none', color: 'var(--muted-foreground)', cursor: 'pointer' }}>✕</button>
+              </form>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--muted-foreground)' }}>Developer</span>
+                <a href="https://warpcast.com/aleekhoso" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>@aleekhoso</a>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--muted-foreground)' }}>Admin</span>
+                <a href="https://warpcast.com/tipsdeck" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>@tipsdeck</a>
+              </div>
+              <div style={{ height: '1px', background: 'var(--border)' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--muted-foreground)' }}>Platform Fee</span>
+                <span>18%</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--muted-foreground)' }}>Distribution</span>
+                <span>Quality Score Weighted</span>
+              </div>
+              <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--muted-foreground)', textAlign: 'center' }}>
+                Post Up is a long-term platform designed to grow your onchain presence with real users.
+              </div>
+            </div>
+          </dialog>
         </div>
       </div>
     </main>

@@ -47,12 +47,12 @@ export interface Campaign {
 }
 
 export const SUPPORTED_TOKENS = [
-    { symbol: 'ETH', label: 'ETH (Ethereum)', chain: 'Ethereum' },
-    { symbol: 'USDC', label: 'USDC (Ethereum)', chain: 'Ethereum' },
-    { symbol: 'ETH_BASE', label: 'ETH (Base)', chain: 'Base' },
-    { symbol: 'DEGEN', label: 'DEGEN (Base)', chain: 'Base' },
-    { symbol: 'OP', label: 'OP (Optimism)', chain: 'Optimism' },
-    { symbol: 'OP_USDC', label: 'USDC (Optimism)', chain: 'Optimism' },
+    { symbol: 'USDC', label: 'USDC (Base Sepolia)', chain: 'Base Sepolia' },
+    { symbol: 'USDT', label: 'USDT (Base Sepolia)', chain: 'Base Sepolia' },
+    { symbol: 'USDC', label: 'USDC (Optimism Sepolia)', chain: 'Optimism Sepolia' },
+    { symbol: 'USDT', label: 'USDT (Optimism Sepolia)', chain: 'Optimism Sepolia' },
+    { symbol: 'USDC', label: 'USDC (Arbitrum Sepolia)', chain: 'Arbitrum Sepolia' },
+    { symbol: 'USDT', label: 'USDT (Arbitrum Sepolia)', chain: 'Arbitrum Sepolia' },
 ];
 
 export interface TaskHistoryItem {
