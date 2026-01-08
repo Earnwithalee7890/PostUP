@@ -417,6 +417,8 @@
     position: relative;
     overflow: hidden;
     letter-spacing: 0.02em;
+    z-index: 10;
+    /* Ensure button is above other elements */
 }
 
 .submitBtn:hover:not(:disabled) {

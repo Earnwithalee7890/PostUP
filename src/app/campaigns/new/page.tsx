@@ -178,23 +178,22 @@ export default function NewCampaignPage() {
         hash,
     });
 
+    const [hasCreated, setHasCreated] = useState(false);
+
     // Effect to handle success after transaction confirmation
     useEffect(() => {
-        if (isConfirmed && hash) {
+        if (isConfirmed && hash && !hasCreated) {
             if (lastAction === 'approve') {
                 refetchAllowance();
-                reset(); // Clear hash so we don't trigger again
+                reset();
                 setLastAction(null);
             } else if (lastAction === 'create') {
-                // Construct campaign object for local state/mock
+                // Prevent duplicate creation
+                setHasCreated(true);
+
                 const selectedCategoryObj = CATEGORIES.find(c => c.id === category);
                 const finalTasks = category === 'Multi' ? selectedMultiTasks : (selectedCategoryObj?.tasks || []);
-
-                // Estimate reward per task (e.g., simpler view, or just show budget)
-                // Since this is quality-weighted, this display value is less critical but needed for interface
                 const estRewardPerTask = netBudget / 50;
-
-                // Calculate endedAt
                 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
                 const endedAt = Date.now() + (duration * ONE_DAY_MS);
 
@@ -215,26 +214,33 @@ export default function NewCampaignPage() {
                     endedAt: endedAt
                 });
 
-                alert(`Campaign created! Transaction Hash: ${hash}`);
-                router.push('/campaigns'); // campaigns or tasks depending on route map? app/tasks/page.tsx maps to /tasks usually but layouts might map /campaigns? 
-                // Router push was /campaigns, but the user listing is at app/tasks/page.tsx?
-                // app/campaigns usually has page.tsx? 
-                // Wait, checked app/tasks/page.tsx. Does app/campaigns exist?
-                // Step 295 listed src/app/campaigns/isDir=True.
-                // Step 221 listed src/app/campaigns/isDir=True.
-                // But Step 355 showed src/app/tasks/page.tsx.
-                // Let's assume /campaigns redirects to /tasks or tasks is the main view.
-                // I will stick to /campaigns if that's what was there, but maybe the listing is at /tasks?
-                // The user complains "users create there campigns there".
-                // I'll check if /campaigns exists as a page.
+                // Redirect after short delay
+                setTimeout(() => {
+                    router.push('/tasks');
+                }, 1500);
             }
         }
-    }, [isConfirmed, hash, lastAction, refetchAllowance, reset, router, createMutation, address, platform, category, postUrl, castUrl, selectedMultiTasks, rewardToken, budget, platformFee, netBudget, require200Followers, requirePro]);
+    }, [isConfirmed, hash, lastAction, hasCreated, refetchAllowance, reset, router, createMutation, address, platform, category, postUrl, castUrl, selectedMultiTasks, rewardToken, budget, platformFee, netBudget, require200Followers, requirePro, duration]);
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isBudgetValid || !platform) return;
+
+        if (!isConnected) {
+            alert('Please connect wallet');
+            return;
+        }
+
+        // Full validation
+        if (!platform || !category || !rewardToken || !budget) {
+            alert('Please complete all fields');
+            return;
+        }
+
+        if (needsProfileUrl && !postUrl.trim()) {
+            alert('Please provide a valid URL');
+            return;
+        }
 
         try {
             if (needsApproval) {
@@ -249,7 +255,7 @@ export default function NewCampaignPage() {
                     address: tokenAddress as `0x${string}`,
                     abi: ERC20_ABI,
                     functionName: 'approve',
-                    args: [DISTRIBUTOR_ADDRESS as `0x${string}`, parseUnits(totalBudget, 6)]
+                    args: [DISTRIBUTOR_ADDRESS as `0x${string}`, BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')] // MAX_UINT256
                 });
             } else {
                 // CREATE FLOW
