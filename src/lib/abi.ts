@@ -1,6 +1,10 @@
 export const DISTRIBUTOR_ABI = [
     {
-        "inputs": [{ "internalType": "bytes32", "name": "_merkleRoot", "type": "bytes32" }],
+        "inputs": [
+            { "internalType": "bytes32", "name": "_merkleRoot", "type": "bytes32" },
+            { "internalType": "address", "name": "_token", "type": "address" },
+            { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+        ],
         "name": "createCampaign",
         "outputs": [],
         "stateMutability": "payable",
@@ -23,6 +27,7 @@ export const DISTRIBUTOR_ABI = [
         "outputs": [
             { "internalType": "address", "name": "creator", "type": "address" },
             { "internalType": "bytes32", "name": "merkleRoot", "type": "bytes32" },
+            { "internalType": "address", "name": "token", "type": "address" },
             { "internalType": "uint256", "name": "totalBudget", "type": "uint256" },
             { "internalType": "uint256", "name": "remainingBudget", "type": "uint256" },
             { "internalType": "bool", "name": "isActive", "type": "bool" }
