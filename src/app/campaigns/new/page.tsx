@@ -109,7 +109,7 @@ export default function NewCampaignPage() {
     const [selectedMultiTasks, setSelectedMultiTasks] = useState<TaskType[]>([]);
 
     const budget = parseFloat(totalBudget) || 0;
-    const platformFee = budget * 0.18;
+    const platformFee = budget * 0.15;
     const netBudget = budget - platformFee;
 
     const MINIMUM_BUDGET = 0.01;
@@ -340,10 +340,7 @@ export default function NewCampaignPage() {
                     ))}
                 </div>
 
-                {/* PROMOTION CONTACT */}
-                <div className={styles.promotionContact}>
-                    Need help or promotion? Contact <a href="https://warpcast.com/aleekhoso" target="_blank" rel="noreferrer" className={styles.promotionLink}>@aleekhoso</a> (Dev) or <a href="https://warpcast.com/tipsdeck" target="_blank" rel="noreferrer" className={styles.promotionLink}>@tipsdeck</a> (Admin) on Farcaster.
-                </div>
+
             </div>
         );
     }
@@ -551,7 +548,7 @@ export default function NewCampaignPage() {
                             <span className={styles.breakdownValue}>{budget.toFixed(6)} {rewardToken}</span>
                         </div>
                         <div className={styles.breakdownRow}>
-                            <span className={`${styles.breakdownLabel} ${styles.feeText}`}>Fee (18%)</span>
+                            <span className={`${styles.breakdownLabel} ${styles.feeText}`}>Fee (15%)</span>
                             <span className={`${styles.breakdownValue} ${styles.feeText}`}>-{platformFee.toFixed(6)} {rewardToken}</span>
                         </div>
                         <div className={`${styles.breakdownRow} ${styles.netRow}`}>
@@ -584,10 +581,7 @@ export default function NewCampaignPage() {
                     </p>
                 )}
 
-                {/* PROMOTION CONTACT */}
-                <div className={styles.promotionContact}>
-                    Need help or promotion? Contact <a href="https://warpcast.com/aleekhoso" target="_blank" rel="noreferrer" className={styles.promotionLink}>@aleekhoso</a> (Dev) or <a href="https://warpcast.com/tipsdeck" target="_blank" rel="noreferrer" className={styles.promotionLink}>@tipsdeck</a> (Admin) on Farcaster.
-                </div>
+
             </form>
         </div>
     );

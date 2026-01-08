@@ -100,26 +100,44 @@ export default function Home() {
                 <button style={{ background: 'none', border: 'none', color: 'var(--muted-foreground)', cursor: 'pointer' }}>✕</button>
               </form>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--muted-foreground)' }}>Developer</span>
-                <a href="https://warpcast.com/aleekhoso" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>@aleekhoso</a>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', fontSize: '0.9rem', lineHeight: '1.5' }}>
+
+              <div>
+                <h4 style={{ margin: '0 0 0.5rem', color: 'var(--foreground)' }}>How it Works</h4>
+                <p style={{ margin: 0, color: 'var(--muted-foreground)' }}>
+                  Post Up helps you grow onchain. Create tasks and reward real users for engagement.
+                </p>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--muted-foreground)' }}>Admin</span>
-                <a href="https://warpcast.com/tipsdeck" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>@tipsdeck</a>
+
+              <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>Platform Fee</span>
+                  <span style={{ color: 'var(--primary)' }}>15%</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                  We charge a 15% service fee upfront. 85% of your budget goes directly to the user reward pool.
+                </p>
               </div>
+
+              <div>
+                <h4 style={{ margin: '0 0 0.5rem', color: 'var(--foreground)' }}>Fair Distribution</h4>
+                <p style={{ margin: 0, color: 'var(--muted-foreground)' }}>
+                  Rewards are distributed based on <strong>Quality Score</strong>.
+                  High-quality users (active,verified) earn significantly more than low-activity bots.
+                </p>
+              </div>
+
               <div style={{ height: '1px', background: 'var(--border)' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--muted-foreground)' }}>Platform Fee</span>
-                <span>18%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--muted-foreground)' }}>Distribution</span>
-                <span>Quality Score Weighted</span>
-              </div>
-              <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--muted-foreground)', textAlign: 'center' }}>
-                Post Up is a long-term platform designed to grow your onchain presence with real users.
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '1px' }}>Contact & Support</span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                  <a href="https://warpcast.com/aleekhoso" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>@aleekhoso (Dev)</a>
+                  <a href="https://warpcast.com/tipsdeck" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>@tipsdeck (Admin)</a>
+                </div>
+                <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                  Reach out for promotions, partnerships, or support.
+                </p>
               </div>
             </div>
           </dialog>
