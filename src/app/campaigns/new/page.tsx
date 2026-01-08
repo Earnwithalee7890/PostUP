@@ -112,9 +112,9 @@ export default function NewCampaignPage() {
     const platformFee = budget * 0.18;
     const netBudget = budget - platformFee;
 
-    const MINIMUM_BUDGET = 10;
-    const isBudgetValid = budget > MINIMUM_BUDGET;
-    const budgetError = totalBudget && budget <= MINIMUM_BUDGET ? `Type any amount higher then ${MINIMUM_BUDGET}` : '';
+    const MINIMUM_BUDGET = 0.01;
+    const isBudgetValid = budget >= MINIMUM_BUDGET;
+    const budgetError = totalBudget && budget < MINIMUM_BUDGET ? `Minimum budget is $${MINIMUM_BUDGET}` : '';
 
     // Filter categories based on platform
     const visibleCategories = CATEGORIES.filter(cat => {

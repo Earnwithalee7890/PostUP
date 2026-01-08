@@ -47,12 +47,8 @@ export interface Campaign {
 }
 
 export const SUPPORTED_TOKENS = [
-    { symbol: 'USDC', label: 'USDC (Base Sepolia)', chain: 'Base Sepolia' },
-    { symbol: 'USDT', label: 'USDT (Base Sepolia)', chain: 'Base Sepolia' },
-    { symbol: 'USDC', label: 'USDC (Optimism Sepolia)', chain: 'Optimism Sepolia' },
-    { symbol: 'USDT', label: 'USDT (Optimism Sepolia)', chain: 'Optimism Sepolia' },
-    { symbol: 'USDC', label: 'USDC (Arbitrum Sepolia)', chain: 'Arbitrum Sepolia' },
-    { symbol: 'USDT', label: 'USDT (Arbitrum Sepolia)', chain: 'Arbitrum Sepolia' },
+    { symbol: 'USDC', label: 'USDC (Base)', chain: 'Base' },
+    { symbol: 'ETH', label: 'ETH (Base)', chain: 'Base' },
 ];
 
 export interface TaskHistoryItem {
