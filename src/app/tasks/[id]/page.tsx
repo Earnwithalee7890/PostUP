@@ -88,9 +88,36 @@ export default function TaskExecutionPage() {
                     const isDone = completedTasks[task];
                     const isVerifying = verifying === task;
 
+                    // Determine the link URL based on task type
+                    const getTaskUrl = () => {
+                        if (task === 'Follow') return campaign.postUrl; // Profile URL
+                        if (task === 'Like' || task === 'Recast' || task === 'Comment') return campaign.castUrl || campaign.postUrl;
+                        return null;
+                    };
+
+                    const taskUrl = getTaskUrl();
+
                     return (
                         <div key={task} className={`${styles.taskItem} ${isDone ? styles.completed : ''}`}>
-                            <span style={{ fontWeight: 600 }}>{task}</span>
+                            {taskUrl ? (
+                                <a
+                                    href={taskUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        fontWeight: 600,
+                                        color: 'var(--primary-light)',
+                                        textDecoration: 'underline',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.25rem'
+                                    }}
+                                >
+                                    {task} <ExternalLink size={14} />
+                                </a>
+                            ) : (
+                                <span style={{ fontWeight: 600 }}>{task}</span>
+                            )}
 
                             {isDone ? (
                                 <button className={`${styles.verifyBtn} ${styles.success}`} disabled>
