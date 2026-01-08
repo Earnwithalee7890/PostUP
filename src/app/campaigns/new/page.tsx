@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { parseEther } from 'viem';
 import { DISTRIBUTOR_ADDRESS } from '@/lib/config';
@@ -208,6 +209,9 @@ export default function NewCampaignPage() {
     };
 
     // RENDER: Check for wallet connection
+    const { context } = useFarcasterContext();
+    const isAutoConnecting = context?.user && !isConnected;
+
     if (!isConnected) {
         return (
             <div className={styles.container}>
@@ -215,11 +219,21 @@ export default function NewCampaignPage() {
                     <ArrowLeft size={16} /> Back
                 </button>
                 <header className={styles.header} style={{ marginTop: '2rem' }}>
-                    <h1>Connect Wallet</h1>
-                    <p style={{ color: 'var(--muted-foreground)' }}>You need to connect a wallet to fund and create a campaign.</p>
+                    <h1>{isAutoConnecting ? 'Connecting...' : 'Connect Wallet'}</h1>
+                    <p style={{ color: 'var(--muted-foreground)' }}>
+                        {isAutoConnecting
+                            ? 'Detecting your Farcaster wallet...'
+                            : 'You need to connect a wallet to fund and create a campaign.'}
+                    </p>
                 </header>
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', background: 'rgba(255,255,255,0.03)', borderRadius: '1rem' }}>
-                    <ConnectButton />
+                    {isAutoConnecting ? (
+                        <div className="flex-center">
+                            <Clock className="spin" size={32} style={{ opacity: 0.5 }} />
+                        </div>
+                    ) : (
+                        <ConnectButton />
+                    )}
                 </div>
             </div>
         );
