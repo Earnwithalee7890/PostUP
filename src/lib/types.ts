@@ -48,7 +48,11 @@ export interface Campaign {
 
 export const SUPPORTED_TOKENS = [
     { symbol: 'USDC', label: 'USDC (Base)', chain: 'Base' },
-    { symbol: 'ETH', label: 'ETH (Base)', chain: 'Base' },
+    { symbol: 'USDT', label: 'USDT (Base)', chain: 'Base' },
+    { symbol: 'USDC', label: 'USDC (Optimism)', chain: 'Optimism' },
+    { symbol: 'USDT', label: 'USDT (Optimism)', chain: 'Optimism' },
+    { symbol: 'USDC', label: 'USDC (Arbitrum)', chain: 'Arbitrum' },
+    { symbol: 'USDT', label: 'USDT (Arbitrum)', chain: 'Arbitrum' },
 ];
 
 export interface TaskHistoryItem {

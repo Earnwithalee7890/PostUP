@@ -103,7 +103,7 @@ export default function NewCampaignPage() {
     const [require200Followers, setRequire200Followers] = useState(false);
     const [requirePro, setRequirePro] = useState(false);
     const [showAllTokens, setShowAllTokens] = useState(false);
-    const [duration, setDuration] = useState<1 | 3>(1);
+    const [duration, setDuration] = useState<1 | 2 | 3>(1);
 
     // Multi-task selection
     const [selectedMultiTasks, setSelectedMultiTasks] = useState<TaskType[]>([]);
@@ -190,6 +190,10 @@ export default function NewCampaignPage() {
                 // Since this is quality-weighted, this display value is less critical but needed for interface
                 const estRewardPerTask = netBudget / 50;
 
+                // Calculate endedAt
+                const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+                const endedAt = Date.now() + (duration * ONE_DAY_MS);
+
                 createMutation.mutate({
                     creator: address || '0x00',
                     platform: platform!,
@@ -203,7 +207,8 @@ export default function NewCampaignPage() {
                     netBudget: netBudget,
                     rewardAmountPerTask: estRewardPerTask,
                     minFollowers: require200Followers ? 200 : 0,
-                    requirePro: requirePro
+                    requirePro: requirePro,
+                    endedAt: endedAt
                 });
 
                 alert(`Campaign created! Transaction Hash: ${hash}`);
@@ -529,6 +534,14 @@ export default function NewCampaignPage() {
                     >
                         <Clock className={styles.clock} size={24} />
                         <span>1 Day</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setDuration(2)}
+                        className={`${styles.durationBtn} ${duration === 2 ? styles.durationActive : ''}`}
+                    >
+                        <Clock className={styles.clock} size={24} />
+                        <span>2 Days</span>
                     </button>
                     <button
                         type="button"
