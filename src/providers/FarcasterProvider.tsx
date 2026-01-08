@@ -20,6 +20,8 @@ const FarcasterContext = createContext<FarcasterContextType>({
 
 export const useFarcasterContext = () => useContext(FarcasterContext);
 
+import { FarcasterAutoConnect } from '@/components/FarcasterAutoConnect';
+
 export default function FarcasterProvider({ children }: { children: React.ReactNode }) {
     const [isSDKLoaded, setIsSDKLoaded] = useState(false);
     const [isLoadingContext, setIsLoadingContext] = useState(true);
@@ -46,6 +48,7 @@ export default function FarcasterProvider({ children }: { children: React.ReactN
 
     return (
         <FarcasterContext.Provider value={{ isSDKLoaded, isLoadingContext, context }}>
+            <FarcasterAutoConnect />
             {children}
         </FarcasterContext.Provider>
     );
