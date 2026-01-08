@@ -9,4 +9,5 @@ export const config = getDefaultConfig({
 });
 
 export const DISTRIBUTOR_ADDRESS = '0xE7B16C2E34Fc3a347e3243FBEb3518830AfE647b';
+export const USDC_ADDRESS = '0x036CbD53842c5426634e7929541eC2318f3dCF7e'; // Base Sepolia USDC
 

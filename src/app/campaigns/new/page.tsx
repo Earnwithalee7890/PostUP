@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadContract } from 'wagmi';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { parseEther } from 'viem';
-import { DISTRIBUTOR_ADDRESS } from '@/lib/config';
+import { parseEther, parseUnits } from 'viem';
+import { DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/config';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
+import { ERC20_ABI } from '@/lib/erc20';
 import { SUPPORTED_TOKENS, TaskType, Platform, CampaignCategory } from '@/lib/types';
 import { UserPlus, Heart, Zap, Hash, Grid3x3, Smartphone, ArrowLeft, ChevronRight, Clock } from 'lucide-react';
 import styles from './new.module.css';
@@ -151,8 +152,22 @@ export default function NewCampaignPage() {
         }
     };
 
-    const { isConnected } = useAccount();
+    const { isConnected, address } = useAccount();
     const { writeContract, data: hash, isPending: isConfirming } = useWriteContract();
+
+    // Check USDC Allowance
+    const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
+        address: USDC_ADDRESS as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: 'allowance',
+        args: [address as `0x${string}`, DISTRIBUTOR_ADDRESS as `0x${string}`],
+        query: {
+            enabled: !!address && rewardToken === 'USDC',
+        }
+    });
+
+    const currentAllowance = allowanceData ? Number(allowanceData) / 1e6 : 0; // USDC has 6 decimals
+    const needsApproval = rewardToken === 'USDC' && currentAllowance < budget;
 
     const { isLoading: isConfirmed } = useWaitForTransactionReceipt({
         hash,
@@ -160,32 +175,58 @@ export default function NewCampaignPage() {
 
     // Effect to handle success after transaction confirmation
     if (isConfirmed && hash) {
-        // Here we would normally call the backend APIs to persist the campaign
-        // For now, we simulate success
-        // createMutation.mutate(...)
-        alert(`Campaign created! Transaction Hash: ${hash}`);
-        router.push('/campaigns');
+        if (!needsApproval) {
+            // Only redirect if we finished the creation (not just approval)
+            // But wait, if we just finished approval, we need to refetch allowance!
+            refetchAllowance();
+            // We can't distinguish easily without local state, so we'll check logic below or just alert
+        } else {
+            // If we just approved, we refetch to update UI
+            refetchAllowance();
+        }
     }
+
+    // Secondary effect to route after creation (approximate check)
+    useEffect(() => {
+        if (isConfirmed && !needsApproval && hash) {
+            alert(`Campaign created! Transaction Hash: ${hash}`);
+            router.push('/campaigns');
+        }
+    }, [isConfirmed, needsApproval, hash, router]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!isBudgetValid || !platform) return;
 
-        // Ensure user is on Base Sepolia? (Wagmi handles chain switching request usually if configured, or fails)
-
         try {
-            writeContract({
-                address: DISTRIBUTOR_ADDRESS as `0x${string}`,
-                abi: DISTRIBUTOR_ABI,
-                functionName: 'createCampaign',
-                args: [
-                    '0x0000000000000000000000000000000000000000000000000000000000000000' // Initial empty root
-                ],
-                value: parseEther(totalBudget)
-            });
+            if (needsApproval) {
+                // APPROVE FLOW
+                writeContract({
+                    address: USDC_ADDRESS as `0x${string}`,
+                    abi: ERC20_ABI,
+                    functionName: 'approve',
+                    args: [DISTRIBUTOR_ADDRESS as `0x${string}`, parseUnits(totalBudget, 6)]
+                });
+            } else {
+                // CREATE FLOW
+                // Determine value logic: If USDC, value is 0. If ETH, value is budget (18 dec)
+                const isUSDC = rewardToken === 'USDC';
+                const msgValue = isUSDC ? BigInt(0) : parseEther(totalBudget);
+
+                writeContract({
+                    address: DISTRIBUTOR_ADDRESS as `0x${string}`,
+                    abi: DISTRIBUTOR_ABI,
+                    functionName: 'createCampaign',
+                    args: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000000' // Initial empty root
+                    ],
+                    value: msgValue
+                });
+            }
         } catch (err) {
             console.error(err);
-            alert('Failed to create campaign on-chain');
+            alert('Failed to execute transaction');
         }
     };
 
@@ -496,12 +537,12 @@ export default function NewCampaignPage() {
                 <button
                     type="submit"
                     className={styles.submitBtn}
-                    disabled={isConfirming || isConfirmed || !isBudgetValid || !totalBudget}
+                    disabled={isConfirming || (isConfirmed && !needsApproval) || !isBudgetValid || !totalBudget}
                 >
                     {isConfirming
-                        ? 'Confirming in Wallet...'
-                        : isConfirmed
-                            ? 'Transaction Pending...'
+                        ? 'Confirming...'
+                        : needsApproval
+                            ? `Approve ${rewardToken}`
                             : `Create Task (${budget.toFixed(4)} ${rewardToken})`
                     }
                 </button>
