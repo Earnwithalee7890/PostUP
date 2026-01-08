@@ -112,7 +112,7 @@ export default function NewCampaignPage() {
     const platformFee = budget * 0.18;
     const netBudget = budget - platformFee;
 
-    const MINIMUM_BUDGET = 15;
+    const MINIMUM_BUDGET = 10;
     const isBudgetValid = budget > MINIMUM_BUDGET;
     const budgetError = totalBudget && budget <= MINIMUM_BUDGET ? `Type any amount higher then ${MINIMUM_BUDGET}` : '';
 
