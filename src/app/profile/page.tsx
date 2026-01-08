@@ -26,32 +26,27 @@ export default function ProfilePage() {
         enabled: !!address || !!context?.user?.fid
     });
 
+    // Non-blocking loading state
     if (isLoadingContext) {
         return (
             <main className="container flex-center" style={{ minHeight: '80vh', flexDirection: 'column' }}>
-                <div style={{ color: 'var(--muted-foreground)' }}>Loading Farcaster Context...</div>
+                <div style={{ color: 'var(--muted-foreground)' }}>Loading Profile...</div>
             </main>
         );
     }
 
-    if (!isConnected && !context?.user) {
-        return (
-            <main className="container flex-center" style={{ minHeight: '80vh', flexDirection: 'column', gap: '2rem' }}>
-                <h1 className="gradient-text">Profile</h1>
-                <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center' }}>
-                    <p style={{ marginBottom: '1.5rem', color: 'var(--muted-foreground)' }}>Connect wallet or open in Farcaster to view your task history.</p>
-                    <div className="flex-center">
-                        <ConnectButton />
-                    </div>
-                </div>
-            </main>
-        );
-    }
+    // Determine identity
+    const identityAddress = address || stats?.verifications?.[0];
+    const identityName = context?.user?.displayName || 'Guest User';
+    const identityUsername = context?.user?.username || 'guest';
+    const identityPfp = context?.user?.pfpUrl;
+
+    // We no longer block access. If not connected, we show empty/guest state.
+
 
     const { disconnect } = useDisconnect();
 
-    // Auto-detect address: Wallet > Farcaster Verified > Empty
-    const displayAddress = address || stats?.verifications?.[0] || '';
+    const displayAddress = identityAddress || '';
     const isWalletConnected = !!address;
 
     const copyAddress = () => {
@@ -82,8 +77,8 @@ export default function ProfilePage() {
                         background: 'var(--primary)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        {context?.user?.pfpUrl ? (
-                            <img src={context.user.pfpUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {identityPfp ? (
+                            <img src={identityPfp} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                             <User size={32} color="#fff" />
                         )}
@@ -92,10 +87,10 @@ export default function ProfilePage() {
                     {/* USER DETAILS */}
                     <div>
                         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0, lineHeight: 1.2 }}>
-                            {context?.user?.displayName || 'Unknown User'}
+                            {identityName}
                         </h2>
                         <div style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            @{context?.user?.username || 'user'}
+                            @{identityUsername}
                             {displayAddress && (
                                 <span style={{
                                     background: 'rgba(255,255,255,0.1)',
@@ -129,7 +124,7 @@ export default function ProfilePage() {
                         }}>PRO</div>
                     )}
 
-                    {isConnected && (
+                    {isConnected ? (
                         <button
                             onClick={() => disconnect()}
                             style={{
@@ -145,6 +140,10 @@ export default function ProfilePage() {
                         >
                             <LogOut size={18} />
                         </button>
+                    ) : (
+                        <div style={{ transform: 'scale(0.9)' }}>
+                            <ConnectButton />
+                        </div>
                     )}
                 </div>
             </div>
