@@ -35,14 +35,14 @@ export default function FarcasterProvider({ children }: { children: React.ReactN
 
                 if (!ctx) {
                     console.warn('⚠️ Farcaster context is undefined - running outside Farcaster app');
-                    setContext(null);
+                    setContext(undefined);
                     return;
                 }
 
                 setContext(ctx);
             } catch (error) {
                 console.error('Error loading Farcaster context:', error);
-                setContext(null);
+                setContext(undefined);
             } finally {
                 setIsLoadingContext(false);
                 sdk.actions.ready();
