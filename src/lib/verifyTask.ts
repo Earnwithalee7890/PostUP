@@ -8,10 +8,11 @@ interface VerificationResult {
 }
 
 /**
- * Extract FID from Farcaster profile URL
+ * Extract FID from Farcaster profile URL or cast URL
  * Supports formats:
  * - https://warpcast.com/username
  * - https://warpcast.com/~/profiles/12345
+ * - https://warpcast.com/username/0xcasthash (extracts author FID from cast)
  */
 async function extractFidFromUrl(profileUrl: string): Promise<number | null> {
     try {
@@ -21,11 +22,35 @@ async function extractFidFromUrl(profileUrl: string): Promise<number | null> {
             return parseInt(fidMatch[1]);
         }
 
+        // Check if it's a cast URL (contains 0x hash)
+        const castHashMatch = profileUrl.match(/0x[a-fA-F0-9]+/);
+        if (castHashMatch) {
+            // It's a cast URL, fetch the cast and get author FID
+            const castHash = castHashMatch[0];
+            const response = await fetch(
+                `https://api.neynar.com/v2/farcaster/cast?identifier=${castHash}&type=hash`,
+                {
+                    headers: {
+                        'accept': 'application/json',
+                        'api_key': NEYNAR_API_KEY
+                    }
+                }
+            );
+
+            if (!response.ok) return null;
+
+            const data = await response.json();
+            return data.cast?.author?.fid || null;
+        }
+
         // Extract username from warpcast URL
         const usernameMatch = profileUrl.match(/warpcast\.com\/([^\/\?]+)/);
         if (!usernameMatch) return null;
 
         const username = usernameMatch[1];
+
+        // Skip special paths
+        if (username === '~' || username === 'profile') return null;
 
         // Look up user by username
         const response = await fetch(
