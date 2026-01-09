@@ -130,8 +130,30 @@ export const SupabaseService = {
     },
 
     async completeTask(campaignId: string, taskType: any) {
-        // For now, just return success
-        // In real implementation, verify task completion on-chain or via social APIs
+        // TODO: Get user FID from authenticated session
+        // For now, this is a placeholder - you'll need to pass userFid from the frontend
+        // based on the authenticated Farcaster user
+
+        // Fetch campaign to get URLs
+        const campaign = await this.getCampaign(campaignId);
+        if (!campaign) {
+            throw new Error('Campaign not found');
+        }
+
+        // IMPORTANT: In production, you need to:
+        // 1. Get the authenticated user's FID from the session
+        // 2. Import and call verifyTask from './verifyTask'
+        // 3. Return the verification result
+
+        // Example implementation:
+        // import { verifyTask } from './verifyTask';
+        // const result = await verifyTask(userFid, taskType, campaign.postUrl, campaign.castUrl);
+        // if (!result.success) {
+        //     throw new Error(result.error || 'Task verification failed');
+        // }
+
+        // For now, return success to unblock development
+        // Replace this with actual verification once FID is available
         return { success: true };
     }
 };
