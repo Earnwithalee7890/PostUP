@@ -1,0 +1,247 @@
+import { TaskType } from './types';
+
+const NEYNAR_API_KEY = process.env.NEXT_PUBLIC_NEYNAR_API_KEY || 'NEYNAR_API_DOCS';
+
+interface VerificationResult {
+    success: boolean;
+    error?: string;
+}
+
+/**
+ * Extract FID from Farcaster profile URL
+ * Supports formats:
+ * - https://warpcast.com/username
+ * - https://warpcast.com/~/profiles/12345
+ */
+async function extractFidFromUrl(profileUrl: string): Promise<number | null> {
+    try {
+        // Check if URL contains direct FID
+        const fidMatch = profileUrl.match(/profiles\/(\d+)/);
+        if (fidMatch) {
+            return parseInt(fidMatch[1]);
+        }
+
+        // Extract username from warpcast URL
+        const usernameMatch = profileUrl.match(/warpcast\.com\/([^\/\?]+)/);
+        if (!usernameMatch) return null;
+
+        const username = usernameMatch[1];
+
+        // Look up user by username
+        const response = await fetch(
+            `https://api.neynar.com/v2/farcaster/user/by_username?username=${username}`,
+            {
+                headers: {
+                    'accept': 'application/json',
+                    'api_key': NEYNAR_API_KEY
+                }
+            }
+        );
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        return data.result?.user?.fid || null;
+    } catch (error) {
+        console.error('Error extracting FID:', error);
+        return null;
+    }
+}
+
+/**
+ * Extract cast hash from Warpcast URL
+ * Format: https://warpcast.com/username/0x123abc...
+ */
+function extractCastHash(castUrl: string): string | null {
+    const match = castUrl.match(/0x[a-fA-F0-9]+/);
+    return match ? match[0] : null;
+}
+
+/**
+ * Verify if user follows a specific profile
+ */
+async function verifyFollow(userFid: number, targetProfileUrl: string): Promise<VerificationResult> {
+    try {
+        const targetFid = await extractFidFromUrl(targetProfileUrl);
+        if (!targetFid) {
+            return { success: false, error: 'Invalid target profile URL' };
+        }
+
+        // Get user's following list
+        const response = await fetch(
+            `https://api.neynar.com/v2/farcaster/following?fid=${userFid}&limit=100`,
+            {
+                headers: {
+                    'accept': 'application/json',
+                    'api_key': NEYNAR_API_KEY
+                }
+            }
+        );
+
+        if (!response.ok) {
+            return { success: false, error: 'Failed to fetch following list' };
+        }
+
+        const data = await response.json();
+        const followingFids = data.users?.map((u: any) => u.fid) || [];
+
+        const isFollowing = followingFids.includes(targetFid);
+
+        return {
+            success: isFollowing,
+            error: isFollowing ? undefined : 'You must follow this profile to complete the task'
+        };
+    } catch (error) {
+        console.error('Follow verification error:', error);
+        return { success: false, error: 'Verification failed' };
+    }
+}
+
+/**
+ * Verify if user liked a specific cast
+ */
+async function verifyLike(userFid: number, castUrl: string): Promise<VerificationResult> {
+    try {
+        const castHash = extractCastHash(castUrl);
+        if (!castHash) {
+            return { success: false, error: 'Invalid cast URL' };
+        }
+
+        // Get cast reactions
+        const response = await fetch(
+            `https://api.neynar.com/v2/farcaster/reactions/cast?hash=${castHash}&types=likes&limit=100`,
+            {
+                headers: {
+                    'accept': 'application/json',
+                    'api_key': NEYNAR_API_KEY
+                }
+            }
+        );
+
+        if (!response.ok) {
+            return { success: false, error: 'Failed to verify like' };
+        }
+
+        const data = await response.json();
+        const likes = data.reactions || [];
+        const hasLiked = likes.some((reaction: any) => reaction.user?.fid === userFid);
+
+        return {
+            success: hasLiked,
+            error: hasLiked ? undefined : 'You must like this cast to complete the task'
+        };
+    } catch (error) {
+        console.error('Like verification error:', error);
+        return { success: false, error: 'Verification failed' };
+    }
+}
+
+/**
+ * Verify if user recasted a specific cast
+ */
+async function verifyRecast(userFid: number, castUrl: string): Promise<VerificationResult> {
+    try {
+        const castHash = extractCastHash(castUrl);
+        if (!castHash) {
+            return { success: false, error: 'Invalid cast URL' };
+        }
+
+        // Get cast reactions (recasts)
+        const response = await fetch(
+            `https://api.neynar.com/v2/farcaster/reactions/cast?hash=${castHash}&types=recasts&limit=100`,
+            {
+                headers: {
+                    'accept': 'application/json',
+                    'api_key': NEYNAR_API_KEY
+                }
+            }
+        );
+
+        if (!response.ok) {
+            return { success: false, error: 'Failed to verify recast' };
+        }
+
+        const data = await response.json();
+        const recasts = data.reactions || [];
+        const hasRecasted = recasts.some((reaction: any) => reaction.user?.fid === userFid);
+
+        return {
+            success: hasRecasted,
+            error: hasRecasted ? undefined : 'You must recast this cast to complete the task'
+        };
+    } catch (error) {
+        console.error('Recast verification error:', error);
+        return { success: false, error: 'Verification failed' };
+    }
+}
+
+/**
+ * Verify if user replied to a specific cast
+ */
+async function verifyComment(userFid: number, castUrl: string): Promise<VerificationResult> {
+    try {
+        const castHash = extractCastHash(castUrl);
+        if (!castHash) {
+            return { success: false, error: 'Invalid cast URL' };
+        }
+
+        // Get cast conversation/replies
+        const response = await fetch(
+            `https://api.neynar.com/v2/farcaster/cast/conversation?identifier=${castHash}&type=hash&reply_depth=1&limit=100`,
+            {
+                headers: {
+                    'accept': 'application/json',
+                    'api_key': NEYNAR_API_KEY
+                }
+            }
+        );
+
+        if (!response.ok) {
+            return { success: false, error: 'Failed to verify comment' };
+        }
+
+        const data = await response.json();
+        const replies = data.conversation?.cast?.direct_replies || [];
+        const hasReplied = replies.some((reply: any) => reply.author?.fid === userFid);
+
+        return {
+            success: hasReplied,
+            error: hasReplied ? undefined : 'You must reply to this cast to complete the task'
+        };
+    } catch (error) {
+        console.error('Comment verification error:', error);
+        return { success: false, error: 'Verification failed' };
+    }
+}
+
+/**
+ * Main verification function
+ * Routes to specific verification based on task type
+ */
+export async function verifyTask(
+    userFid: number,
+    taskType: TaskType,
+    profileUrl: string,
+    castUrl?: string
+): Promise<VerificationResult> {
+    switch (taskType) {
+        case 'Follow':
+            return verifyFollow(userFid, profileUrl);
+
+        case 'Like':
+            if (!castUrl) return { success: false, error: 'Cast URL required for Like task' };
+            return verifyLike(userFid, castUrl);
+
+        case 'Repost':
+            if (!castUrl) return { success: false, error: 'Cast URL required for Recast task' };
+            return verifyRecast(userFid, castUrl);
+
+        case 'Comment':
+            if (!castUrl) return { success: false, error: 'Cast URL required for Comment task' };
+            return verifyComment(userFid, castUrl);
+
+        // For other task types, return success (placeholder)
+        default:
+            return { success: true };
+    }
+}
