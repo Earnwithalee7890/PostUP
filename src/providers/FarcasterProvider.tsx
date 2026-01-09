@@ -28,28 +28,35 @@ export default function FarcasterProvider({ children }: { children: React.ReactN
     const [context, setContext] = useState<FrameContext>();
 
     useEffect(() => {
-        const load = async () => {
+        const loadContext = async () => {
             try {
-                const context = await sdk.context;
-                console.log('Farcaster Context Loaded:', context);
-                setContext(context);
+                const ctx = await sdk.context;
+                console.log('Farcaster Context Loaded:', ctx);
+
+                if (!ctx) {
+                    console.warn('⚠️ Farcaster context is undefined - running outside Farcaster app');
+                    setContext(null);
+                    return;
+                }
+
+                setContext(ctx);
             } catch (error) {
-                console.error('Failed to load Farcaster context:', error);
+                console.error('Error loading Farcaster context:', error);
+                setContext(null);
             } finally {
                 setIsLoadingContext(false);
                 sdk.actions.ready();
             }
         };
-        if (sdk && !isSDKLoaded) {
-            setIsSDKLoaded(true);
-            load();
-        }
+        setIsSDKLoaded(true);
+        load();
+    }
     }, [isSDKLoaded]);
 
-    return (
-        <FarcasterContext.Provider value={{ isSDKLoaded, isLoadingContext, context }}>
-            <FarcasterAutoConnect />
-            {children}
-        </FarcasterContext.Provider>
-    );
+return (
+    <FarcasterContext.Provider value={{ isSDKLoaded, isLoadingContext, context }}>
+        <FarcasterAutoConnect />
+        {children}
+    </FarcasterContext.Provider>
+);
 }
