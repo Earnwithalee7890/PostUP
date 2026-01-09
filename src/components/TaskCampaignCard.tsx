@@ -60,9 +60,19 @@ export function TaskCampaignCard({ campaign }: TaskCampaignCardProps) {
     };
 
     const getTaskUrl = (task: string) => {
-        if (task === 'Follow') return campaign.postUrl;
-        if (task === 'Like' || task === 'Repost' || task === 'Comment') return campaign.castUrl || campaign.postUrl;
-        return null;
+        let url = null;
+
+        if (task === 'Follow') {
+            url = campaign.postUrl;
+            // If it's just a FID number, convert to Warpcast profile URL
+            if (url && /^\d+$/.test(url.trim())) {
+                url = `https://warpcast.com/~/profiles/${url.trim()}`;
+            }
+        } else if (task === 'Like' || task === 'Repost' || task === 'Comment') {
+            url = campaign.castUrl || campaign.postUrl;
+        }
+
+        return url;
     };
 
     return (
