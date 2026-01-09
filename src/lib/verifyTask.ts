@@ -13,6 +13,9 @@ interface VerificationResult {
  * - https://warpcast.com/username
  * - https://warpcast.com/~/profiles/12345
  * - https://warpcast.com/username/0xcasthash (extracts author FID from cast)
+ * - https://farcaster.xyz/username (profile)
+ * - https://farcaster.xyz/username/0xcasthash (cast)
+ * - https://farcaster.xyz/miniapps/... (mini app)
  */
 async function extractFidFromUrl(profileUrl: string): Promise<number | null> {
     try {
@@ -43,14 +46,18 @@ async function extractFidFromUrl(profileUrl: string): Promise<number | null> {
             return data.cast?.author?.fid || null;
         }
 
-        // Extract username from warpcast URL
-        const usernameMatch = profileUrl.match(/warpcast\.com\/([^\/\?]+)/);
+        // Extract username from warpcast.com or farcaster.xyz URL
+        let usernameMatch = profileUrl.match(/warpcast\.com\/([^\/\?]+)/);
+        if (!usernameMatch) {
+            usernameMatch = profileUrl.match(/farcaster\.xyz\/([^\/\?]+)/);
+        }
+
         if (!usernameMatch) return null;
 
         const username = usernameMatch[1];
 
         // Skip special paths
-        if (username === '~' || username === 'profile') return null;
+        if (username === '~' || username === 'profile' || username === 'miniapps') return null;
 
         // Look up user by username
         const response = await fetch(
