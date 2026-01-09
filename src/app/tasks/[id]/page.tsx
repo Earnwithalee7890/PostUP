@@ -144,7 +144,13 @@ export default function TaskExecutionPage() {
                             ) : (
                                 <button
                                     className={styles.verifyBtn}
-                                    onClick={() => handleVerify(task)}
+                                    onClick={() => {
+                                        // Open link in new tab for Follow task
+                                        if (task === 'Follow' && taskUrl) {
+                                            window.open(taskUrl, '_blank');
+                                        }
+                                        handleVerify(task);
+                                    }}
                                     disabled={isVerifying}
                                 >
                                     {isVerifying ? <Loader2 size={16} className="spin" /> : 'Verify'}
