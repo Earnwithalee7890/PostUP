@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useCampaign, useCompleteTask } from '@/hooks/useCampaigns';
 import { useState } from 'react';
+import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { Check, Loader2, ExternalLink } from 'lucide-react';
 import styles from './task.module.css';
 
@@ -10,22 +11,46 @@ export default function TaskExecutionPage() {
     const { id } = useParams() as { id: string };
     const { data: campaign, isLoading } = useCampaign(id);
     const completeMutation = useCompleteTask();
+    const { context } = useFarcasterContext();
 
     const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
     const [verifying, setVerifying] = useState<string | null>(null);
 
-    const handleVerify = (task: string) => {
+    const handleVerify = async (task: string) => {
+        const userFid = context?.user?.fid;
+
+        if (!userFid) {
+            alert('Please connect your Farcaster account to verify tasks');
+            return;
+        }
+
         setVerifying(task);
-        completeMutation.mutate({ campaignId: id, taskType: task }, {
-            onSuccess: () => {
+
+        try {
+            // Call the verification API
+            const response = await fetch('/api/verify-task', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    campaignId: id,
+                    taskType: task,
+                    userFid: userFid
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
                 setCompletedTasks(prev => ({ ...prev, [task]: true }));
-                setVerifying(null);
-            },
-            onError: () => {
-                alert('Verification failed. Did you complete the task?');
-                setVerifying(null);
+            } else {
+                alert(result.error || 'Verification failed. Did you complete the task?');
             }
-        });
+        } catch (error) {
+            console.error('Verification error:', error);
+            alert('Verification failed. Please try again.');
+        } finally {
+            setVerifying(null);
+        }
     };
 
     if (isLoading) return <div className="flex-center full-screen">Loading...</div>;
@@ -37,13 +62,6 @@ export default function TaskExecutionPage() {
                 <span className="gradient-text" style={{ fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
                     {campaign.platform} Campaign
                 </span>
-            </div>
-
-            <div className={`glass-panel ${styles.rewardCard}`}>
-                <div style={{ marginBottom: '0.5rem', color: 'var(--muted-foreground)' }}>Total Potential Reward</div>
-                <div className={styles.rewardAmount}>
-                    {(campaign.rewardAmountPerTask * campaign.tasks.length).toFixed(2)} {campaign.rewardToken}
-                </div>
             </div>
 
             <div className={`glass-panel`} style={{ marginBottom: '1rem', padding: '1rem' }}>
@@ -66,8 +84,8 @@ export default function TaskExecutionPage() {
                         </div>
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: 'var(--muted-foreground)' }}>Remaining Budget</span>
-                        <span>{campaign.remainingBudget.toFixed(2)} {campaign.rewardToken}</span>
+                        <span style={{ color: 'var(--muted-foreground)' }}>Net Reward Pool</span>
+                        <span>{campaign.netBudget.toFixed(4)} {campaign.rewardToken}</span>
                     </div>
                 </div>
             </div>
