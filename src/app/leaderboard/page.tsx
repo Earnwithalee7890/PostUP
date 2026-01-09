@@ -44,7 +44,7 @@ export default function LeaderboardPage() {
                         border: tab === 'creators' ? 'none' : '1px solid var(--border)'
                     }}
                 >
-                    Top Creators
+                    Top Spenders
                 </button>
             </div>
 
