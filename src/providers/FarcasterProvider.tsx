@@ -48,15 +48,16 @@ export default function FarcasterProvider({ children }: { children: React.ReactN
                 sdk.actions.ready();
             }
         };
-        setIsSDKLoaded(true);
-        load();
-    }
+        if (sdk && !isSDKLoaded) {
+            setIsSDKLoaded(true);
+            loadContext();
+        }
     }, [isSDKLoaded]);
 
-return (
-    <FarcasterContext.Provider value={{ isSDKLoaded, isLoadingContext, context }}>
-        <FarcasterAutoConnect />
-        {children}
-    </FarcasterContext.Provider>
-);
+    return (
+        <FarcasterContext.Provider value={{ isSDKLoaded, isLoadingContext, context }}>
+            <FarcasterAutoConnect />
+            {children}
+        </FarcasterContext.Provider>
+    );
 }
