@@ -116,29 +116,10 @@ async function verifyFollow(userFid: number, targetProfileUrl: string): Promise<
 
         console.log('Target FID extracted:', targetFid);
 
-        // Get user's following list
-        const response = await fetch(
-            `https://api.neynar.com/v2/farcaster/following?fid=${userFid}&limit=100`,
-            {
-                headers: {
-                    'accept': 'application/json',
-                    'api_key': NEYNAR_API_KEY
-                }
-            }
-        );
-
-        if (!response.ok) {
-            console.error('Failed to fetch following list:', response.status);
-            return { success: false, error: 'Failed to fetch following list' };
-        }
-
-        const data = await response.json();
-        const followingFids = data.users?.map((u: any) => u.fid) || [];
-
-        console.log('User is following', followingFids.length, 'accounts');
-        console.log('Checking if following FID:', targetFid);
-
-        const isFollowing = followingFids.includes(targetFid);
+        // Use FREE Hub API instead of Neynar
+        const { checkUserFollows } = await import('./hubClient');
+        console.log('Using FREE Farcaster Hub for verification...');
+        const isFollowing = await checkUserFollows(userFid, targetFid);
 
         console.log('Is following?', isFollowing);
 
@@ -173,29 +154,10 @@ async function verifyLike(userFid: number, castUrl: string): Promise<Verificatio
             return { success: false, error: `Invalid cast URL: "${castUrl}". Cast URL should contain a hash like 0x123abc...` };
         }
 
-        // Get cast reactions
-        console.log('Fetching likes for cast...');
-        const response = await fetch(
-            `https://api.neynar.com/v2/farcaster/reactions/cast?hash=${castHash}&types=likes&limit=100`,
-            {
-                headers: {
-                    'accept': 'application/json',
-                    'api_key': NEYNAR_API_KEY
-                }
-            }
-        );
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Neynar API error:', response.status, errorText);
-            return { success: false, error: `Failed to verify like: ${response.status}` };
-        }
-
-        const data = await response.json();
-        const likes = data.reactions || [];
-        console.log('Found', likes.length, 'likes on this cast');
-
-        const hasLiked = likes.some((reaction: any) => reaction.user?.fid === userFid);
+        // Use FREE Hub API
+        const { checkUserReaction } = await import('./hubClient');
+        console.log('Using FREE Farcaster Hub for like verification...');
+        const hasLiked = await checkUserReaction(userFid, castHash, 'like');
         console.log('User has liked?', hasLiked);
 
         return {
@@ -229,29 +191,10 @@ async function verifyRecast(userFid: number, castUrl: string): Promise<Verificat
             return { success: false, error: `Invalid cast URL: "${castUrl}". Cast URL should contain a hash like 0x123abc...` };
         }
 
-        // Get cast reactions (recasts)
-        console.log('Fetching recasts for cast...');
-        const response = await fetch(
-            `https://api.neynar.com/v2/farcaster/reactions/cast?hash=${castHash}&types=recasts&limit=100`,
-            {
-                headers: {
-                    'accept': 'application/json',
-                    'api_key': NEYNAR_API_KEY
-                }
-            }
-        );
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Neynar API error:', response.status, errorText);
-            return { success: false, error: `Failed to verify recast: ${response.status}` };
-        }
-
-        const data = await response.json();
-        const recasts = data.reactions || [];
-        console.log('Found', recasts.length, 'recasts on this cast');
-
-        const hasRecasted = recasts.some((reaction: any) => reaction.user?.fid === userFid);
+        // Use FREE Hub API
+        const { checkUserReaction } = await import('./hubClient');
+        console.log('Using FREE Farcaster Hub for recast verification...');
+        const hasRecasted = await checkUserReaction(userFid, castHash, 'recast');
         console.log('User has recasted?', hasRecasted);
 
         return {
