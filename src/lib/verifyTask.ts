@@ -19,6 +19,14 @@ interface VerificationResult {
  */
 async function extractFidFromUrl(profileUrl: string): Promise<number | null> {
     try {
+        // Check if it's just a number (direct FID input)
+        const trimmed = profileUrl.trim();
+        if (/^\d+$/.test(trimmed)) {
+            const fid = parseInt(trimmed);
+            console.log('✅ Direct FID number detected:', fid);
+            return fid;
+        }
+
         // Check if URL contains direct FID
         const fidMatch = profileUrl.match(/profiles\/(\d+)/);
         if (fidMatch) {
