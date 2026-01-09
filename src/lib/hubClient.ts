@@ -1,66 +1,76 @@
 /**
- * Farcaster Hub Client - Free verification using Farcaster protocol
- * No API keys needed, no limits!
+ * Farcaster Verification Client
+ * Uses Neynar free tier for reactions (no premium needed)
  */
 
-const HUB_URL = 'https://hub.pinata.cloud';
-
-interface HubResponse {
-    messages?: any[];
-    error?: string;
-}
+const NEYNAR_API_KEY = process.env.NEXT_PUBLIC_NEYNAR_API_KEY || '';
 
 /**
- * Get user's following list from hub
+ * Get user's following list using Neynar
  */
 export async function getFollowing(fid: number): Promise<number[]> {
     try {
-        const response = await fetch(`${HUB_URL}/v1/linksByFid?fid=${fid}&link_type=follow`);
+        console.log('Fetching following list for FID:', fid);
+        const response = await fetch(
+            `https://api.neynar.com/v2/farcaster/following?fid=${fid}&limit=100`,
+            {
+                headers: {
+                    'accept': 'application/json',
+                    'api_key': NEYNAR_API_KEY
+                }
+            }
+        );
 
         if (!response.ok) {
-            console.error('Hub API error:', response.status);
+            console.error('Neynar API error (following):', response.status, await response.text());
             return [];
         }
 
         const data = await response.json();
-        const messages = data.messages || [];
-
-        // Extract target FIDs from links
-        const followingFids = messages
-            .map((msg: any) => msg.data?.linkBody?.targetFid)
-            .filter((fid: any) => fid !== undefined);
+        const followingFids = data.users?.map((u: any) => u.fid) || [];
+        console.log('Found', followingFids.length, 'following');
 
         return followingFids;
     } catch (error) {
-        console.error('Error fetching following from hub:', error);
+        console.error('Error fetching following:', error);
         return [];
     }
 }
 
 /**
- * Get cast reactions (likes/recasts) from hub
+ * Get cast reactions (likes/recasts) using Neynar FREE tier
  */
 export async function getCastReactions(castHash: string, reactionType: 'like' | 'recast'): Promise<number[]> {
     try {
-        const type = reactionType === 'like' ? 1 : 2; // 1 = like, 2 = recast
-        const response = await fetch(`${HUB_URL}/v1/reactionsByCast?target_cast_id=${castHash}&reaction_type=${type}`);
+        const type = reactionType === 'like' ? 'likes' : 'recasts';
+        console.log(`Fetching ${type} for cast:`, castHash);
+
+        const response = await fetch(
+            `https://api.neynar.com/v2/farcaster/reactions/cast?hash=${castHash}&types=${type}&limit=100`,
+            {
+                headers: {
+                    'accept': 'application/json',
+                    'api_key': NEYNAR_API_KEY
+                }
+            }
+        );
 
         if (!response.ok) {
-            console.error('Hub API error:', response.status);
+            const errorText = await response.text();
+            console.error(`Neynar API error (${type}):`, response.status, errorText);
             return [];
         }
 
         const data = await response.json();
-        const messages = data.messages || [];
+        const reactions = data.reactions || [];
+        const reactorFids = reactions.map((r: any) => r.user?.fid).filter((fid: any) => fid !== undefined);
 
-        // Extract FIDs who reacted
-        const reactorFids = messages
-            .map((msg: any) => msg.data?.fid)
-            .filter((fid: any) => fid !== undefined);
+        console.log(`Found ${reactorFids.length} ${type} on cast`);
+        console.log('Reactor FIDs:', reactorFids);
 
         return reactorFids;
     } catch (error) {
-        console.error('Error fetching reactions from hub:', error);
+        console.error(`Error fetching ${reactionType}:`, error);
         return [];
     }
 }
@@ -70,8 +80,11 @@ export async function getCastReactions(castHash: string, reactionType: 'like' | 
  */
 export async function checkUserFollows(userFid: number, targetFid: number): Promise<boolean> {
     try {
+        console.log('Checking if FID', userFid, 'follows', targetFid);
         const following = await getFollowing(userFid);
-        return following.includes(targetFid);
+        const isFollowing = following.includes(targetFid);
+        console.log('Result:', isFollowing);
+        return isFollowing;
     } catch (error) {
         console.error('Error checking follow:', error);
         return false;
@@ -83,8 +96,11 @@ export async function checkUserFollows(userFid: number, targetFid: number): Prom
  */
 export async function checkUserReaction(userFid: number, castHash: string, reactionType: 'like' | 'recast'): Promise<boolean> {
     try {
+        console.log(`Checking if FID ${userFid} ${reactionType}d cast ${castHash}`);
         const reactors = await getCastReactions(castHash, reactionType);
-        return reactors.includes(userFid);
+        const hasReacted = reactors.includes(userFid);
+        console.log(`User has ${reactionType}d:`, hasReacted);
+        return hasReacted;
     } catch (error) {
         console.error('Error checking reaction:', error);
         return false;
