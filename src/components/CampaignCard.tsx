@@ -52,9 +52,39 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
             </div>
 
             <div className={styles.content}>
-                {campaign.postUrl ? (
-                    <a href={campaign.postUrl} target="_blank" rel="noopener noreferrer" className="flex-center" style={{ gap: '0.5rem', wordBreak: 'break-all', fontSize: '0.9rem', color: 'var(--foreground)' }}>
-                        Post #{campaign.id.slice(0, 8)} <ExternalLink size={12} />
+                {campaign.tasks.includes('Follow') && campaign.postUrl ? (
+                    <a
+                        href={`/tasks/${campaign.id}`}
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.6rem 1.2rem',
+                            background: 'var(--primary)',
+                            color: 'white',
+                            borderRadius: '0.5rem',
+                            fontWeight: 600,
+                            fontSize: '0.9rem',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        FOLLOW <ExternalLink size={14} />
+                    </a>
+                ) : campaign.postUrl ? (
+                    <a href={`/tasks/${campaign.id}`} style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.6rem 1.2rem',
+                        background: 'var(--primary)',
+                        color: 'white',
+                        borderRadius: '0.5rem',
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        textDecoration: 'none'
+                    }}>
+                        Start Task <ExternalLink size={14} />
                     </a>
                 ) : (
                     <span style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>No URL provided</span>
