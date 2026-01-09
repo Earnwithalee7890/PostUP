@@ -28,21 +28,30 @@ export default function TaskExecutionPage() {
 
         try {
             // Call the verification API
+            const requestBody = {
+                campaignId: id,
+                taskType: task,
+                userFid: userFid
+            };
+
+            console.log('Sending request to /api/verify-task:', requestBody);
+
             const response = await fetch('/api/verify-task', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    campaignId: id,
-                    taskType: task,
-                    userFid: userFid
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const result = await response.json();
 
+            console.log('API Response Status:', response.status);
+            console.log('API Response:', result);
+
             if (result.success) {
                 setCompletedTasks(prev => ({ ...prev, [task]: true }));
+                alert('Task verified successfully! ✅');
             } else {
+                console.error('Verification failed:', result.error);
                 alert(result.error || 'Verification failed. Did you complete the task?');
             }
         } catch (error) {
