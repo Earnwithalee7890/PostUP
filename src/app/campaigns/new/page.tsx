@@ -252,11 +252,13 @@ export default function NewCampaignPage() {
                     ? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'  // Base USDC
                     : '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2'; // Base USDT
 
+                const approvalAmount = parseUnits(totalBudget, 6);
+
                 writeContract({
                     address: tokenAddress as `0x${string}`,
                     abi: ERC20_ABI,
                     functionName: 'approve',
-                    args: [DISTRIBUTOR_ADDRESS as `0x${string}`, BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')] // MAX_UINT256
+                    args: [DISTRIBUTOR_ADDRESS as `0x${string}`, approvalAmount]
                 });
             } else {
                 // CREATE FLOW
