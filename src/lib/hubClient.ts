@@ -1,76 +1,85 @@
 /**
- * Farcaster Verification Client
- * Uses Neynar free tier for reactions (no premium needed)
+ * Farcaster Protocol Verification using Hub SDK
+ * Direct protocol access - NO API restrictions!
  */
 
-const NEYNAR_API_KEY = process.env.NEXT_PUBLIC_NEYNAR_API_KEY || '';
+import { getSSLHubRpcClient, Message } from '@farcaster/hub-nodejs';
+
+// Public Farcaster Hub
+const HUB_URL = 'nemes.farcaster.xyz:2283';
+
+let hubClient: Awaited<ReturnType<typeof getSSLHubRpcClient>> | null = null;
+
+async function getHubClient() {
+    if (!hubClient) {
+        hubClient = getSSLHubRpcClient(HUB_URL);
+    }
+    return hubClient;
+}
 
 /**
- * Get user's following list using Neynar
+ * Get user's following list from Farcaster Hub
  */
 export async function getFollowing(fid: number): Promise<number[]> {
     try {
-        console.log('Fetching following list for FID:', fid);
-        const response = await fetch(
-            `https://api.neynar.com/v2/farcaster/following?fid=${fid}&limit=100`,
-            {
-                headers: {
-                    'accept': 'application/json',
-                    'api_key': NEYNAR_API_KEY
-                }
-            }
-        );
+        console.log('📡 Fetching following from Farcaster Hub for FID:', fid);
+        const client = await getHubClient();
 
-        if (!response.ok) {
-            console.error('Neynar API error (following):', response.status, await response.text());
+        const linksResult = await client.getLinksByFid({ fid });
+
+        if (linksResult.isErr()) {
+            console.error('Hub error fetching links:', linksResult.error);
             return [];
         }
 
-        const data = await response.json();
-        const followingFids = data.users?.map((u: any) => u.fid) || [];
-        console.log('Found', followingFids.length, 'following');
+        const followingFids = linksResult.value.messages
+            .map((msg: Message) => {
+                const link = msg.data?.linkBody;
+                return link?.type === 'follow' ? link.targetFid : null;
+            })
+            .filter((fid): fid is number => fid !== null);
 
+        console.log(`✅ Found ${followingFids.length} following`);
         return followingFids;
     } catch (error) {
-        console.error('Error fetching following:', error);
+        console.error('Error fetching following from hub:', error);
         return [];
     }
 }
 
 /**
- * Get cast reactions (likes/recasts) using Neynar FREE tier
+ * Get cast reactions from Farcaster Hub
  */
 export async function getCastReactions(castHash: string, reactionType: 'like' | 'recast'): Promise<number[]> {
     try {
-        const type = reactionType === 'like' ? 'likes' : 'recasts';
-        console.log(`Fetching ${type} for cast:`, castHash);
+        const type = reactionType === 'like' ? 1 : 2;
+        console.log(`📡 Fetching ${reactionType}s from Farcaster Hub for cast:`, castHash);
 
-        const response = await fetch(
-            `https://api.neynar.com/v2/farcaster/reactions/cast?hash=${castHash}&types=${type}&limit=100`,
-            {
-                headers: {
-                    'accept': 'application/json',
-                    'api_key': NEYNAR_API_KEY
-                }
+        const client = await getHubClient();
+        const hashBytes = Buffer.from(castHash.slice(2), 'hex'); // Remove 0x prefix
+
+        const reactionsResult = await client.getReactionsByTarget({
+            targetCastId: {
+                hash: hashBytes,
+                fid: 0 // Will be filled by hub
             }
-        );
+        });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Neynar API error (${type}):`, response.status, errorText);
+        if (reactionsResult.isErr()) {
+            console.error(`Hub error fetching ${reactionType}s:`, reactionsResult.error);
             return [];
         }
 
-        const data = await response.json();
-        const reactions = data.reactions || [];
-        const reactorFids = reactions.map((r: any) => r.user?.fid).filter((fid: any) => fid !== undefined);
+        const reactorFids = reactionsResult.value.messages
+            .filter((msg: Message) => msg.data?.reactionBody?.type === type)
+            .map((msg: Message) => msg.data?.fid)
+            .filter((fid): fid is number => fid !== undefined && fid !== null);
 
-        console.log(`Found ${reactorFids.length} ${type} on cast`);
+        console.log(`✅ Found ${reactorFids.length} ${reactionType}s`);
         console.log('Reactor FIDs:', reactorFids);
-
         return reactorFids;
     } catch (error) {
-        console.error(`Error fetching ${reactionType}:`, error);
+        console.error(`Error fetching ${reactionType}s:`, error);
         return [];
     }
 }
@@ -80,10 +89,10 @@ export async function getCastReactions(castHash: string, reactionType: 'like' | 
  */
 export async function checkUserFollows(userFid: number, targetFid: number): Promise<boolean> {
     try {
-        console.log('Checking if FID', userFid, 'follows', targetFid);
+        console.log(`🔍 Checking if FID ${userFid} follows FID ${targetFid}`);
         const following = await getFollowing(userFid);
         const isFollowing = following.includes(targetFid);
-        console.log('Result:', isFollowing);
+        console.log(`Result: ${isFollowing ? '✅ YES' : '❌ NO'}`);
         return isFollowing;
     } catch (error) {
         console.error('Error checking follow:', error);
@@ -96,10 +105,10 @@ export async function checkUserFollows(userFid: number, targetFid: number): Prom
  */
 export async function checkUserReaction(userFid: number, castHash: string, reactionType: 'like' | 'recast'): Promise<boolean> {
     try {
-        console.log(`Checking if FID ${userFid} ${reactionType}d cast ${castHash}`);
+        console.log(`🔍 Checking if FID ${userFid} ${reactionType}d cast ${castHash}`);
         const reactors = await getCastReactions(castHash, reactionType);
         const hasReacted = reactors.includes(userFid);
-        console.log(`User has ${reactionType}d:`, hasReacted);
+        console.log(`Result: ${hasReacted ? '✅ YES' : '❌ NO'}`);
         return hasReacted;
     } catch (error) {
         console.error('Error checking reaction:', error);
