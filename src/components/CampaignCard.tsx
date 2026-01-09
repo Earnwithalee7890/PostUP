@@ -47,7 +47,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                 </div>
 
                 <span className={styles.reward}>
-                    {campaign.rewardAmountPerTask} {campaign.rewardToken}
+                    {campaign.netBudget.toFixed(4)} {campaign.rewardToken}
                 </span>
             </div>
 
@@ -70,8 +70,8 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
             <div className={styles.footer}>
                 <div style={{ width: '100%' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
-                        <span>Progress</span>
-                        <span>{campaign.remainingBudget.toFixed(2)} left</span>
+                        <span>Reward Pool</span>
+                        <span>{campaign.netBudget.toFixed(4)} {campaign.rewardToken}</span>
                     </div>
                     <div style={{
                         width: '100%',
