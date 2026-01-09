@@ -1,0 +1,188 @@
+.card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.platformBadge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.platform_Farcaster {
+    background: rgba(123, 63, 228, 0.2);
+    color: #7b3fe4;
+    border: 1px solid rgba(123, 63, 228, 0.4);
+}
+
+.platform_X {
+    background: rgba(29, 155, 240, 0.2);
+    color: #1d9bf0;
+    border: 1px solid rgba(29, 155, 240, 0.4);
+}
+
+.statusActive {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.4);
+    font-weight: 600;
+}
+
+.statusEnded {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(231, 15, 15, 0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(231, 15, 15, 0.4);
+    font-weight: 600;
+}
+
+.category {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--muted-foreground);
+    border: 1px solid var(--border);
+}
+
+.reward {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-light);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.label {
+    color: var(--muted-foreground);
+}
+
+.value {
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.taskRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--muted);
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    gap: 1rem;
+}
+
+.taskRow.completed {
+    background: rgba(46, 204, 113, 0.1);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.taskName {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.taskActions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.actionBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.8rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.actionBtn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.verifyBtn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.4rem;
+    border: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    background: var(--accent);
+    color: white;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.verifyBtn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.verifyBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.verifyBtn.verified {
+    background: #2ecc71;
+}
+
+@media (max-width: 640px) {
+    .taskRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .taskActions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

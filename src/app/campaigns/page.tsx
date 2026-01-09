@@ -1,24 +1,20 @@
 'use client';
 
 import { useCampaigns } from '@/hooks/useCampaigns';
-import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { CampaignCard } from '@/components/CampaignCard';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 
 export default function CampaignsPage() {
     const { data: campaigns, isLoading } = useCampaigns();
-    const isAdmin = useIsAdmin();
 
     return (
         <main className="container" style={{ padding: '2rem 1rem' }}>
             <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h1 className="gradient-text" style={{ fontSize: '2rem' }}>All Campaigns</h1>
-                {isAdmin && (
-                    <Link href="/campaigns/new" className="glass-button flex-center" style={{ gap: '0.5rem', padding: '0.6rem 1rem', borderRadius: '0.5rem', textDecoration: 'none', color: 'white' }}>
-                        <Plus size={18} /> New
-                    </Link>
-                )}
+                <Link href="/campaigns/new" className="glass-button flex-center" style={{ gap: '0.5rem', padding: '0.6rem 1rem', borderRadius: '0.5rem', textDecoration: 'none', color: 'white' }}>
+                    <Plus size={18} /> New
+                </Link>
             </header>
 
             {isLoading ? (
