@@ -94,10 +94,19 @@ function extractCastHash(castUrl: string): string | null {
  */
 async function verifyFollow(userFid: number, targetProfileUrl: string): Promise<VerificationResult> {
     try {
+        console.log('=== VERIFY FOLLOW ===');
+        console.log('User FID:', userFid);
+        console.log('Target Profile URL:', targetProfileUrl);
+
         const targetFid = await extractFidFromUrl(targetProfileUrl);
         if (!targetFid) {
-            return { success: false, error: 'Invalid target profile URL' };
+            return {
+                success: false,
+                error: `Invalid target profile URL: "${targetProfileUrl}". Please check the URL format (should be farcaster.xyz/username or warpcast.com/username)`
+            };
         }
+
+        console.log('Target FID extracted:', targetFid);
 
         // Get user's following list
         const response = await fetch(
@@ -111,13 +120,19 @@ async function verifyFollow(userFid: number, targetProfileUrl: string): Promise<
         );
 
         if (!response.ok) {
+            console.error('Failed to fetch following list:', response.status);
             return { success: false, error: 'Failed to fetch following list' };
         }
 
         const data = await response.json();
         const followingFids = data.users?.map((u: any) => u.fid) || [];
 
+        console.log('User is following', followingFids.length, 'accounts');
+        console.log('Checking if following FID:', targetFid);
+
         const isFollowing = followingFids.includes(targetFid);
+
+        console.log('Is following?', isFollowing);
 
         return {
             success: isFollowing,
