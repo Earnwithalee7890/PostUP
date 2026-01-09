@@ -149,12 +149,24 @@ async function verifyFollow(userFid: number, targetProfileUrl: string): Promise<
  */
 async function verifyLike(userFid: number, castUrl: string): Promise<VerificationResult> {
     try {
+        console.log('=== VERIFY LIKE ===');
+        console.log('User FID:', userFid);
+        console.log('Cast URL:', castUrl);
+
+        if (!castUrl || castUrl.trim() === '') {
+            console.error('Cast URL is empty or missing');
+            return { success: false, error: 'Cast URL is required for Like verification. Please add a cast URL when creating the campaign.' };
+        }
+
         const castHash = extractCastHash(castUrl);
+        console.log('Extracted cast hash:', castHash);
+
         if (!castHash) {
-            return { success: false, error: 'Invalid cast URL' };
+            return { success: false, error: `Invalid cast URL: "${castUrl}". Cast URL should contain a hash like 0x123abc...` };
         }
 
         // Get cast reactions
+        console.log('Fetching likes for cast...');
         const response = await fetch(
             `https://api.neynar.com/v2/farcaster/reactions/cast?hash=${castHash}&types=likes&limit=100`,
             {
@@ -166,12 +178,17 @@ async function verifyLike(userFid: number, castUrl: string): Promise<Verificatio
         );
 
         if (!response.ok) {
-            return { success: false, error: 'Failed to verify like' };
+            const errorText = await response.text();
+            console.error('Neynar API error:', response.status, errorText);
+            return { success: false, error: `Failed to verify like: ${response.status}` };
         }
 
         const data = await response.json();
         const likes = data.reactions || [];
+        console.log('Found', likes.length, 'likes on this cast');
+
         const hasLiked = likes.some((reaction: any) => reaction.user?.fid === userFid);
+        console.log('User has liked?', hasLiked);
 
         return {
             success: hasLiked,
@@ -188,12 +205,24 @@ async function verifyLike(userFid: number, castUrl: string): Promise<Verificatio
  */
 async function verifyRecast(userFid: number, castUrl: string): Promise<VerificationResult> {
     try {
+        console.log('=== VERIFY RECAST ===');
+        console.log('User FID:', userFid);
+        console.log('Cast URL:', castUrl);
+
+        if (!castUrl || castUrl.trim() === '') {
+            console.error('Cast URL is empty or missing');
+            return { success: false, error: 'Cast URL is required for Recast verification. Please add a cast URL when creating the campaign.' };
+        }
+
         const castHash = extractCastHash(castUrl);
+        console.log('Extracted cast hash:', castHash);
+
         if (!castHash) {
-            return { success: false, error: 'Invalid cast URL' };
+            return { success: false, error: `Invalid cast URL: "${castUrl}". Cast URL should contain a hash like 0x123abc...` };
         }
 
         // Get cast reactions (recasts)
+        console.log('Fetching recasts for cast...');
         const response = await fetch(
             `https://api.neynar.com/v2/farcaster/reactions/cast?hash=${castHash}&types=recasts&limit=100`,
             {
@@ -205,12 +234,17 @@ async function verifyRecast(userFid: number, castUrl: string): Promise<Verificat
         );
 
         if (!response.ok) {
-            return { success: false, error: 'Failed to verify recast' };
+            const errorText = await response.text();
+            console.error('Neynar API error:', response.status, errorText);
+            return { success: false, error: `Failed to verify recast: ${response.status}` };
         }
 
         const data = await response.json();
         const recasts = data.reactions || [];
+        console.log('Found', recasts.length, 'recasts on this cast');
+
         const hasRecasted = recasts.some((reaction: any) => reaction.user?.fid === userFid);
+        console.log('User has recasted?', hasRecasted);
 
         return {
             success: hasRecasted,
