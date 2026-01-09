@@ -1,0 +1,53 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyTask } from '@/lib/verifyTask';
+import { SupabaseService } from '@/lib/supabaseService';
+import { TaskType } from '@/lib/types';
+
+export async function POST(req: NextRequest) {
+    try {
+        const body = await req.json();
+        const { campaignId, taskType, userFid } = body;
+
+        if (!campaignId || !taskType || !userFid) {
+            return NextResponse.json(
+                { success: false, error: 'Missing required fields' },
+                { status: 400 }
+            );
+        }
+
+        // Get campaign details
+        const campaign = await SupabaseService.getCampaign(campaignId);
+        if (!campaign) {
+            return NextResponse.json(
+                { success: false, error: 'Campaign not found' },
+                { status: 404 }
+            );
+        }
+
+        // Verify task completion
+        const result = await verifyTask(
+            parseInt(userFid),
+            taskType as TaskType,
+            campaign.postUrl,
+            campaign.castUrl
+        );
+
+        if (!result.success) {
+            return NextResponse.json(
+                { success: false, error: result.error || 'Task verification failed' },
+                { status: 400 }
+            );
+        }
+
+        // TODO: Store completion in database
+        // await SupabaseService.recordTaskCompletion(campaignId, userFid, taskType);
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Task verification error:', error);
+        return NextResponse.json(
+            { success: false, error: 'Internal server error' },
+            { status: 500 }
+        );
+    }
+}
