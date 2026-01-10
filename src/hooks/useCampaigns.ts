@@ -21,7 +21,7 @@ export function useCreateCampaign() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: SupabaseService.createCampaign,
+        mutationFn: MockService.createCampaign,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['campaigns'] });
         },
@@ -31,6 +31,6 @@ export function useCreateCampaign() {
 export function useCompleteTask() {
     return useMutation({
         mutationFn: ({ campaignId, taskType }: { campaignId: string, taskType: any }) =>
-            SupabaseService.completeTask(campaignId, taskType),
+            MockService.completeTask(campaignId, taskType),
     });
 }
