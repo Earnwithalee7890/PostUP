@@ -18,16 +18,20 @@ export function TaskCampaignCard({ campaign }: TaskCampaignCardProps) {
     const isEnded = campaign.status === 'completed' || campaign.status === 'claimable' || campaign.remainingBudget < campaign.rewardAmountPerTask;
 
     const handleVerify = async (task: string) => {
-        const userFid = context?.user?.fid;
+        // For browser testing: Use test FID when Farcaster context is unavailable
+        const TEST_FID = 338060; // Your FID for testing
+        const userFid = context?.user?.fid || TEST_FID;
 
         console.log('=== VERIFY TASK ===');
         console.log('User FID:', userFid);
         console.log('Task:', task);
 
-        if (!userFid) {
-            alert('Please connect your Farcaster account to verify tasks');
-            return;
+        if (userFid === TEST_FID) {
+            console.log('⚠️ Using TEST FID for browser testing');
         }
+
+        // Note: Removed the "Please connect" check to allow testing with TEST_FID
+        // In production, you may want to re-enable this check
 
         setVerifying(task);
 
