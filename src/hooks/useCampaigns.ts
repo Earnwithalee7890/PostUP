@@ -1,18 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { SupabaseService } from '@/lib/supabaseService';
+import { MockService } from '@/lib/mockService';
 import { Campaign } from '@/lib/types';
 
 export function useCampaigns() {
     return useQuery({
         queryKey: ['campaigns'],
-        queryFn: SupabaseService.getCampaigns,
+        queryFn: MockService.getCampaigns,
     });
 }
 
 export function useCampaign(id: string) {
     return useQuery({
         queryKey: ['campaign', id],
-        queryFn: () => SupabaseService.getCampaign(id),
+        queryFn: () => MockService.getCampaign(id),
         enabled: !!id,
     });
 }
