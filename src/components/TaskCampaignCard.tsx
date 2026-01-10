@@ -158,12 +158,7 @@ export function TaskCampaignCard({ campaign }: TaskCampaignCardProps) {
                                 ) : (
                                     <button
                                         className={styles.verifyBtn}
-                                        onClick={() => {
-                                            if (task === 'Follow' && taskUrl) {
-                                                window.open(taskUrl, '_blank');
-                                            }
-                                            handleVerify(task);
-                                        }}
+                                        onClick={() => handleVerify(task)}
                                         disabled={isVerifying || isEnded}
                                     >
                                         {isVerifying ? <Loader2 size={14} className="spin" /> : 'Verify'}
