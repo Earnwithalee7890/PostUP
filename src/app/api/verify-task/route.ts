@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyTask } from '@/lib/verifyTask';
-import { SupabaseService } from '@/lib/supabaseService';
+import { MockService } from '@/lib/mockService';
 import { TaskType } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Get campaign details
-        const campaign = await SupabaseService.getCampaign(campaignId);
+        const campaign = await MockService.getCampaign(campaignId);
         if (!campaign) {
             console.error('Campaign not found:', campaignId);
             return NextResponse.json(
