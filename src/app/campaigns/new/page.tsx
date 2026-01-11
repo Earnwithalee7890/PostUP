@@ -64,6 +64,7 @@ const CATEGORIES = [
     { id: 'Follow' as CampaignCategory, label: 'Follow', icon: UserPlus, tasks: ['Follow'] as TaskType[] },
     { id: 'Boost' as CampaignCategory, label: 'Boost', icon: Zap, tasks: ['Like', 'Repost'] as TaskType[] },
     { id: 'MiniApp' as CampaignCategory, label: 'Mini App', icon: Smartphone, tasks: ['OpenMiniApp'] as TaskType[] },
+    { id: 'Multi' as CampaignCategory, label: 'Multi', icon: Grid3x3, tasks: [] as TaskType[] },
 ];
 
 const MULTI_ACTIONS = [
@@ -310,13 +311,14 @@ export default function NewCampaignPage() {
                     <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>Choose your campaign goal</p>
                 </header>
 
-                {/* Horizontal compact layout */}
+                {/* Single horizontal line layout */}
                 <div style={{
                     display: 'flex',
-                    gap: '1rem',
+                    gap: '0.75rem',
                     marginTop: '2rem',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center'
+                    flexWrap: 'nowrap',
+                    justifyContent: 'center',
+                    overflowX: 'auto'
                 }}>
                     {CATEGORIES.map((cat) => (
                         <button
