@@ -4,12 +4,27 @@ import styles from './page.module.css';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
-import { useFarcasterContext } from '@/providers/FarcasterProvider';
+import { use FarcasterContext } from '@/providers/FarcasterProvider';
+import { useEffect } from 'react';
 
 export default function Home() {
   const { isConnected } = useAccount();
   const { context } = useFarcasterContext(); // Removed isLoadingContext check
   const isFarcasterConnected = !!context?.user;
+
+  // Call ready() AFTER UI renders - per official Farcaster docs
+  useEffect(() => {
+    async function signalReady() {
+      try {
+        const { sdk } = await import('@farcaster/miniapp-sdk');
+        await sdk.actions.ready();
+        console.log('✅ ready() called after UI render');
+      } catch (e) {
+        // Not in Farcaster environment
+      }
+    }
+    signalReady();
+  }, []);
 
   // REMOVED LOADING BLOCK - render immediately
 

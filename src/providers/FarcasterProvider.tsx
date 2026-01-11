@@ -57,7 +57,7 @@ export default function FarcasterProvider({ children }: { children: React.ReactN
                 // Dynamically import SDK only when needed
                 const { sdk } = await import('@farcaster/miniapp-sdk');
 
-                // Load the context from the SDK
+                //Load the context from the SDK
                 const ctx = await sdk.context;
                 console.log('✅ Farcaster Context Loaded:', ctx);
 
@@ -69,9 +69,8 @@ export default function FarcasterProvider({ children }: { children: React.ReactN
                     setContext(undefined);
                 }
 
-                // Signal that the app is ready to display
-                await sdk.actions.ready();
-                console.log('✅ MiniApp ready signal sent');
+                // DON'T call ready() here - per official docs, call it AFTER UI renders
+                // ready() will be called in page component after content loads
 
                 setIsLoadingContext(false);
                 setIsSDKLoaded(true);
