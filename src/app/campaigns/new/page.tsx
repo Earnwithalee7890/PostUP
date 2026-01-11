@@ -57,24 +57,11 @@ const SUPPORTED_PLATFORMS = [
         label: 'Farcaster',
         logo: FarcasterLogo,
         description: 'Grow your Warpcast audience with follows, likes, and recasts.'
-    },
-    {
-        id: 'X' as Platform,
-        label: 'X (Twitter)',
-        logo: XLogo,
-        description: 'Boost engagement on your X posts and profile.'
-    },
-    {
-        id: 'Base' as Platform,
-        label: 'Base',
-        logo: BaseLogo,
-        description: 'Drive on-chain actions and community growth.'
     }
 ];
 
 const CATEGORIES = [
     { id: 'Follow' as CampaignCategory, label: 'Follow', icon: UserPlus, tasks: ['Follow'] as TaskType[] },
-    { id: 'Channel' as CampaignCategory, label: 'Channel', icon: Hash, tasks: ['JoinChannel'] as TaskType[] },
     { id: 'Boost' as CampaignCategory, label: 'Boost', icon: Zap, tasks: ['Like', 'Repost'] as TaskType[] },
     { id: 'MiniApp' as CampaignCategory, label: 'Mini App', icon: Smartphone, tasks: ['OpenMiniApp'] as TaskType[] },
     { id: 'Multi' as CampaignCategory, label: 'Multi', icon: Grid3x3, tasks: [] as TaskType[] },
@@ -90,11 +77,11 @@ const MULTI_ACTIONS = [
 
 export default function NewCampaignPage() {
     const router = useRouter();
-    const createMutation = useCreateCampaign();
+    const { mutate: createCampaign } = useCreateCampaign();
 
     // Steps: 0 = Platform Selection, 1 = Campaign Details
-    const [platform, setPlatform] = useState<Platform | null>(null);
-    const [category, setCategory] = useState<CampaignCategory>('Follow');
+    const [platform, setPlatform] = useState<Platform>('Farcaster'); // Auto-select Farcaster
+    const [category, setCategory] = useState<CampaignCategory | null>(null);
     const [postUrl, setPostUrl] = useState('');
     const [castUrl, setCastUrl] = useState('');
     const [rewardToken, setRewardToken] = useState('USDC');
@@ -310,44 +297,55 @@ export default function NewCampaignPage() {
     // RENDER: Check for wallet connection
     const { context } = useFarcasterContext();
     const isFarcasterUser = !!context?.user;
-
     // Get address from Farcaster verified addresses
     const userAddress = context?.user?.verifications?.[0] || address;
 
-    // RENDER: Platform Selection
-    if (!platform) {
+    // Skip platform selection - Farcaster is auto-selected
+    // RENDER: Category Selection
+    if (!category) {
         return (
             <div className={styles.container}>
                 <header className={styles.header}>
-                    <h1>Select Platform</h1>
-                    <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>Choose where to grow your audience</p>
+                    <h1>Campaign Type</h1>
+                    <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>Choose your campaign goal</p>
                 </header>
 
-                <div className={styles.platformGrid}>
-                    {SUPPORTED_PLATFORMS.map(p => (
-                        <div
-                            key={p.id}
+                {/* Horizontal compact layout */}
+                <div style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    marginTop: '2rem',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center'
+                }}>
+                    {CATEGORIES.map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => {
+                                setCategory(cat.id);
+                                if (cat.tasks.length === 1) {
+                                    setSelectedMultiTasks([cat.tasks[0]]);
+                                }
+                            }}
                             className={styles.platformCard}
-                            onClick={() => handlePlatformSelect(p.id)}
+                            style={{
+                                flex: '1 1 180px',
+                                maxWidth: '200px',
+                                padding: '1.5rem 1rem',
+                                textAlign: 'center'
+                            }}
                         >
-                            <div className={styles.platformIconWrapper}>
-                                <p.logo />
+                            <cat.icon size={32} style={{ margin: '0 auto 0.75rem' }} />
+                            <h3 style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>{cat.label}</h3>
+                            <div style={{ marginTop: '0.5rem', color: 'var(--primary)', fontSize: '0.85rem', fontWeight: 600 }}>
+                                Select <ChevronRight size={12} style={{ display: 'inline', marginLeft: '2px' }} />
                             </div>
-                            <div className={styles.platformContent}>
-                                <div className={styles.platformName}>{p.label}</div>
-                                <div className={styles.platformDesc}>{p.description}</div>
-                            </div>
-                            <ChevronRight className={styles.arrowIcon} />
-                        </div>
+                        </button>
                     ))}
                 </div>
-
-
             </div>
         );
     }
-
-    // RENDER: Campaign Details Form
     return (
         <div className={styles.container}>
             <button onClick={() => setPlatform(null)} className={styles.backButton}>
