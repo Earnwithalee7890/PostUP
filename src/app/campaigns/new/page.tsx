@@ -214,8 +214,8 @@ export default function NewCampaignPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!isConnected) {
-            alert('Please connect wallet');
+        if (!userAddress) {
+            alert('Please connect your Farcaster account');
             return;
         }
 
@@ -340,14 +340,24 @@ export default function NewCampaignPage() {
                                 style={{
                                     flex: '1 1 150px',
                                     maxWidth: '180px',
-                                    padding: '1rem 0.75rem',
+                                    padding: '1.2rem 0.75rem',
                                     textAlign: 'center',
-                                    border: isActive ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)',
-                                    background: isActive ? 'rgba(165, 166, 246, 0.1)' : 'rgba(255,255,255,0.03)'
+                                    border: isActive ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.2)',
+                                    background: isActive ? 'rgba(165, 166, 246, 0.15)' : 'rgba(255,255,255,0.05)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
-                                <Icon size={24} style={{ margin: '0 auto 0.5rem', color: isActive ? 'var(--primary)' : 'inherit' }} />
-                                <h3 style={{ fontSize: '0.9rem', marginBottom: '0' }}>{cat.label}</h3>
+                                <Icon size={26} style={{
+                                    margin: '0 auto 0.6rem',
+                                    color: isActive ? 'var(--primary)' : 'rgba(255,255,255,0.7)'
+                                }} />
+                                <h3 style={{
+                                    fontSize: '0.95rem',
+                                    marginBottom: '0',
+                                    color: isActive ? '#fff' : 'rgba(255,255,255,0.85)',
+                                    fontWeight: isActive ? 600 : 500
+                                }}>{cat.label}</h3>
                             </button>
                         );
                     })}
