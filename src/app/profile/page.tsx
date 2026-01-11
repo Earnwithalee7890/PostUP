@@ -81,7 +81,6 @@ export default function ProfilePage() {
                                 }} onClick={copyAddress}>
                                     {displayAddress.slice(0, 6)}...{displayAddress.slice(-4)}
                                     <Copy size={10} />
-                                    {!isWalletConnected && <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>(Auto)</span>}
                                 </span>
                             )}
                         </div>
