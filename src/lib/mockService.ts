@@ -4,52 +4,9 @@ import { calculateQualityScore } from './qualityScore';
 import { calculateWeightedDistribution } from './distribution';
 import { generateMerkleDistribution } from './merkle';
 
-// MockService is deprecated - using SupabaseService now
-// Keeping minimal version to avoid breaking imports
-let campaigns: Campaign[] = [
-    // Sample campaign 1: Follow task
-    {
-        id: 'test-campaign-1',
-        creator: '0xTestCreator',
-        platform: 'Farcaster' as Platform,
-        category: 'Follow',
-        postUrl: '3', // Vitalik's FID
-        castUrl: '',
-        tasks: ['Follow'] as TaskType[],
-        rewardToken: 'USDC',
-        totalBudget: 100,
-        platformFee: 18,
-        netBudget: 82,
-        rewardAmountPerTask: 1,
-        remainingBudget: 82,
-        minFollowers: 0,
-        requirePro: false,
-        status: 'active',
-        participants: [],
-        createdAt: Date.now() - 3600000,
-    },
-    // Sample campaign 2: Like + Recast
-    {
-        id: 'test-campaign-2',
-        creator: '0xTestCreator2',
-        platform: 'Farcaster' as Platform,
-        category: 'Boost',
-        postUrl: '',
-        castUrl: 'https://warpcast.com/dwr.eth/0x8e1e823e',
-        tasks: ['Like', 'Repost'] as TaskType[],
-        rewardToken: 'USDC',
-        totalBudget: 200,
-        platformFee: 36,
-        netBudget: 164,
-        rewardAmountPerTask: 2,
-        remainingBudget: 164,
-        minFollowers: 100,
-        requirePro: false,
-        status: 'active',
-        participants: [],
-        createdAt: Date.now() - 7200000,
-    }
-];
+// MockService - stores campaign data
+// Campaigns array starts empty - only real user-created campaigns will appear
+let campaigns: Campaign[] = [];
 let claimedRewards = new Map<string, Set<string>>();
 
 export const MockService = {
