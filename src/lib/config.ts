@@ -5,7 +5,7 @@ export const config = getDefaultConfig({
   appName: 'Post Up',
   projectId: 'YOUR_PROJECT_ID',
   chains: [base],
-  ssr: false,
+  ssr: true, // FIXED: Must be true for Next.js App Router
 });
 
 export const DISTRIBUTOR_ADDRESS = '0x310a9F6f4ed24f390A2ef7552b6F0b2Dd914C342'; // Base Mainnet V2 (USDC Support)
