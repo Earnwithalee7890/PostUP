@@ -61,8 +61,7 @@ export default function Home() {
               Browse Tasks
             </Link>
           </div>
-        </>
-          )}
+        </div>
 
         <div style={{ marginTop: '2rem' }}>
           <button
