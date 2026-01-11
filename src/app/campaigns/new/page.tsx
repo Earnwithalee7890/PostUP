@@ -502,17 +502,13 @@ export default function NewCampaignPage() {
                     <button
                         type="submit"
                         className={styles.submitBtn}
-                        disabled={isConfirming}
+                        disabled={isSubmitting}
                         style={{
-                            opacity: isConnected ? 1 : 0.5,
-                            cursor: isConnected ? 'pointer' : 'not-allowed'
+                            opacity: userAddress ? 1 : 0.5,
+                            cursor: userAddress ? 'pointer' : 'not-allowed'
                         }}
                     >
-                        {needsApproval ? (
-                            isConfirming && lastAction === 'approve' ? 'Approving...' : `Approve ${rewardToken}`
-                        ) : (
-                            isConfirming && lastAction === 'create' ? 'Creating...' : `Create Task (${totalBudget} ${rewardToken})`
-                        )}
+                        {isSubmitting ? 'Creating...' : `Create Task (${totalBudget} ${rewardToken})`}
                     </button>
                 </div>
 
