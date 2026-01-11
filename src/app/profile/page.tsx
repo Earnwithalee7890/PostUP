@@ -1,53 +1,32 @@
 'use client';
 
-import { useAccount, useDisconnect } from 'wagmi';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useQuery } from '@tanstack/react-query';
 import { MockService } from '@/lib/mockService';
 import { NeynarService } from '@/lib/neynar';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { User, CheckCircle, TrendingUp, History, LogOut, Copy } from 'lucide-react';
+import { User, CheckCircle, History, Copy } from 'lucide-react';
 
 export default function ProfilePage() {
-    const { address, isConnected } = useAccount();
-    const { context, isLoadingContext } = useFarcasterContext();
+    const { context } = useFarcasterContext();
 
     const { data: stats } = useQuery({
-        queryKey: ['userStats', address, context?.user?.fid],
+        queryKey: ['userStats', context?.user?.fid],
         queryFn: async () => {
             if (context?.user?.fid) {
                 return NeynarService.getUserStats(context.user.fid);
             }
-            if (address) {
-                return NeynarService.getUserStats(address);
-            }
             return MockService.getUserStats('');
         },
-        enabled: !!address || !!context?.user?.fid
+        enabled: !!context?.user?.fid
     });
 
-    // Non-blocking loading state
-    if (isLoadingContext) {
-        return (
-            <main className="container flex-center" style={{ minHeight: '80vh', flexDirection: 'column' }}>
-                <div style={{ color: 'var(--muted-foreground)' }}>Loading Profile...</div>
-            </main>
-        );
-    }
-
-    // Determine identity
-    const identityAddress = address || stats?.verifications?.[0];
+    // Determine identity from Farcaster
+    const identityAddress = context?.user?.verifications?.[0] || stats?.verifications?.[0];
     const identityName = context?.user?.displayName || 'Guest User';
     const identityUsername = context?.user?.username || 'guest';
     const identityPfp = context?.user?.pfpUrl;
 
-    // We no longer block access. If not connected, we show empty/guest state.
-
-
-    const { disconnect } = useDisconnect();
-
     const displayAddress = identityAddress || '';
-    const isWalletConnected = !!address;
 
     const copyAddress = () => {
         if (displayAddress) {
@@ -109,106 +88,71 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* ACTIONS */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {stats?.isPro && (
-                        <div style={{
-                            padding: '0.4rem 0.8rem',
-                            background: 'rgba(123, 63, 228, 0.2)',
-                            border: '1px solid var(--primary)',
-                            borderRadius: '99px',
-                            fontSize: '0.8rem',
-                            fontWeight: 700,
-                            color: 'var(--primary-light)',
-                            height: 'fit-content'
-                        }}>PRO</div>
-                    )}
+                {/* Farcaster user - no wallet connection needed */}
+            </div>
+        </div>
 
-                    {isConnected ? (
-                        <button
-                            onClick={() => disconnect()}
-                            style={{
-                                padding: '0.6rem',
-                                borderRadius: '50%',
-                                background: 'rgba(255, 73, 74, 0.1)',
-                                border: '1px solid rgba(255, 73, 74, 0.2)',
-                                color: '#FF494A',
-                                cursor: 'pointer',
+            {/* STATS GRID */ }
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '3rem' }}>
+        <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
+            <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Total Tasks</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.totalTasks || 0}</div>
+        </div>
+        <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
+            <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Neynar Score</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)', color: '#a5a6f6' }}>{stats?.neynarScore || 0}%</div>
+        </div>
+        <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
+            <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Followers</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.followers || 0}</div>
+        </div>
+    </div>
+
+    {/* HISTORY */ }
+    <section>
+        <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <History size={18} /> Task History
+        </h3>
+
+        <div className="glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
+            {stats?.history && stats.history.length > 0 ? (
+                stats.history.map((item, i) => (
+                    <div key={i} style={{
+                        padding: '1.25rem',
+                        borderBottom: '1px solid var(--border)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{
+                                width: '36px', height: '36px',
+                                borderRadius: '8px',
+                                background: 'rgba(255,255,255,0.05)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }}
-                            title="Disconnect Wallet"
-                        >
-                            <LogOut size={18} />
-                        </button>
-                    ) : (
-                        <div style={{ transform: 'scale(0.9)' }}>
-                            <ConnectButton />
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* STATS GRID */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '3rem' }}>
-                <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Total Tasks</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.totalTasks || 0}</div>
-                </div>
-                <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Neynar Score</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)', color: '#a5a6f6' }}>{stats?.neynarScore || 0}%</div>
-                </div>
-                <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Followers</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.followers || 0}</div>
-                </div>
-            </div>
-
-            {/* HISTORY */}
-            <section>
-                <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <History size={18} /> Task History
-                </h3>
-
-                <div className="glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
-                    {stats?.history && stats.history.length > 0 ? (
-                        stats.history.map((item, i) => (
-                            <div key={i} style={{
-                                padding: '1.25rem',
-                                borderBottom: '1px solid var(--border)',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{
-                                        width: '36px', height: '36px',
-                                        borderRadius: '8px',
-                                        background: 'rgba(255,255,255,0.05)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                    }}>
-                                        <CheckCircle size={18} color={i === 0 ? '#2ecc71' : 'var(--muted-foreground)'} />
-                                    </div>
-                                    <div>
-                                        <div style={{ fontWeight: 600 }}>{item.task} on {item.platform}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
-                                            {new Date(item.date).toLocaleDateString()}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div style={{ fontWeight: 700, color: 'var(--secondary)' }}>
-                                    +{item.reward}
+                                <CheckCircle size={18} color={i === 0 ? '#2ecc71' : 'var(--muted-foreground)'} />
+                            </div>
+                            <div>
+                                <div style={{ fontWeight: 600 }}>{item.task} on {item.platform}</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                                    {new Date(item.date).toLocaleDateString()}
                                 </div>
                             </div>
-                        ))
-                    ) : (
-                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
-                            No history yet. Start a task!
                         </div>
-                    )}
+
+                        <div style={{ fontWeight: 700, color: 'var(--secondary)' }}>
+                            +{item.reward}
+                        </div>
+                    </div>
+                ))
+            ) : (
+                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+                    No history yet. Start a task!
                 </div>
-            </section>
-        </main>
+            )}
+        </div>
+    </section>
+        </main >
     );
 }
