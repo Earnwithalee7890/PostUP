@@ -4,7 +4,7 @@ import styles from './page.module.css';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
-import { use FarcasterContext } from '@/providers/FarcasterProvider';
+import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useEffect } from 'react';
 
 export default function Home() {
