@@ -138,6 +138,6 @@ export default function Home() {
         </dialog>
       </div>
     </div>
-    </main >
+    </main>
   );
 }
