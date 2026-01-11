@@ -90,69 +90,68 @@ export default function ProfilePage() {
 
                 {/* Farcaster user - no wallet connection needed */}
             </div>
-        </div>
 
-            {/* STATS GRID */ }
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '3rem' }}>
-        <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
-            <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Total Tasks</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.totalTasks || 0}</div>
-        </div>
-        <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
-            <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Neynar Score</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)', color: '#a5a6f6' }}>{stats?.neynarScore || 0}%</div>
-        </div>
-        <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
-            <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Followers</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.followers || 0}</div>
-        </div>
-    </div>
+            {/* STATS GRID */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '3rem' }}>
+                <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Total Tasks</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.totalTasks || 0}</div>
+                </div>
+                <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Neynar Score</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)', color: '#a5a6f6' }}>{stats?.neynarScore || 0}%</div>
+                </div>
+                <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Followers</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.followers || 0}</div>
+                </div>
+            </div>
 
-    {/* HISTORY */ }
-    <section>
-        <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <History size={18} /> Task History
-        </h3>
+            {/* HISTORY */}
+            <section>
+                <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <History size={18} /> Task History
+                </h3>
 
-        <div className="glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
-            {stats?.history && stats.history.length > 0 ? (
-                stats.history.map((item, i) => (
-                    <div key={i} style={{
-                        padding: '1.25rem',
-                        borderBottom: '1px solid var(--border)',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{
-                                width: '36px', height: '36px',
-                                borderRadius: '8px',
-                                background: 'rgba(255,255,255,0.05)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                <div className="glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
+                    {stats?.history && stats.history.length > 0 ? (
+                        stats.history.map((item, i) => (
+                            <div key={i} style={{
+                                padding: '1.25rem',
+                                borderBottom: '1px solid var(--border)',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
                             }}>
-                                <CheckCircle size={18} color={i === 0 ? '#2ecc71' : 'var(--muted-foreground)'} />
-                            </div>
-                            <div>
-                                <div style={{ fontWeight: 600 }}>{item.task} on {item.platform}</div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
-                                    {new Date(item.date).toLocaleDateString()}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{
+                                        width: '36px', height: '36px',
+                                        borderRadius: '8px',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        <CheckCircle size={18} color={i === 0 ? '#2ecc71' : 'var(--muted-foreground)'} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: 600 }}>{item.task} on {item.platform}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                                            {new Date(item.date).toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ fontWeight: 700, color: 'var(--secondary)' }}>
+                                    +{item.reward}
                                 </div>
                             </div>
+                        ))
+                    ) : (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+                            No history yet. Start a task!
                         </div>
-
-                        <div style={{ fontWeight: 700, color: 'var(--secondary)' }}>
-                            +{item.reward}
-                        </div>
-                    </div>
-                ))
-            ) : (
-                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
-                    No history yet. Start a task!
+                    )}
                 </div>
-            )}
-        </div>
-    </section>
+            </section>
         </main >
     );
 }
