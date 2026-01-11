@@ -359,25 +359,6 @@ export default function NewCampaignPage() {
 
             <form onSubmit={handleSubmit} className={styles.form}>
 
-                {/* CATEGORY ICONS */}
-                <div className={styles.categoryGrid}>
-                    {visibleCategories.map(cat => {
-                        const Icon = cat.icon;
-                        const isActive = category === cat.id;
-                        return (
-                            <button
-                                key={cat.id}
-                                type="button"
-                                onClick={() => handleCategorySelect(cat)}
-                                className={`${styles.categoryBtn} ${isActive ? styles.categoryActive : ''}`}
-                            >
-                                <Icon size={20} />
-                                <span>{cat.label}</span>
-                            </button>
-                        );
-                    })}
-                </div>
-
                 {/* MULTI TASK SELECTOR */}
                 {category === 'Multi' && (
                     <>
