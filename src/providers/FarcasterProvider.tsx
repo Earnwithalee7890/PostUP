@@ -19,8 +19,6 @@ const FarcasterContext = createContext<FarcasterContextType>({
 
 export const useFarcasterContext = () => useContext(FarcasterContext);
 
-import { FarcasterAutoConnect } from '@/components/FarcasterAutoConnect';
-
 export default function FarcasterProvider({ children }: { children: React.ReactNode }) {
     const [isSDKLoaded, setIsSDKLoaded] = useState(false);
     const [isLoadingContext, setIsLoadingContext] = useState(true);
@@ -29,7 +27,7 @@ export default function FarcasterProvider({ children }: { children: React.ReactN
     useEffect(() => {
         const loadContext = async () => {
             try {
-                // Only attempt SDK loading if we're in a client environment with potential Farcaster context
+                // Server-side check
                 if (typeof window === 'undefined') {
                     console.log('⚠️ Server-side rendering detected, skipping SDK');
                     setContext(undefined);
@@ -38,45 +36,28 @@ export default function FarcasterProvider({ children }: { children: React.ReactN
                     return;
                 }
 
-                // Check if we're inside a Farcaster iframe (miniapp context)
-                const isInFarcaster = window.parent !== window ||
-                    window.location.ancestorOrigins?.length > 0 ||
-                    document.referrer.includes('farcaster') ||
-                    document.referrer.includes('warpcast');
-
-                if (!isInFarcaster) {
-                    console.log('⚠️ Not in Farcaster context - browser mode');
-                    setContext(undefined);
-                    setIsLoadingContext(false);
-                    setIsSDKLoaded(true);
-                    return;
-                }
-
                 console.log('🔄 Loading Farcaster MiniApp SDK...');
 
-                // Dynamically import SDK only when needed
+                // Always try to load SDK - it will gracefully fail if not in miniapp
                 const { sdk } = await import('@farcaster/miniapp-sdk');
 
-                //Load the context from the SDK
+                // Load the context from the SDK
                 const ctx = await sdk.context;
                 console.log('✅ Farcaster Context Loaded:', ctx);
 
                 if (ctx && ctx.user) {
                     setContext(ctx);
-                    console.log('✅ Farcaster user detected:', ctx.user.fid);
+                    console.log('✅ Farcaster user detected:', ctx.user.fid, ctx.user.username);
                 } else {
-                    console.warn('⚠️ No Farcaster user found');
+                    console.warn('⚠️ No Farcaster user found in context');
                     setContext(undefined);
                 }
-
-                // DON'T call ready() here - per official docs, call it AFTER UI renders
-                // ready() will be called in page component after content loads
 
                 setIsLoadingContext(false);
                 setIsSDKLoaded(true);
             } catch (err) {
                 // SDK not available - running in browser mode
-                console.warn('⚠️ Farcaster SDK unavailable - browser mode');
+                console.warn('⚠️ Farcaster SDK unavailable - browser mode', err);
                 setContext(undefined);
                 setIsLoadingContext(false);
                 setIsSDKLoaded(true);
@@ -90,7 +71,6 @@ export default function FarcasterProvider({ children }: { children: React.ReactN
 
     return (
         <FarcasterContext.Provider value={{ isSDKLoaded, isLoadingContext, context }}>
-            <FarcasterAutoConnect />
             {children}
         </FarcasterContext.Provider>
     );
