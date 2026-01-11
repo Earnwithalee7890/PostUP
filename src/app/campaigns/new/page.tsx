@@ -184,7 +184,7 @@ export default function NewCampaignPage() {
                 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
                 const endedAt = Date.now() + (duration * ONE_DAY_MS);
 
-                createMutation.mutate({
+                createCampaign({
                     creator: address || '0x00',
                     platform: platform!,
                     category: category,
@@ -207,7 +207,7 @@ export default function NewCampaignPage() {
                 }, 1500);
             }
         }
-    }, [isConfirmed, hash, lastAction, hasCreated, refetchAllowance, reset, router, createMutation, address, platform, category, postUrl, castUrl, selectedMultiTasks, rewardToken, budget, platformFee, netBudget, require200Followers, requirePro, duration]);
+    }, [isConfirmed, hash, lastAction, hasCreated, refetchAllowance, reset, router, createCampaign, address, platform, category, postUrl, castUrl, selectedMultiTasks, rewardToken, budget, platformFee, netBudget, require200Followers, requirePro, duration]);
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -348,8 +348,8 @@ export default function NewCampaignPage() {
     }
     return (
         <div className={styles.container}>
-            <button onClick={() => setPlatform(null)} className={styles.backButton}>
-                <ArrowLeft size={16} /> Back to Platforms
+            <button onClick={() => setCategory(null)} className={styles.backButton}>
+                <ArrowLeft size={16} /> Back
             </button>
 
             <header className={styles.header}>
@@ -570,18 +570,23 @@ export default function NewCampaignPage() {
                 )}
 
                 {/* SUBMIT */}
-                <button
-                    type="submit"
-                    className={styles.submitBtn}
-                    disabled={isConfirming || (isConfirmed && !needsApproval) || !isBudgetValid || !totalBudget}
-                >
-                    {isConfirming
-                        ? 'Confirming...'
-                        : needsApproval
-                            ? `Approve ${rewardToken}`
-                            : `Create Task (${budget.toFixed(4)} ${rewardToken})`
-                    }
-                </button>
+                <div style={{ marginBottom: '100px' }}> {/* Extra space to prevent overlap with footer */}
+                    <button
+                        type="submit"
+                        className={styles.submitBtn}
+                        disabled={isConfirming}
+                        style={{
+                            opacity: isConnected ? 1 : 0.5,
+                            cursor: isConnected ? 'pointer' : 'not-allowed'
+                        }}
+                    >
+                        {needsApproval && rewardToken !== 'ETH' ? (
+                            isConfirming && lastAction === 'approve' ? 'Approving...' : `Approve ${rewardToken}`
+                        ) : (
+                            isConfirming && lastAction === 'create' ? 'Creating...' : `Create Task (${totalBudget} ${rewardToken})`
+                        )}
+                    </button>
+                </div>
 
                 {category === 'MiniApp' && (
                     <p className={styles.miniAppNote}>
