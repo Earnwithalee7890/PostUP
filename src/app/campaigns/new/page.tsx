@@ -184,10 +184,11 @@ export default function NewCampaignPage() {
                 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
                 const endedAt = Date.now() + (duration * ONE_DAY_MS);
 
+
                 createCampaign({
                     creator: address || '0x00',
                     platform: platform!,
-                    category: category,
+                    category: category!,  // Non-null assertion - category is guaranteed to exist here
                     postUrl: postUrl,
                     castUrl: castUrl,
                     tasks: finalTasks,
@@ -580,7 +581,7 @@ export default function NewCampaignPage() {
                             cursor: isConnected ? 'pointer' : 'not-allowed'
                         }}
                     >
-                        {needsApproval && rewardToken !== 'ETH' ? (
+                        {needsApproval ? (
                             isConfirming && lastAction === 'approve' ? 'Approving...' : `Approve ${rewardToken}`
                         ) : (
                             isConfirming && lastAction === 'create' ? 'Creating...' : `Create Task (${totalBudget} ${rewardToken})`
