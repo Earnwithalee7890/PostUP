@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
-import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadContract } from 'wagmi';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { parseEther, parseUnits } from 'viem';
 import { DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/config';
@@ -138,77 +137,8 @@ export default function NewCampaignPage() {
         }
     };
 
-    const { isConnected, address } = useAccount();
-    const { writeContract, data: hash, isPending: isConfirming, reset } = useWriteContract();
-    const [lastAction, setLastAction] = useState<'approve' | 'create' | null>(null);
-
-    // Check USDC/USDT Allowance
-    const tokenAddress = rewardToken === 'USDC'
-        ? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'  // Base USDC
-        : '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2'; // Base USDT
-
-    const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
-        address: tokenAddress as `0x${string}`,
-        abi: ERC20_ABI,
-        functionName: 'allowance',
-        args: [address as `0x${string}`, DISTRIBUTOR_ADDRESS as `0x${string}`],
-        query: {
-            enabled: !!address && (rewardToken === 'USDC' || rewardToken === 'USDT'),
-        }
-    });
-
-    const currentAllowance = allowanceData ? BigInt(allowanceData.toString()) : BigInt(0);
-    const requiredAmount = parseUnits(totalBudget, 6);
-    const needsApproval = (rewardToken === 'USDC' || rewardToken === 'USDT') && currentAllowance < requiredAmount;
-
-    const { isLoading: isConfirmed } = useWaitForTransactionReceipt({
-        hash,
-    });
-
-    const [hasCreated, setHasCreated] = useState(false);
-
-    // Effect to handle success after transaction confirmation
-    useEffect(() => {
-        if (isConfirmed && hash && !hasCreated) {
-            if (lastAction === 'approve') {
-                refetchAllowance();
-                reset();
-                setLastAction(null);
-            } else if (lastAction === 'create') {
-                // Prevent duplicate creation
-                setHasCreated(true);
-
-                const selectedCategoryObj = CATEGORIES.find(c => c.id === category);
-                const finalTasks = category === 'Multi' ? selectedMultiTasks : (selectedCategoryObj?.tasks || []);
-                const estRewardPerTask = netBudget / 50;
-                const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-                const endedAt = Date.now() + (duration * ONE_DAY_MS);
-
-
-                createCampaign({
-                    creator: address || '0x00',
-                    platform: platform!,
-                    category: category!,  // Non-null assertion - category is guaranteed to exist here
-                    postUrl: postUrl,
-                    castUrl: castUrl,
-                    tasks: finalTasks,
-                    rewardToken: rewardToken as any,
-                    totalBudget: budget,
-                    platformFee: platformFee,
-                    netBudget: netBudget,
-                    rewardAmountPerTask: estRewardPerTask,
-                    minFollowers: require200Followers ? 200 : 0,
-                    requirePro: requirePro,
-                    endedAt: endedAt
-                });
-
-                // Redirect after short delay
-                setTimeout(() => {
-                    router.push('/tasks');
-                }, 1500);
-            }
-        }
-    }, [isConfirmed, hash, lastAction, hasCreated, refetchAllowance, reset, router, createCampaign, address, platform, category, postUrl, castUrl, selectedMultiTasks, rewardToken, budget, platformFee, netBudget, require200Followers, requirePro, duration]);
+    // Removed wallet dependencies - using Farcaster auth only
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -230,49 +160,58 @@ export default function NewCampaignPage() {
             return;
         }
 
+
+        if (needsCastUrl && !castUrl.trim()) {
+            alert('Please provide a Cast URL');
+            return;
+        }
+
+        if (!isBudgetValid) {
+            alert(budgetError || 'Invalid budget');
+            return;
+        }
+
+        if (category === 'Multi' && selectedMultiTasks.length === 0) {
+            alert('Please select at least one action for Multi campaign');
+            return;
+        }
+
+        // Create campaign directly (no wallet transactions needed)
+        setIsSubmitting(true);
+
         try {
-            if (needsApproval) {
-                // APPROVE FLOW
-                setLastAction('approve');
+            const selectedCategoryObj = CATEGORIES.find(c => c.id === category);
+            const finalTasks = category === 'Multi' ? selectedMultiTasks : (selectedCategoryObj?.tasks || []);
+            const estRewardPerTask = netBudget / 50;
+            const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+            const endedAt = Date.now() + (duration * ONE_DAY_MS);
 
-                const tokenAddress = rewardToken === 'USDC'
-                    ? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'  // Base USDC
-                    : '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2'; // Base USDT
+            createCampaign({
+                creator: userAddress,
+                platform: platform!,
+                category: category!,
+                postUrl: postUrl,
+                castUrl: castUrl,
+                tasks: finalTasks,
+                rewardToken: rewardToken as any,
+                totalBudget: budget,
+                platformFee: platformFee,
+                netBudget: netBudget,
+                rewardAmountPerTask: estRewardPerTask,
+                minFollowers: require200Followers ? 200 : 0,
+                requirePro: requirePro,
+                endedAt: endedAt
+            });
 
-                const approvalAmount = parseUnits(totalBudget, 6);
-
-                writeContract({
-                    address: tokenAddress as `0x${string}`,
-                    abi: ERC20_ABI,
-                    functionName: 'approve',
-                    args: [DISTRIBUTOR_ADDRESS as `0x${string}`, approvalAmount]
-                });
-            } else {
-                // CREATE FLOW
-                setLastAction('create');
-
-                // Get token address based on selection
-                const tokenAddress = rewardToken === 'USDC'
-                    ? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'  // Base USDC
-                    : '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2'; // Base USDT
-
-                const amountInDecimals = parseUnits(totalBudget, 6); // USDC/USDT both use 6 decimals
-
-                writeContract({
-                    address: DISTRIBUTOR_ADDRESS as `0x${string}`,
-                    abi: DISTRIBUTOR_ABI,
-                    functionName: 'createCampaign',
-                    args: [
-                        '0x0000000000000000000000000000000000000000000000000000000000000000', // Initial empty root
-                        tokenAddress as `0x${string}`, // Token address
-                        amountInDecimals // Amount in token decimals
-                    ],
-                });
-            }
-        } catch (err) {
-            console.error(err);
-            alert('Failed to execute transaction');
-            setLastAction(null);
+            // Redirect after creation
+            setTimeout(() => {
+                router.push('/tasks');
+            }, 1500);
+        } catch (error) {
+            console.error('Error creating campaign:', error);
+            alert('Failed to create campaign. Please try again.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -299,7 +238,7 @@ export default function NewCampaignPage() {
     const { context } = useFarcasterContext();
     const isFarcasterUser = !!context?.user;
     // Get address from Farcaster verified addresses
-    const userAddress = context?.user?.verifications?.[0] || address;
+    const userAddress = context?.user?.verifications?.[0];
 
     // Skip category selection - go directly to form with category buttons
     return (
@@ -317,11 +256,12 @@ export default function NewCampaignPage() {
                 {/* CATEGORY SELECTOR - Horizontal buttons in form */}
                 <div style={{
                     display: 'flex',
-                    gap: '0.75rem',
+                    gap: '0.5rem',
                     marginBottom: '2rem',
                     flexWrap: 'nowrap',
-                    justifyContent: 'center',
-                    overflowX: 'auto'
+                    justifyContent: 'flex-start',
+                    overflowX: 'auto',
+                    padding: '0 0.5rem'
                 }}>
                     {CATEGORIES.map((cat) => {
                         const Icon = cat.icon;
@@ -338,14 +278,16 @@ export default function NewCampaignPage() {
                                 }}
                                 className={styles.platformCard}
                                 style={{
-                                    flex: '1 1 150px',
-                                    maxWidth: '180px',
-                                    padding: '1.2rem 0.75rem',
+                                    flex: '0 0 auto',
+                                    minWidth: '90px',
+                                    maxWidth: '105px',
+                                    padding: '1rem 0.5rem',
                                     textAlign: 'center',
                                     border: isActive ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.2)',
                                     background: isActive ? 'rgba(165, 166, 246, 0.15)' : 'rgba(255,255,255,0.05)',
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s ease'
+                                    transition: 'all 0.2s ease',
+                                    borderRadius: '12px'
                                 }}
                             >
                                 <Icon size={26} style={{
