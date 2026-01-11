@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
 import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadContract } from 'wagmi';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { parseEther, parseUnits } from 'viem';
 import { DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/config';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
@@ -312,33 +311,8 @@ export default function NewCampaignPage() {
     const { context } = useFarcasterContext();
     const isFarcasterUser = !!context?.user;
 
-    if (!isConnected) {
-        return (
-            <div className={styles.container}>
-                <button onClick={() => router.push('/')} className={styles.backButton}>
-                    <ArrowLeft size={16} /> Back
-                </button>
-                <header className={styles.header} style={{ marginTop: '2rem' }}>
-                    <h1>{isFarcasterUser ? 'Verifying Identity...' : 'Connect Wallet'}</h1>
-                    <p style={{ color: 'var(--muted-foreground)' }}>
-                        {isFarcasterUser
-                            ? 'Syncing with your Farcaster client...'
-                            : 'You need to connect a wallet to fund and create a campaign.'}
-                    </p>
-                </header>
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', background: 'rgba(255,255,255,0.03)', borderRadius: '1rem' }}>
-                    {isFarcasterUser ? (
-                        <div className="flex-center" style={{ flexDirection: 'column', gap: '1rem' }}>
-                            <Clock className="spin" size={32} style={{ opacity: 0.5 }} />
-                            <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Please approve the connection in your wallet if prompted.</span>
-                        </div>
-                    ) : (
-                        <ConnectButton />
-                    )}
-                </div>
-            </div>
-        );
-    }
+    // Get address from Farcaster verified addresses
+    const userAddress = context?.user?.verifications?.[0] || address;
 
     // RENDER: Platform Selection
     if (!platform) {
