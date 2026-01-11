@@ -81,7 +81,7 @@ export default function NewCampaignPage() {
 
     // Steps: 0 = Platform Selection, 1 = Campaign Details
     const [platform, setPlatform] = useState<Platform>('Farcaster'); // Auto-select Farcaster
-    const [category, setCategory] = useState<CampaignCategory | null>(null);
+    const [category, setCategory] = useState<CampaignCategory>('Follow'); // Auto-select Follow by default
     const [postUrl, setPostUrl] = useState('');
     const [castUrl, setCastUrl] = useState('');
     const [rewardToken, setRewardToken] = useState('USDC');
@@ -301,56 +301,10 @@ export default function NewCampaignPage() {
     // Get address from Farcaster verified addresses
     const userAddress = context?.user?.verifications?.[0] || address;
 
-    // Skip platform selection - Farcaster is auto-selected
-    // RENDER: Category Selection
-    if (!category) {
-        return (
-            <div className={styles.container}>
-                <header className={styles.header}>
-                    <h1>Campaign Type</h1>
-                    <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>Choose your campaign goal</p>
-                </header>
-
-                {/* Single horizontal line layout */}
-                <div style={{
-                    display: 'flex',
-                    gap: '0.75rem',
-                    marginTop: '2rem',
-                    flexWrap: 'nowrap',
-                    justifyContent: 'center',
-                    overflowX: 'auto'
-                }}>
-                    {CATEGORIES.map((cat) => (
-                        <button
-                            key={cat.id}
-                            onClick={() => {
-                                setCategory(cat.id);
-                                if (cat.tasks.length === 1) {
-                                    setSelectedMultiTasks([cat.tasks[0]]);
-                                }
-                            }}
-                            className={styles.platformCard}
-                            style={{
-                                flex: '1 1 180px',
-                                maxWidth: '200px',
-                                padding: '1.5rem 1rem',
-                                textAlign: 'center'
-                            }}
-                        >
-                            <cat.icon size={32} style={{ margin: '0 auto 0.75rem' }} />
-                            <h3 style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>{cat.label}</h3>
-                            <div style={{ marginTop: '0.5rem', color: 'var(--primary)', fontSize: '0.85rem', fontWeight: 600 }}>
-                                Select <ChevronRight size={12} style={{ display: 'inline', marginLeft: '2px' }} />
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            </div>
-        );
-    }
+    // Skip category selection - go directly to form with category buttons
     return (
         <div className={styles.container}>
-            <button onClick={() => setCategory(null)} className={styles.backButton}>
+            <button onClick={() => router.push('/')} className={styles.backButton}>
                 <ArrowLeft size={16} /> Back
             </button>
 
@@ -359,6 +313,45 @@ export default function NewCampaignPage() {
             </header>
 
             <form onSubmit={handleSubmit} className={styles.form}>
+
+                {/* CATEGORY SELECTOR - Horizontal buttons in form */}
+                <div style={{
+                    display: 'flex',
+                    gap: '0.75rem',
+                    marginBottom: '2rem',
+                    flexWrap: 'nowrap',
+                    justifyContent: 'center',
+                    overflowX: 'auto'
+                }}>
+                    {CATEGORIES.map((cat) => {
+                        const Icon = cat.icon;
+                        const isActive = category === cat.id;
+                        return (
+                            <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => {
+                                    setCategory(cat.id);
+                                    if (cat.id !== 'Multi') {
+                                        setSelectedMultiTasks([]);
+                                    }
+                                }}
+                                className={styles.platformCard}
+                                style={{
+                                    flex: '1 1 150px',
+                                    maxWidth: '180px',
+                                    padding: '1rem 0.75rem',
+                                    textAlign: 'center',
+                                    border: isActive ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)',
+                                    background: isActive ? 'rgba(165, 166, 246, 0.1)' : 'rgba(255,255,255,0.03)'
+                                }}
+                            >
+                                <Icon size={24} style={{ margin: '0 auto 0.5rem', color: isActive ? 'var(--primary)' : 'inherit' }} />
+                                <h3 style={{ fontSize: '0.9rem', marginBottom: '0' }}>{cat.label}</h3>
+                            </button>
+                        );
+                    })}
+                </div>
 
                 {/* MULTI TASK SELECTOR */}
                 {category === 'Multi' && (
