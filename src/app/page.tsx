@@ -8,19 +8,10 @@ import { useFarcasterContext } from '@/providers/FarcasterProvider';
 
 export default function Home() {
   const { isConnected } = useAccount();
-  const { context, isLoadingContext } = useFarcasterContext();
+  const { context } = useFarcasterContext(); // Removed isLoadingContext check
   const isFarcasterConnected = !!context?.user;
 
-  // Show loading state while checking context
-  if (isLoadingContext) {
-    return (
-      <main className={styles.main}>
-        <div className={styles.hero}>
-          <div style={{ color: 'var(--muted-foreground)' }}>Loading...</div>
-        </div>
-      </main>
-    );
-  }
+  // REMOVED LOADING BLOCK - render immediately
 
   return (
     <main className={styles.main}>
