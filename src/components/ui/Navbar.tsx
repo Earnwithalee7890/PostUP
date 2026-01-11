@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Home, Zap, Layers, User, TrendingUp } from 'lucide-react';
 import styles from './Navbar.module.css';
 
@@ -38,18 +37,6 @@ export function Navbar() {
                     <Link href="/profile" className={`${styles.navLink} ${isActive('/profile') ? styles.active : ''}`}>
                         <User size={18} style={{ marginRight: '6px' }} /> Profile
                     </Link>
-                </div>
-
-                <div className={styles.connectWrapper}>
-                    {/* Mainnet Mode */}
-                    <ConnectButton
-                        accountStatus={{
-                            smallScreen: 'avatar',
-                            largeScreen: 'full',
-                        }}
-                        chainStatus="icon"
-                        showBalance={false}
-                    />
                 </div>
             </nav>
         </div>
