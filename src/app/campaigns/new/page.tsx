@@ -77,7 +77,7 @@ const MULTI_ACTIONS = [
 
 export default function NewCampaignPage() {
     const router = useRouter();
-    const { mutate: createCampaign } = useCreateCampaign();
+    const { mutateAsync: createCampaign } = useCreateCampaign();
 
     // Steps: 0 = Platform Selection, 1 = Campaign Details
     const [platform, setPlatform] = useState<Platform>('Farcaster'); // Auto-select Farcaster
@@ -219,7 +219,7 @@ export default function NewCampaignPage() {
             const ONE_DAY_MS = 24 * 60 * 60 * 1000;
             const endedAt = Date.now() + (duration * ONE_DAY_MS);
 
-            createCampaign({
+            const newCampaign = await createCampaign({
                 creator: userId!,
                 platform: platform!,
                 category: category!,
@@ -236,10 +236,10 @@ export default function NewCampaignPage() {
                 endedAt: endedAt,
             } as any);
 
-            // Redirect after creation
-            setTimeout(() => {
-                router.push('/campaigns');
-            }, 500);
+            alert('Campaign created successfully! 🎉');
+
+            // Redirect to the campaign tasks page with the correct ID
+            router.push(`/tasks/${newCampaign.id}`);
         } catch (error) {
             console.error('Error creating campaign:', error);
             alert('Failed to create campaign. Please try again.');
