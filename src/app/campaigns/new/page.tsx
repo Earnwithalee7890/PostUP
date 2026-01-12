@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { parseEther, parseUnits } from 'viem';
+import { parseEther, parseUnits, encodePacked, keccak256 } from 'viem';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
 import { DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/config';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
 import { ERC20_ABI } from '@/lib/erc20';
@@ -137,19 +138,38 @@ export default function NewCampaignPage() {
         }
     };
 
-    // Removed wallet dependencies - using Farcaster auth only
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    // Wallet and contract integration
+    const { address, isConnected } = useAccount();
+    const { writeContract: writeApprove, data: approveHash } = useWriteContract();
+    const { writeContract: writeCreate, data: createHash } = useWriteContract();
+    const { isLoading: isApproving, isSuccess: isApproved } = useWaitForTransactionReceipt({ hash: approveHash });
+    const { isLoading: isCreating, isSuccess: isCreated } = useWaitForTransactionReceipt({ hash: createHash });
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [txStep, setTxStep] = useState<'idle' | 'approving' | 'creating' | 'saving'>('idle');
+
+    // Check USDC allowance
+    const { data: allowance } = useReadContract({
+        address: USDC_ADDRESS as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: 'allowance',
+        args: address && isConnected ? [address, DISTRIBUTOR_ADDRESS as `0x${string}`] : undefined,
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Validation
         if (!isFarcasterUser || !userId) {
             alert('Please open this app in Farcaster to create campaigns');
             return;
         }
 
-        // Full validation
+        if (!isConnected || !address) {
+            alert('Please connect your wallet to create campaigns');
+            return;
+        }
+
         if (!platform || !category || !rewardToken || !budget) {
             alert('Please complete all fields');
             return;
@@ -159,7 +179,6 @@ export default function NewCampaignPage() {
             alert('Please provide a valid URL');
             return;
         }
-
 
         if (needsCastUrl && !castUrl.trim()) {
             alert('Please provide a Cast URL');
@@ -176,9 +195,67 @@ export default function NewCampaignPage() {
             return;
         }
 
-        // Create campaign directly (no wallet transactions needed)
         setIsSubmitting(true);
 
+        try {
+            // Calculate amounts
+            const budgetInUSDC = parseUnits(budget.toString(), 6); // USDC has 6 decimals
+            const platformFeeAmount = (budgetInUSDC * BigInt(15)) / BigInt(100);
+            const netAmount = budgetInUSDC - platformFeeAmount;
+
+            // Step 1: Check allowance and approve if needed
+            const currentAllowance = (allowance as bigint) || BigInt(0);
+            if (currentAllowance < budgetInUSDC) {
+                setTxStep('approving');
+                writeApprove({
+                    address: USDC_ADDRESS as `0x${string}`,
+                    abi: ERC20_ABI,
+                    functionName: 'approve',
+                    args: [DISTRIBUTOR_ADDRESS as `0x${string}`, budgetInUSDC],
+                });
+                return; // Wait for approval to complete
+            }
+
+            // Step 2: Create campaign on contract
+            setTxStep('creating');
+            // Generate a simple merkle root (in production, this should be based on actual participant list)
+            const mockMerkleRoot = keccak256(encodePacked(['string'], ['campaign-' + Date.now()])) as `0x${string}`;
+
+            writeCreate({
+                address: DISTRIBUTOR_ADDRESS as `0x${string}`,
+                abi: DISTRIBUTOR_ABI,
+                functionName: 'createCampaign',
+                args: [mockMerkleRoot, USDC_ADDRESS as `0x${string}`, budgetInUSDC],
+            });
+
+        } catch (error) {
+            console.error('Error creating campaign:', error);
+            alert('Failed to create campaign. Please try again.');
+            setIsSubmitting(false);
+            setTxStep('idle');
+        }
+    };
+
+    // Handle approval success
+    useEffect(() => {
+        if (isApproved && txStep === 'approving') {
+            // Retry submission after approval
+            const form = document.querySelector('form');
+            if (form) {
+                form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
+        }
+    }, [isApproved, txStep]);
+
+    // Handle campaign creation success
+    useEffect(() => {
+        if (isCreated && createHash && txStep === 'creating') {
+            setTxStep('saving');
+            saveCampaignToDatabase(createHash);
+        }
+    }, [isCreated, createHash, txStep]);
+
+    const saveCampaignToDatabase = (txHash: `0x${string}`) => {
         try {
             const selectedCategoryObj = CATEGORIES.find(c => c.id === category);
             const finalTasks = category === 'Multi' ? selectedMultiTasks : (selectedCategoryObj?.tasks || []);
@@ -187,7 +264,7 @@ export default function NewCampaignPage() {
             const endedAt = Date.now() + (duration * ONE_DAY_MS);
 
             createCampaign({
-                creator: userId,
+                creator: userId!,
                 platform: platform!,
                 category: category!,
                 postUrl: postUrl,
@@ -200,18 +277,20 @@ export default function NewCampaignPage() {
                 rewardAmountPerTask: estRewardPerTask,
                 minFollowers: require200Followers ? 200 : 0,
                 requirePro: requirePro,
-                endedAt: endedAt
-            });
+                endedAt: endedAt,
+                txHash: txHash, // Store transaction hash
+            } as any);
 
             // Redirect after creation
             setTimeout(() => {
                 router.push('/tasks');
             }, 1500);
         } catch (error) {
-            console.error('Error creating campaign:', error);
-            alert('Failed to create campaign. Please try again.');
+            console.error('Error saving campaign:', error);
+            alert('Campaign created on blockchain but failed to save to database.');
         } finally {
             setIsSubmitting(false);
+            setTxStep('idle');
         }
     };
 
@@ -479,14 +558,23 @@ export default function NewCampaignPage() {
                     <button
                         type="submit"
                         className={styles.submitBtn}
-                        disabled={isSubmitting || !isFarcasterUser}
+                        disabled={isSubmitting || !isFarcasterUser || !isConnected}
                         style={{
-                            opacity: (isFarcasterUser && !isSubmitting) ? 1 : 0.5,
-                            cursor: (isFarcasterUser && !isSubmitting) ? 'pointer' : 'not-allowed'
+                            opacity: (isFarcasterUser && isConnected && !isSubmitting) ? 1 : 0.5,
+                            cursor: (isFarcasterUser && isConnected && !isSubmitting) ? 'pointer' : 'not-allowed'
                         }}
                     >
-                        {isSubmitting ? 'Creating...' : `Create Task (${totalBudget} ${rewardToken})`}
+                        {txStep === 'approving' && 'Approving USDC...'}
+                        {txStep === 'creating' && 'Creating on Blockchain...'}
+                        {txStep === 'saving' && 'Saving...'}
+                        {txStep === 'idle' && !isSubmitting && `Create Campaign (${totalBudget} ${rewardToken})`}
+                        {txStep === 'idle' && isSubmitting && 'Processing...'}
                     </button>
+                    {!isConnected && (
+                        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>
+                            💳 Connect wallet to create campaigns
+                        </p>
+                    )}
                 </div>
 
                 {category === 'MiniApp' && (
