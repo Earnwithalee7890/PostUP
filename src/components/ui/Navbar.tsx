@@ -23,14 +23,12 @@ export function Navbar() {
 
                 <div className={styles.navLinks}>
                     <Link href="/" className={`${styles.navLink} ${isActive('/') ? styles.active : ''}`}>
-                        <Home size={18} />
+                        <Home size={18} style={{ marginRight: '6px' }} /> Home
                     </Link>
                     <Link href="/campaigns" className={`${styles.navLink} ${isActive('/campaigns') ? styles.active : ''}`}>
                         <Layers size={18} style={{ marginRight: '6px' }} /> Campaigns
                     </Link>
-                    <Link href="/tasks" className={`${styles.navLink} ${isActive('/tasks') ? styles.active : ''}`}>
-                        <Zap size={18} style={{ marginRight: '6px' }} /> Earn
-                    </Link>
+
                     <Link href="/leaderboard" className={`${styles.navLink} ${isActive('/leaderboard') ? styles.active : ''}`}>
                         <TrendingUp size={18} style={{ marginRight: '6px' }} /> Rank
                     </Link>
