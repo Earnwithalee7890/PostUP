@@ -14,51 +14,47 @@ export default function TaskExecutionPage() {
     const { context } = useFarcasterContext();
 
     const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
-    const [verifying, setVerifying] = useState<string | null>(null);
+    const [screenshots, setScreenshots] = useState<Record<string, string>>({});
+    const [uploadingTask, setUploadingTask] = useState<string | null>(null);
 
-    const handleVerify = async (task: string) => {
+    const handleScreenshotUpload = (task: string, file: File) => {
         const userFid = context?.user?.fid;
 
         if (!userFid) {
-            alert('Please connect your Farcaster account to verify tasks');
+            alert('Please connect your Farcaster account');
             return;
         }
 
-        setVerifying(task);
+        // Convert to base64 for preview and storage
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = reader.result as string;
+            setScreenshots(prev => ({ ...prev, [task]: base64 }));
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleSubmitScreenshot = async (task: string) => {
+        const screenshot = screenshots[task];
+        if (!screenshot) {
+            alert('Please upload a screenshot first');
+            return;
+        }
+
+        setUploadingTask(task);
 
         try {
-            // Call the verification API
-            const requestBody = {
-                campaignId: id,
-                taskType: task,
-                userFid: userFid
-            };
+            // Here you would upload to your backend/storage
+            // For now, we'll just mark it as complete
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate upload
 
-            console.log('Sending request to /api/verify-task:', requestBody);
-
-            const response = await fetch('/api/verify-task', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody)
-            });
-
-            const result = await response.json();
-
-            console.log('API Response Status:', response.status);
-            console.log('API Response:', result);
-
-            if (result.success) {
-                setCompletedTasks(prev => ({ ...prev, [task]: true }));
-                alert('Task verified successfully! ✅');
-            } else {
-                console.error('Verification failed:', result.error);
-                alert(result.error || 'Verification failed. Did you complete the task?');
-            }
+            setCompletedTasks(prev => ({ ...prev, [task]: true }));
+            alert('Screenshot submitted successfully! ✅');
         } catch (error) {
-            console.error('Verification error:', error);
-            alert('Verification failed. Please try again.');
+            console.error('Upload error:', error);
+            alert('Failed to submit screenshot. Please try again.');
         } finally {
-            setVerifying(null);
+            setUploadingTask(null);
         }
     };
 
@@ -113,7 +109,6 @@ export default function TaskExecutionPage() {
             <div className={styles.taskList}>
                 {campaign.tasks.map(task => {
                     const isDone = completedTasks[task];
-                    const isVerifying = verifying === task;
 
                     // Determine the link URL based on task type
                     const getTaskUrl = () => {
@@ -151,19 +146,38 @@ export default function TaskExecutionPage() {
                                     <Check size={16} style={{ marginRight: '4px' }} /> Done
                                 </button>
                             ) : (
-                                <button
-                                    className={styles.verifyBtn}
-                                    onClick={() => {
-                                        // Open link in new tab for Follow task
-                                        if (task === 'Follow' && taskUrl) {
-                                            window.open(taskUrl, '_blank');
-                                        }
-                                        handleVerify(task);
-                                    }}
-                                    disabled={isVerifying}
-                                >
-                                    {isVerifying ? <Loader2 size={16} className="spin" /> : 'Verify'}
-                                </button>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+                                    {screenshots[task] && (
+                                        <img
+                                            src={screenshots[task]}
+                                            alt="Task screenshot"
+                                            style={{ maxWidth: '100px', maxHeight: '60px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }}
+                                        />
+                                    )}
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <label className={styles.uploadBtn}>
+                                            {screenshots[task] ? 'Change' : 'Upload'}
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) handleScreenshotUpload(task, file);
+                                                }}
+                                                style={{ display: 'none' }}
+                                            />
+                                        </label>
+                                        {screenshots[task] && (
+                                            <button
+                                                className={styles.verifyBtn}
+                                                onClick={() => handleSubmitScreenshot(task)}
+                                                disabled={uploadingTask === task}
+                                            >
+                                                {uploadingTask === task ? <Loader2 size={16} className="spin" /> : 'Submit'}
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
                             )}
                         </div>
                     );
