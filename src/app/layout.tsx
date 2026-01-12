@@ -6,6 +6,9 @@ import { Providers } from "@/lib/providers";
 import FarcasterProvider from "@/providers/FarcasterProvider";
 import { Navbar } from "@/components/ui/Navbar";
 
+// Force dynamic rendering to avoid localStorage errors during build
+export const dynamic = 'force-dynamic';
+
 const outfit = Outfit({
   subsets: ["latin"],
   variable: '--font-outfit',

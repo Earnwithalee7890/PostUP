@@ -144,8 +144,8 @@ export default function NewCampaignPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!userAddress) {
-            alert('Please connect your Farcaster account');
+        if (!isFarcasterUser || !userId) {
+            alert('Please open this app in Farcaster to create campaigns');
             return;
         }
 
@@ -187,7 +187,7 @@ export default function NewCampaignPage() {
             const endedAt = Date.now() + (duration * ONE_DAY_MS);
 
             createCampaign({
-                creator: userAddress,
+                creator: userId,
                 platform: platform!,
                 category: category!,
                 postUrl: postUrl,
@@ -234,11 +234,11 @@ export default function NewCampaignPage() {
         return 'Cast URL';
     };
 
-    // RENDER: Check for wallet connection
+    // RENDER: Check for Farcaster authentication
     const { context } = useFarcasterContext();
     const isFarcasterUser = !!context?.user;
-    // Get address from Farcaster verified addresses
-    const userAddress = context?.user?.verifications?.[0];
+    // Use Farcaster FID as user identifier
+    const userId = context?.user?.fid ? String(context.user.fid) : undefined;
 
     // Skip category selection - go directly to form with category buttons
     return (
@@ -258,9 +258,8 @@ export default function NewCampaignPage() {
                     display: 'flex',
                     gap: '0.5rem',
                     marginBottom: '2rem',
-                    flexWrap: 'nowrap',
+                    flexWrap: 'wrap',
                     justifyContent: 'flex-start',
-                    overflowX: 'auto',
                     padding: '0 0.5rem'
                 }}>
                     {CATEGORIES.map((cat) => {
@@ -502,10 +501,10 @@ export default function NewCampaignPage() {
                     <button
                         type="submit"
                         className={styles.submitBtn}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !isFarcasterUser}
                         style={{
-                            opacity: userAddress ? 1 : 0.5,
-                            cursor: userAddress ? 'pointer' : 'not-allowed'
+                            opacity: (isFarcasterUser && !isSubmitting) ? 1 : 0.5,
+                            cursor: (isFarcasterUser && !isSubmitting) ? 'pointer' : 'not-allowed'
                         }}
                     >
                         {isSubmitting ? 'Creating...' : `Create Task (${totalBudget} ${rewardToken})`}
