@@ -95,13 +95,12 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                         Start Task <ExternalLink size={14} />
                     </a>
                 ) : (
-                ) : (
                     <span style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>No URL provided</span>
                 )}
-                
+
                 {/* Admin/Creator View: Submissions */}
                 {isUserAdmin && (
-                    <Link 
+                    <Link
                         href={`/campaigns/${campaign.id}/submissions`}
                         style={{
                             padding: '0.6rem',
