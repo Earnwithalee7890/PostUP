@@ -165,11 +165,6 @@ export default function NewCampaignPage() {
             return;
         }
 
-        if (!isConnected || !address) {
-            alert('Please connect your wallet to create campaigns');
-            return;
-        }
-
         if (!platform || !category || !rewardToken || !budget) {
             alert('Please complete all fields');
             return;
@@ -554,27 +549,18 @@ export default function NewCampaignPage() {
                 )}
 
                 {/* SUBMIT */}
-                <div style={{ marginBottom: '100px' }}> {/* Extra space to prevent overlap with footer */}
+                <div style={{ marginBottom: '100px' }}>
                     <button
                         type="submit"
                         className={styles.submitBtn}
-                        disabled={isSubmitting || !isFarcasterUser || !isConnected}
+                        disabled={isSubmitting || !isFarcasterUser}
                         style={{
-                            opacity: (isFarcasterUser && isConnected && !isSubmitting) ? 1 : 0.5,
-                            cursor: (isFarcasterUser && isConnected && !isSubmitting) ? 'pointer' : 'not-allowed'
+                            opacity: (isFarcasterUser && !isSubmitting) ? 1 : 0.5,
+                            cursor: (isFarcasterUser && !isSubmitting) ? 'pointer' : 'not-allowed'
                         }}
                     >
-                        {txStep === 'approving' && 'Approving USDC...'}
-                        {txStep === 'creating' && 'Creating on Blockchain...'}
-                        {txStep === 'saving' && 'Saving...'}
-                        {txStep === 'idle' && !isSubmitting && `Create Campaign (${totalBudget} ${rewardToken})`}
-                        {txStep === 'idle' && isSubmitting && 'Processing...'}
+                        {isSubmitting ? 'Creating Campaign...' : `Create Campaign (${totalBudget} ${rewardToken})`}
                     </button>
-                    {!isConnected && (
-                        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>
-                            💳 Connect wallet to create campaigns
-                        </p>
-                    )}
                 </div>
 
                 {category === 'MiniApp' && (
