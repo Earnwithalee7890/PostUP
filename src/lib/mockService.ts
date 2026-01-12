@@ -184,13 +184,13 @@ export const MockService = {
         ).length;
 
         return {
-            totalEarnedUSD: totalEarned,
             totalTasks: completedTasks,
-            rank: 0,
-            isPro: false,
+            totalEarned: totalEarned,
+            verifications: [mockAddress],
+            username: 'mockuser',
+            displayName: 'Mock User',
             followers: 0,
             neynarScore: 0,
-            verifications: [],
             history: []
         };
     },
