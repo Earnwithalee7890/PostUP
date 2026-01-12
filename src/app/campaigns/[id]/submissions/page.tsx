@@ -7,12 +7,29 @@ import { Loader2, ArrowLeft, ExternalLink, Image as ImageIcon } from 'lucide-rea
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { Link as HomeLink } from 'lucide-react'; // Avoid conflict with next/link
+import { isAdmin } from '@/lib/admin';
+import { useAccount } from 'wagmi';
+
 export default function CampaignSubmissionsPage() {
     const { id } = useParams() as { id: string };
     const { data: campaign, isLoading: loadingCampaign } = useCampaign(id);
     const { data: participants, isLoading: loadingParticipants } = useCampaignParticipants(id);
     const { context } = useFarcasterContext();
+    const { address } = useAccount();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    const isUserAdmin = isAdmin(address, context?.user?.fid);
+
+    if (!isUserAdmin) {
+        return (
+            <div className="flex-center full-screen" style={{ flexDirection: 'column', gap: '1rem' }}>
+                <h2>🚫 Access Denied</h2>
+                <p style={{ color: 'var(--muted-foreground)' }}>Only admins can view submissions.</p>
+                <Link href="/campaigns" className="glass-button">Back to Campaigns</Link>
+            </div>
+        );
+    }
 
     if (loadingCampaign || loadingParticipants) return <div className="flex-center full-screen"><Loader2 className="spin" /></div>;
     if (!campaign) return <div className="flex-center full-screen">Campaign not found</div>;

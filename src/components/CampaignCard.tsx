@@ -2,8 +2,15 @@ import { Campaign } from '@/lib/types';
 import Link from 'next/link';
 import styles from './CampaignCard.module.css';
 import { ExternalLink, Image } from 'lucide-react';
+import { useFarcasterContext } from '@/providers/FarcasterProvider';
+import { useAccount } from 'wagmi';
+import { isAdmin } from '@/lib/admin';
 
 export function CampaignCard({ campaign }: { campaign: Campaign }) {
+    const { context } = useFarcasterContext();
+    const { address } = useAccount();
+    const isUserAdmin = isAdmin(address, context?.user?.fid);
+
     const isX = campaign.platform === 'X';
 
     // Status Determination
@@ -92,21 +99,23 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                     <span style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>No URL provided</span>
                 )}
                 
-                {/* Creator View: Submissions */}
-                <Link 
-                    href={`/campaigns/${campaign.id}/submissions`}
-                    style={{
-                        padding: '0.6rem',
-                        borderRadius: '0.5rem',
-                        background: 'rgba(255,255,255,0.05)',
-                        color: 'var(--muted-foreground)',
-                        border: '1px solid var(--border)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}
-                    title="View Submissions"
-                >
-                    <Image size={18} />
-                </Link>
+                {/* Admin/Creator View: Submissions */}
+                {isUserAdmin && (
+                    <Link 
+                        href={`/campaigns/${campaign.id}/submissions`}
+                        style={{
+                            padding: '0.6rem',
+                            borderRadius: '0.5rem',
+                            background: 'rgba(255,255,255,0.05)',
+                            color: 'var(--muted-foreground)',
+                            border: '1px solid var(--border)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}
+                        title="View Submissions (Admin Only)"
+                    >
+                        <Image size={18} />
+                    </Link>
+                )}
             </div>
 
             <div className={styles.tasks}>
