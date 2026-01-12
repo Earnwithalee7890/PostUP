@@ -360,15 +360,18 @@ export default function NewCampaignPage() {
                                     background: isActive ? 'rgba(165, 166, 246, 0.15)' : 'rgba(255,255,255,0.05)',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s ease',
-                                    borderRadius: '10px'
+                                    borderRadius: '10px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '0.2rem'
                                 }}
                             >
-                                <Icon size={20} style={{
-                                    margin: '0 auto 0.3rem',
+                                <Icon size={18} style={{
                                     color: isActive ? 'var(--primary)' : 'rgba(255,255,255,0.7)'
                                 }} />
                                 <h3 style={{
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     marginBottom: '0',
                                     color: isActive ? '#fff' : 'rgba(255,255,255,0.85)',
                                     fontWeight: isActive ? 600 : 500
@@ -496,39 +499,36 @@ export default function NewCampaignPage() {
                     ))}
                 </div>
 
-                <button
-                    type="button"
-                    className={styles.moreTokens}
-                    onClick={() => setShowAllTokens(!showAllTokens)}
-                >
-                    {showAllTokens ? 'Less tokens ↑' : 'More tokens ↓'}
-                </button>
 
-                {/* DURATION */}
-                <div className={styles.durationGrid}>
+
+                {/* DURATION - COMPACT */}
+                <div className={styles.durationGrid} style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
                     <button
                         type="button"
                         onClick={() => setDuration(1)}
                         className={`${styles.durationBtn} ${duration === 1 ? styles.durationActive : ''}`}
+                        style={{ padding: '0.6rem' }}
                     >
-                        <Clock className={styles.clock} size={24} />
-                        <span>1 Day</span>
+                        <Clock className={styles.clock} size={18} />
+                        <span style={{ fontSize: '0.85rem' }}>1 Day</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setDuration(2)}
                         className={`${styles.durationBtn} ${duration === 2 ? styles.durationActive : ''}`}
+                        style={{ padding: '0.6rem' }}
                     >
-                        <Clock className={styles.clock} size={24} />
-                        <span>2 Days</span>
+                        <Clock className={styles.clock} size={18} />
+                        <span style={{ fontSize: '0.85rem' }}>2 Days</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setDuration(3)}
                         className={`${styles.durationBtn} ${duration === 3 ? styles.durationActive : ''}`}
+                        style={{ padding: '0.6rem' }}
                     >
-                        <Clock className={styles.clock} size={24} />
-                        <span>3 Days</span>
+                        <Clock className={styles.clock} size={18} />
+                        <span style={{ fontSize: '0.85rem' }}>3 Days</span>
                     </button>
                 </div>
 
