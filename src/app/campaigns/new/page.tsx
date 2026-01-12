@@ -138,23 +138,7 @@ export default function NewCampaignPage() {
         }
     };
 
-    // Wallet and contract integration
-    const { address, isConnected } = useAccount();
-    const { writeContract: writeApprove, data: approveHash } = useWriteContract();
-    const { writeContract: writeCreate, data: createHash } = useWriteContract();
-    const { isLoading: isApproving, isSuccess: isApproved } = useWaitForTransactionReceipt({ hash: approveHash });
-    const { isLoading: isCreating, isSuccess: isCreated } = useWaitForTransactionReceipt({ hash: createHash });
-
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [txStep, setTxStep] = useState<'idle' | 'approving' | 'creating' | 'saving'>('idle');
-
-    // Check USDC allowance
-    const { data: allowance } = useReadContract({
-        address: USDC_ADDRESS as `0x${string}`,
-        abi: ERC20_ABI,
-        functionName: 'allowance',
-        args: address && isConnected ? [address, DISTRIBUTOR_ADDRESS as `0x${string}`] : undefined,
-    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
