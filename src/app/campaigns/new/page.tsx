@@ -177,65 +177,6 @@ export default function NewCampaignPage() {
         setIsSubmitting(true);
 
         try {
-            // Calculate amounts
-            const budgetInUSDC = parseUnits(budget.toString(), 6); // USDC has 6 decimals
-            const platformFeeAmount = (budgetInUSDC * BigInt(15)) / BigInt(100);
-            const netAmount = budgetInUSDC - platformFeeAmount;
-
-            // Step 1: Check allowance and approve if needed
-            const currentAllowance = (allowance as bigint) || BigInt(0);
-            if (currentAllowance < budgetInUSDC) {
-                setTxStep('approving');
-                writeApprove({
-                    address: USDC_ADDRESS as `0x${string}`,
-                    abi: ERC20_ABI,
-                    functionName: 'approve',
-                    args: [DISTRIBUTOR_ADDRESS as `0x${string}`, budgetInUSDC],
-                });
-                return; // Wait for approval to complete
-            }
-
-            // Step 2: Create campaign on contract
-            setTxStep('creating');
-            // Generate a simple merkle root (in production, this should be based on actual participant list)
-            const mockMerkleRoot = keccak256(encodePacked(['string'], ['campaign-' + Date.now()])) as `0x${string}`;
-
-            writeCreate({
-                address: DISTRIBUTOR_ADDRESS as `0x${string}`,
-                abi: DISTRIBUTOR_ABI,
-                functionName: 'createCampaign',
-                args: [mockMerkleRoot, USDC_ADDRESS as `0x${string}`, budgetInUSDC],
-            });
-
-        } catch (error) {
-            console.error('Error creating campaign:', error);
-            alert('Failed to create campaign. Please try again.');
-            setIsSubmitting(false);
-            setTxStep('idle');
-        }
-    };
-
-    // Handle approval success
-    useEffect(() => {
-        if (isApproved && txStep === 'approving') {
-            // Retry submission after approval
-            const form = document.querySelector('form');
-            if (form) {
-                form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-            }
-        }
-    }, [isApproved, txStep]);
-
-    // Handle campaign creation success
-    useEffect(() => {
-        if (isCreated && createHash && txStep === 'creating') {
-            setTxStep('saving');
-            saveCampaignToDatabase(createHash);
-        }
-    }, [isCreated, createHash, txStep]);
-
-    const saveCampaignToDatabase = (txHash: `0x${string}`) => {
-        try {
             const selectedCategoryObj = CATEGORIES.find(c => c.id === category);
             const finalTasks = category === 'Multi' ? selectedMultiTasks : (selectedCategoryObj?.tasks || []);
             const estRewardPerTask = netBudget / 50;

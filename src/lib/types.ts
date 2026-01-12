@@ -59,12 +59,20 @@ export interface TaskHistoryItem {
 }
 
 export interface UserStats {
-    totalEarnedUSD: number;
     totalTasks: number;
-    rank: number;
-    isPro: boolean; // Added to track Farcaster Pro/Power Badge status
-    followers: number;
-    neynarScore: number;
-    verifications: string[]; // Added for auto-wallet detection
-    history: TaskHistoryItem[];
+    totalEarned: number;
+    verifications: string[];
+    username?: string;
+    displayName?: string;
+    pfpUrl?: string;
+    followers?: number;
+    following?: number;
+    neynarScore?: number;
+    isSpam?: boolean;  // Added for spam detection
+    history?: Array<{
+        task: string;
+        platform: string;
+        reward: string;
+        date: number;
+    }>;
 }
