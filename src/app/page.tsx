@@ -40,7 +40,7 @@ export default function Home() {
             </div>
           )}
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <Link href="/campaigns" className="glass-button" style={{
+            <Link href="/campaigns/new" className="glass-button" style={{
               padding: '0.75rem 1.5rem',
               borderRadius: '0.5rem',
               fontWeight: 600,
@@ -50,15 +50,6 @@ export default function Home() {
               border: 'none'
             }}>
               Launch Campaign
-            </Link>
-            <Link href="/tasks" className="glass-button" style={{
-              padding: '0.75rem 1.5rem',
-              borderRadius: '0.5rem',
-              fontWeight: 600,
-              textDecoration: 'none',
-              border: '1px solid var(--border)'
-            }}>
-              Browse Tasks
             </Link>
           </div>
         </div>
