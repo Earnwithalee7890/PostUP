@@ -38,7 +38,7 @@ export const NeynarService = {
                 pfpUrl: user.pfp_url,
                 followers: user.follower_count || 0,
                 following: user.following_count || 0,
-                neynarScore: 0,
+                neynarScore: calculatedScore,
                 isSpam: false,
                 history: []
             };
