@@ -202,14 +202,13 @@ export default function NewCampaignPage() {
 
             // Redirect after creation
             setTimeout(() => {
-                router.push('/tasks');
-            }, 1500);
+                router.push('/campaigns');
+            }, 500);
         } catch (error) {
-            console.error('Error saving campaign:', error);
-            alert('Campaign created on blockchain but failed to save to database.');
+            console.error('Error creating campaign:', error);
+            alert('Failed to create campaign. Please try again.');
         } finally {
             setIsSubmitting(false);
-            setTxStep('idle');
         }
     };
 
