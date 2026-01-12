@@ -186,7 +186,7 @@ export const MockService = {
         return {
             totalTasks: completedTasks,
             totalEarned: totalEarned,
-            verifications: [mockAddress],
+            verifications: address ? [address] : [],
             username: 'mockuser',
             displayName: 'Mock User',
             followers: 0,
