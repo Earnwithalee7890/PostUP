@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useCampaign, useCompleteTask } from '@/hooks/useCampaigns';
 import { useState } from 'react';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { Check, Loader2, ExternalLink } from 'lucide-react';
+import { Check, Loader2, ExternalLink, Camera } from 'lucide-react';
 import styles from './task.module.css';
 
 export default function TaskExecutionPage() {
@@ -146,7 +146,7 @@ export default function TaskExecutionPage() {
                                     <Check size={16} style={{ marginRight: '4px' }} /> Done
                                 </button>
                             ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end', width: '100%' }}>
                                     {screenshots[task] && (
                                         <img
                                             src={screenshots[task]}
@@ -154,28 +154,36 @@ export default function TaskExecutionPage() {
                                             style={{ maxWidth: '100px', maxHeight: '60px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }}
                                         />
                                     )}
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <label className={styles.uploadBtn}>
-                                            {screenshots[task] ? 'Change' : 'Upload'}
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) handleScreenshotUpload(task, file);
-                                                }}
-                                                style={{ display: 'none' }}
-                                            />
-                                        </label>
-                                        {screenshots[task] && (
-                                            <button
-                                                className={styles.verifyBtn}
-                                                onClick={() => handleSubmitScreenshot(task)}
-                                                disabled={uploadingTask === task}
-                                            >
-                                                {uploadingTask === task ? <Loader2 size={16} className="spin" /> : 'Submit'}
-                                            </button>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', alignItems: 'flex-end' }}>
+                                        {!isDone && !screenshots[task] && (
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--primary-light)', fontWeight: 600 }}>
+                                                📸 Proof Required
+                                            </div>
                                         )}
+                                        <div style={{ display: 'flex', gap: '0.5rem', width: 'auto' }}>
+                                            <label className={styles.uploadBtn}>
+                                                <Camera size={14} style={{ marginRight: '6px' }} />
+                                                {screenshots[task] ? 'Change Proof' : 'Upload Proof'}
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) handleScreenshotUpload(task, file);
+                                                    }}
+                                                    style={{ display: 'none' }}
+                                                />
+                                            </label>
+                                            {screenshots[task] && (
+                                                <button
+                                                    className={styles.verifyBtn}
+                                                    onClick={() => handleSubmitScreenshot(task)}
+                                                    disabled={uploadingTask === task}
+                                                >
+                                                    {uploadingTask === task ? <Loader2 size={16} className="spin" /> : 'Submit Verification'}
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             )}
