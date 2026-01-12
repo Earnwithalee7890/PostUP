@@ -198,7 +198,6 @@ export default function NewCampaignPage() {
                 minFollowers: require200Followers ? 200 : 0,
                 requirePro: requirePro,
                 endedAt: endedAt,
-                txHash: txHash, // Store transaction hash
             } as any);
 
             // Redirect after creation
