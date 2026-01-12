@@ -3,7 +3,7 @@ import { base } from 'wagmi/chains';
 
 export const config = getDefaultConfig({
   appName: 'Post Up',
-  projectId: 'YOUR_PROJECT_ID',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
   chains: [base],
   ssr: true, // FIXED: Must be true for Next.js App Router
 });

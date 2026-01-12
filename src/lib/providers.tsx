@@ -19,6 +19,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider
+                    modalSize="compact"
+                    appInfo={{
+                        appName: 'Post Up',
+                        disclaimer: undefined,
+                    }}
                     theme={darkTheme({
                         accentColor: '#7b3fe4',
                         accentColorForeground: 'white',
