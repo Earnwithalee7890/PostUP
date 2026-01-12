@@ -5,7 +5,8 @@ import { useCampaign, useSubmitScreenshot } from '@/hooks/useCampaigns';
 import { useState } from 'react';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useAccount } from 'wagmi';
-import { Check, Loader2, ExternalLink, Camera } from 'lucide-react';
+import { Check, Loader2, ExternalLink, Camera, CheckCircle } from 'lucide-react';
+import sdk from '@farcaster/miniapp-sdk';
 import styles from './task.module.css';
 
 export default function TaskExecutionPage() {
@@ -36,14 +37,18 @@ export default function TaskExecutionPage() {
         reader.readAsDataURL(file);
     };
 
+    const handleOpenLink = () => {
+        if (campaign?.postUrl) {
+            sdk.actions.openUrl(campaign.postUrl);
+        }
+    };
+
     const handleSubmitScreenshot = async (task: string) => {
         const screenshot = screenshots[task];
         if (!screenshot) {
             alert('Please upload a screenshot first');
             return;
         }
-
-        setUploadingTask(task);
 
         setUploadingTask(task);
 
@@ -72,107 +77,105 @@ export default function TaskExecutionPage() {
 
     return (
         <main className={styles.container}>
-            <div className={styles.header}>
-                <span className="gradient-text" style={{ fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
-                    {campaign.platform} Campaign
-                </span>
-            </div>
-
-            <div className={`glass-panel`} style={{ marginBottom: '1rem', padding: '1rem' }}>
-                <h4 style={{ margin: '0 0 0.5rem 0' }}>Campaign Info</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: 'var(--muted-foreground)' }}>Category</span>
-                        <span>{campaign.category}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                <div className={styles.card}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                        <div style={{
+                            width: 48, height: 48,
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontWeight: 'bold', fontSize: '1.2rem', color: 'white'
+                        }}>
+                            {campaign.rewardToken.charAt(0)}
+                        </div>
+                        <div>
+                            <div className={styles.label}>Total Reward</div>
+                            <div className={styles.value} style={{ fontSize: '1.4rem' }}>
+                                {campaign.netBudget.toFixed(4)} {campaign.rewardToken}
+                            </div>
+                        </div>
                     </div>
-                    {campaign.minFollowers > 0 && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: 'var(--muted-foreground)' }}>Min Followers</span>
-                            <span>{campaign.minFollowers}</span>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div>
+                            <div className={styles.label}>Category</div>
+                            <div className={styles.value}>{campaign.category}</div>
                         </div>
-                    )}
-                    {campaign.requirePro && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: 'var(--muted-foreground)' }}>Requirement</span>
-                            <span>Farcaster Pro Only</span>
+                        <div>
+                            <div className={styles.label}>Platform</div>
+                            <div className={styles.value}>{campaign.platform}</div>
                         </div>
-                    )}
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: 'var(--muted-foreground)' }}>Net Reward Pool</span>
-                        <span>{campaign.netBudget.toFixed(4)} {campaign.rewardToken}</span>
+                    </div>
+                </div>
+
+                <div className={`${styles.card} ${styles.postPreview}`}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <span className={styles.label} style={{ marginBottom: 0 }}>TARGET ACTION</span>
+                        <ExternalLink size={14} style={{ opacity: 0.6 }} />
+                    </div>
+                    <div
+                        onClick={handleOpenLink}
+                        style={{
+                            color: 'var(--primary-light)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            fontWeight: 500
+                        }}
+                    >
+                        <span style={{ textDecoration: 'underline', wordBreak: 'break-all' }}>{campaign.postUrl || 'No link provided'}</span>
                     </div>
                 </div>
             </div>
 
-            <div className={styles.postPreview}>
-                <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem' }}>TARGET POST</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <a href={campaign.postUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary-light)', textDecoration: 'underline' }}>
-                        {campaign.postUrl}
-                    </a>
-                    <ExternalLink size={14} />
-                </div>
-            </div>
-
-            <h3 style={{ marginBottom: '1rem' }}>Required Actions</h3>
+            <h3 style={{ marginBottom: '1rem', paddingLeft: '0.5rem', borderLeft: '4px solid var(--accent)' }}>Your Tasks</h3>
             <div className={styles.taskList}>
                 {campaign.tasks.map(task => {
                     const isDone = completedTasks[task];
-
-                    // Determine the link URL based on task type
-                    const getTaskUrl = () => {
-                        if (task === 'Follow') return campaign.postUrl; // Profile URL
-                        if (task === 'Like' || task === 'Repost' || task === 'Comment') return campaign.castUrl || campaign.postUrl;
-                        return null;
-                    };
-
-                    const taskUrl = getTaskUrl();
+                    const hasScreenshot = !!screenshots[task];
 
                     return (
-                        <div key={task} className={`${styles.taskItem} ${isDone ? styles.completed : ''}`}>
-                            {taskUrl ? (
-                                <a
-                                    href={taskUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{
-                                        fontWeight: 600,
-                                        color: 'var(--primary-light)',
-                                        textDecoration: 'underline',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.25rem'
-                                    }}
-                                >
-                                    {task} <ExternalLink size={14} />
-                                </a>
-                            ) : (
-                                <span style={{ fontWeight: 600 }}>{task}</span>
-                            )}
+                        <div key={task} className={styles.taskItem}>
+                            <div className={styles.taskHeader}>
+                                <div className={styles.taskTitle}>
+                                    <span style={{
+                                        width: 24, height: 24,
+                                        borderRadius: '50%',
+                                        background: 'rgba(255,255,255,0.1)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: '0.7rem'
+                                    }}>
+                                        {task === 'Follow' ? '1' : '2'}
+                                    </span>
+                                    {task}
+                                </div>
+                                {isDone ? (
+                                    <div className={styles.completedBadge}>
+                                        <Check size={14} /> Completed
+                                    </div>
+                                ) : (
+                                    <button
+                                        className={styles.actionBtn}
+                                        onClick={handleOpenLink}
+                                    >
+                                        Open Link <ExternalLink size={12} />
+                                    </button>
+                                )}
+                            </div>
 
-                            {isDone ? (
-                                <button className={`${styles.verifyBtn} ${styles.success}`} disabled>
-                                    <Check size={16} style={{ marginRight: '4px' }} /> Done
-                                </button>
-                            ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end', width: '100%' }}>
-                                    {screenshots[task] && (
-                                        <img
-                                            src={screenshots[task]}
-                                            alt="Task screenshot"
-                                            style={{ maxWidth: '100px', maxHeight: '60px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }}
-                                        />
-                                    )}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', alignItems: 'flex-end' }}>
-                                        {!isDone && !screenshots[task] && (
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--primary-light)', fontWeight: 600 }}>
-                                                📸 Proof Required
-                                            </div>
-                                        )}
-                                        <div style={{ display: 'flex', gap: '0.5rem', width: 'auto' }}>
-                                            <label className={styles.uploadBtn}>
-                                                <Camera size={14} style={{ marginRight: '6px' }} />
-                                                {screenshots[task] ? 'Change Proof' : 'Upload Proof'}
+                            {!isDone && (
+                                <div style={{ marginTop: '0.5rem' }}>
+                                    {hasScreenshot ? (
+                                        <div className={styles.previewContainer}>
+                                            <img
+                                                src={screenshots[task]}
+                                                alt="Proof preview"
+                                                className={styles.previewImage}
+                                            />
+                                            <label className={styles.changeBtn}>
+                                                <Camera size={12} /> Change
                                                 <input
                                                     type="file"
                                                     accept="image/*"
@@ -183,23 +186,51 @@ export default function TaskExecutionPage() {
                                                     style={{ display: 'none' }}
                                                 />
                                             </label>
-                                            {screenshots[task] && (
-                                                <button
-                                                    className={styles.verifyBtn}
-                                                    onClick={() => handleSubmitScreenshot(task)}
-                                                    disabled={uploadingTask === task}
-                                                >
-                                                    {uploadingTask === task ? <Loader2 size={16} className="spin" /> : 'Submit Verification'}
-                                                </button>
-                                            )}
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <label className={styles.uploadZone}>
+                                            <div className={styles.uploadIcon}>
+                                                <Camera size={24} />
+                                            </div>
+                                            <div>
+                                                <div style={{ fontWeight: 600, color: 'white', marginBottom: '0.2rem' }}>
+                                                    Upload Proof
+                                                </div>
+                                                <div style={{ fontSize: '0.8rem' }}>
+                                                    Take a screenshot of your action
+                                                </div>
+                                            </div>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) handleScreenshotUpload(task, file);
+                                                }}
+                                                style={{ display: 'none' }}
+                                            />
+                                        </label>
+                                    )}
+
+                                    {hasScreenshot && (
+                                        <button
+                                            className={styles.submitBtn}
+                                            onClick={() => handleSubmitScreenshot(task)}
+                                            disabled={uploadingTask === task}
+                                        >
+                                            {uploadingTask === task ? <Loader2 size={18} className="spin" /> : (
+                                                <>
+                                                    Submit Verification <CheckCircle size={18} />
+                                                </>
+                                            )}
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>
                     );
                 })}
             </div>
-        </main>
+        </main >
     );
 }

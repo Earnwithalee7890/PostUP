@@ -286,72 +286,36 @@ export default function NewCampaignPage() {
 
             <form onSubmit={handleSubmit} className={styles.form}>
 
-                {/* CATEGORY SELECTOR - Compact single row grid */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '0.5rem',
-                    marginBottom: '1rem'
-                }}>
-                    {CATEGORIES.map((cat) => {
-                        const Icon = cat.icon;
-                        const isActive = category === cat.id;
-                        return (
-                            <button
-                                key={cat.id}
-                                type="button"
-                                onClick={() => {
-                                    setCategory(cat.id);
-                                    if (cat.id !== 'Multi') {
-                                        setSelectedMultiTasks([]);
-                                    }
-                                }}
-                                className={styles.platformCard}
-                                style={{
-                                    padding: '0.6rem 0.3rem',
-                                    textAlign: 'center',
-                                    border: isActive ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.2)',
-                                    background: isActive ? 'rgba(165, 166, 246, 0.15)' : 'rgba(255,255,255,0.05)',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease',
-                                    borderRadius: '10px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    gap: '0.2rem'
-                                }}
-                            >
-                                <Icon size={18} style={{
-                                    color: isActive ? 'var(--primary)' : 'rgba(255,255,255,0.7)'
-                                }} />
-                                <h3 style={{
-                                    fontSize: '0.75rem',
-                                    marginBottom: '0',
-                                    color: isActive ? '#fff' : 'rgba(255,255,255,0.85)',
-                                    fontWeight: isActive ? 600 : 500
-                                }}>{cat.label}</h3>
-                            </button>
-                        );
-                    })}
+                {/* CATEGORY SELECTOR */}
+                <div className={styles.inputGroup}>
+                    <label className={styles.inputLabel}>Campaign Type</label>
+                    <div className={styles.categoryGrid}>
+                        {CATEGORIES.map((cat) => {
+                            const Icon = cat.icon;
+                            const isActive = category === cat.id;
+                            return (
+                                <button
+                                    key={cat.id}
+                                    type="button"
+                                    onClick={() => {
+                                        setCategory(cat.id);
+                                        if (cat.id !== 'Multi') {
+                                            setSelectedMultiTasks([]);
+                                        }
+                                    }}
+                                    className={`${styles.categoryBtn} ${isActive ? styles.categoryActive : ''}`}
+                                >
+                                    <Icon size={20} className={styles.categoryIcon} />
+                                    <span className={styles.categoryLabel}>{cat.label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* MULTI TASK SELECTOR */}
                 {category === 'Multi' && (
-                    <>
-                        {selectedMultiTasks.length > 0 && (
-                            <div className={styles.multiSummary}>
-                                <div className={styles.multiIcons}>
-                                    {selectedMultiTasks.map((t, i) => (
-                                        <span key={i} className={styles.taskIcon}>●</span>
-                                    ))}
-                                </div>
-                                <div>
-                                    <div className={styles.multiTitle}>{selectedMultiTasks.join(' + ')}</div>
-                                    <div className={styles.multiSubtitle}>Users must complete all actions</div>
-                                </div>
-                            </div>
-                        )}
-
+                    <div className={styles.panel}>
                         <div className={styles.multiGrid}>
                             {MULTI_ACTIONS.map(action => {
                                 const isSelected = selectedMultiTasks.includes(action.id);
@@ -362,12 +326,20 @@ export default function NewCampaignPage() {
                                         onClick={() => toggleMultiTask(action.id)}
                                         className={`${styles.multiActionBtn} ${isSelected ? styles.multiActionActive : ''}`}
                                     >
-                                        {isSelected && '✓ '}{action.label}
+                                        {action.label}
                                     </button>
                                 );
                             })}
                         </div>
-                    </>
+                        {selectedMultiTasks.length > 0 && (
+                            <div className={styles.multiSummary} style={{ marginTop: '1rem' }}>
+                                <div>
+                                    <div className={styles.multiTitle}>{selectedMultiTasks.join(' + ')}</div>
+                                    <div className={styles.multiSubtitle}>Users must complete all actions</div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 )}
 
                 {/* URL INPUTS */}
@@ -415,75 +387,53 @@ export default function NewCampaignPage() {
                 {/* REQUIREMENTS TOGGLES - REMOVED FOR CLEANER UI */}
 
                 {/* BUDGET - COMPACT */}
-                <div className={styles.budgetSection} style={{ margin: '0.5rem 0' }}>
-                    <div className={styles.budgetInput}>
-                        <span className={styles.currency} style={{ fontSize: '1.8rem' }}>$</span>
+                {/* BUDGET SECTION */}
+                <div className={styles.budgetCard}>
+                    <div className={styles.inputLabel} style={{ textAlign: 'center', marginBottom: '0.5rem' }}>TOTAL BUDGET</div>
+                    <div className={styles.budgetInputWrapper}>
+                        <span className={styles.currencySymbol}>$</span>
                         <input
                             type="number"
                             value={totalBudget}
                             onChange={(e) => setTotalBudget(e.target.value)}
-                            placeholder="20"
+                            placeholder="50"
                             required
                             min="0.01"
-                            className={styles.budgetField}
-                            style={{ fontSize: '2.5rem', width: '120px' }}
+                            className={styles.budgetInput}
                         />
                     </div>
-                    {budgetError && (
-                        <div className={styles.budgetError}>
-                            ⚠️ {budgetError}
-                        </div>
-                    )}
+
+                    {/* TOKEN SELECTION */}
+                    <div className={styles.selectorGrid} style={{ marginTop: '1.5rem' }}>
+                        {visibleTokens.map(token => (
+                            <button
+                                key={token.symbol}
+                                type="button"
+                                onClick={() => setRewardToken(token.symbol)}
+                                className={`${styles.selectorBtn} ${rewardToken === token.symbol ? styles.selectorActive : ''}`}
+                            >
+                                {token.symbol}
+                            </button>
+                        ))}
+                    </div>
+                    {budgetError && <div style={{ color: '#ef4444', marginTop: '0.5rem', fontSize: '0.85rem' }}>{budgetError}</div>}
                 </div>
 
-                {/* TOKEN SELECTION */}
-                <div className={styles.tokenGrid}>
-                    {visibleTokens.map(token => (
-                        <button
-                            key={token.symbol}
-                            type="button"
-                            onClick={() => setRewardToken(token.symbol)}
-                            className={`${styles.tokenBtn} ${rewardToken === token.symbol ? styles.tokenActive : ''}`}
-                        >
-                            <div className={styles.tokenContent}>
-                                <span className={styles.tokenSymbol}>{token.symbol}</span>
-                                <span className={styles.tokenChain}>{token.chain}</span>
-                            </div>
-                        </button>
-                    ))}
-                </div>
-
-
-
-                {/* DURATION - COMPACT */}
-                <div className={styles.durationGrid} style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
-                    <button
-                        type="button"
-                        onClick={() => setDuration(1)}
-                        className={`${styles.durationBtn} ${duration === 1 ? styles.durationActive : ''}`}
-                        style={{ padding: '0.6rem' }}
-                    >
-                        <Clock className={styles.clock} size={18} />
-                        <span style={{ fontSize: '0.85rem' }}>1 Day</span>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setDuration(2)}
-                        className={`${styles.durationBtn} ${duration === 2 ? styles.durationActive : ''}`}
-                        style={{ padding: '0.6rem' }}
-                    >
-                        <Clock className={styles.clock} size={18} />
-                        <span style={{ fontSize: '0.85rem' }}>2 Days</span>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setDuration(3)}
-                        className={`${styles.durationBtn} ${duration === 3 ? styles.durationActive : ''}`}
-                        style={{ padding: '0.6rem' }}
-                    >
-                        <Clock className={styles.clock} size={18} />
-                        <span style={{ fontSize: '0.85rem' }}>3 Days</span>
-                    </button>
+                {/* DURATION */}
+                <div className={styles.inputGroup}>
+                    <label className={styles.inputLabel}>Campaign Duration</label>
+                    <div className={styles.selectorGrid} style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                        {[1, 2, 3].map(d => (
+                            <button
+                                key={d}
+                                type="button"
+                                onClick={() => setDuration(d as 1 | 2 | 3)}
+                                className={`${styles.selectorBtn} ${duration === d ? styles.selectorActive : ''}`}
+                            >
+                                <Clock size={16} /> {d} Day{d > 1 ? 's' : ''}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* FEE BREAKDOWN */}

@@ -2,6 +2,7 @@
     max-width: 600px;
     margin: 0 auto;
     padding: 2rem 1rem;
+    min-height: 100vh;
 }
 
 .header {
@@ -9,86 +10,199 @@
     text-align: center;
 }
 
-.rewardCard {
-    background: linear-gradient(135deg, rgba(123, 63, 228, 0.2) 0%, rgba(123, 63, 228, 0.05) 100%);
-    border: 1px solid var(--primary);
+.card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
     padding: 1.5rem;
-    border-radius: var(--radius);
-    margin-bottom: 2rem;
-    text-align: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, border-color 0.2s;
 }
 
-.rewardAmount {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--primary-light);
+.card:hover {
+    border-color: rgba(123, 63, 228, 0.3);
+}
+
+.label {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.value {
+    font-size: 1rem;
+    font-weight: 500;
 }
 
 .postPreview {
-    padding: 1rem;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 2rem;
-    word-break: break-all;
-}
-
-.taskList {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    background: linear-gradient(135deg, rgba(30, 30, 40, 0.5) 0%, rgba(20, 20, 30, 0.5) 100%);
+    border-left: 4px solid var(--primary);
 }
 
 .taskItem {
+    composes: card;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.taskHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    background: var(--muted);
-    border-radius: 0.5rem;
-    transition: all 0.2s;
 }
 
-.taskItem.completed {
-    background: rgba(46, 204, 113, 0.1);
-    border: 1px solid rgba(46, 204, 113, 0.3);
-}
-
-.verifyBtn {
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border: none;
+.taskTitle {
+    font-size: 1.1rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+}
+
+.uploadZone {
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    text-align: center;
     cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+.uploadZone:hover {
+    border-color: var(--primary);
+    background: rgba(123, 63, 228, 0.05);
+    color: var(--primary-light);
+}
+
+.uploadIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s;
+}
+
+.uploadZone:hover .uploadIcon {
     background: var(--primary);
     color: white;
+    box-shadow: 0 0 15px var(--primary);
 }
 
-.verifyBtn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.previewContainer {
+    position: relative;
+    width: 100%;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.verifyBtn.success {
-    background: #2ecc71;
+.previewImage {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 300px;
+    object-fit: cover;
 }
 
-.uploadBtn {
-    padding: 0.6rem 1.2rem;
-    border-radius: 0.5rem;
-    border: 1px dashed var(--primary);
-    background: rgba(123, 63, 228, 0.1);
+.changeBtn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
     cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.changeBtn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.05);
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(123, 63, 228, 0.3);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.submitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(123, 63, 228, 0.4);
+}
+
+.submitBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.completedBadge {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.4);
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.actionBtn {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2rem;
+    color: white;
+    text-decoration: none;
     font-size: 0.9rem;
     transition: all 0.2s;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.4rem;
 }
 
-.uploadBtn:hover {
+.actionBtn:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary);
+    border-color: rgba(255, 255, 255, 0.3);
 }
