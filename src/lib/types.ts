@@ -14,6 +14,7 @@ export interface CampaignParticipant {
     claimed?: boolean;
     proof?: string[]; // Merkle proof
     screenshots?: Record<string, string>; // task -> url (proof)
+    screenshotStatus?: Record<string, 'pending' | 'approved' | 'rejected'>;
 }
 
 export interface Campaign {

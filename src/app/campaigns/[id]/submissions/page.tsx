@@ -1,9 +1,9 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useCampaign, useCampaignParticipants } from '@/hooks/useCampaigns';
+import { useCampaign, useCampaignParticipants, useVerifyScreenshot } from '@/hooks/useCampaigns';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { Loader2, ArrowLeft, ExternalLink, Image as ImageIcon } from 'lucide-react';
+import { Loader2, ArrowLeft, ExternalLink, Image as ImageIcon, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -14,7 +14,8 @@ import { useAccount } from 'wagmi';
 export default function CampaignSubmissionsPage() {
     const { id } = useParams() as { id: string };
     const { data: campaign, isLoading: loadingCampaign } = useCampaign(id);
-    const { data: participants, isLoading: loadingParticipants } = useCampaignParticipants(id);
+    const { data: participants, isLoading: loadingParticipants, refetch: refetchParticipants } = useCampaignParticipants(id);
+    const { mutateAsync: verifyScreenshot } = useVerifyScreenshot();
     const { context } = useFarcasterContext();
     const { address } = useAccount();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -94,7 +95,7 @@ export default function CampaignSubmissionsPage() {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
                                 {Object.entries(participant.screenshots || {}).map(([task, url]) => (
                                     <div key={task}>
                                         <div style={{ fontSize: '0.85rem', marginBottom: '0.5rem', fontWeight: 500 }}>{task}</div>
@@ -115,6 +116,20 @@ export default function CampaignSubmissionsPage() {
                                                 alt={`${task} proof`}
                                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                             />
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                            <button
+                                                onClick={() => verifyScreenshot({ campaignId: id, userFid: participant.fid, taskId: task, status: 'approved' }).then(() => refetchParticipants())}
+                                                style={{ flex: 1, padding: '0.4rem', borderRadius: '4px', border: 'none', background: '#2ecc71', color: 'white', cursor: 'pointer', fontSize: '0.8rem' }}
+                                            >
+                                                Approve
+                                            </button>
+                                            <button
+                                                onClick={() => verifyScreenshot({ campaignId: id, userFid: participant.fid, taskId: task, status: 'rejected' }).then(() => refetchParticipants())}
+                                                style={{ flex: 1, padding: '0.4rem', borderRadius: '4px', border: 'none', background: '#e74c3c', color: 'white', cursor: 'pointer', fontSize: '0.8rem' }}
+                                            >
+                                                Reject
+                                            </button>
                                         </div>
                                     </div>
                                 ))}

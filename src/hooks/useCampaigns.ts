@@ -42,6 +42,13 @@ export function useSubmitScreenshot() {
     });
 }
 
+export function useVerifyScreenshot() {
+    return useMutation({
+        mutationFn: ({ campaignId, userFid, taskId, status }: { campaignId: string, userFid: number, taskId: string, status: 'approved' | 'rejected' }) =>
+            MockService.verifyScreenshot(campaignId, userFid, taskId, status),
+    });
+}
+
 export function useCampaignParticipants(campaignId: string) {
     return useQuery({
         queryKey: ['campaign', campaignId, 'participants'],

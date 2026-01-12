@@ -253,4 +253,15 @@ export const MockService = {
         if (!campaign) return [];
         return campaign.participants;
     },
+    verifyScreenshot: async (campaignId: string, userFid: number, taskId: string, status: 'approved' | 'rejected') => {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const campaign = campaigns.find(c => c.id === campaignId);
+        if (!campaign) throw new Error('Campaign not found');
+        const participant = campaign.participants.find(p => p.fid === userFid);
+        if (!participant) throw new Error('Participant not found');
+
+        if (!participant.screenshotStatus) participant.screenshotStatus = {};
+        participant.screenshotStatus[taskId] = status;
+        return true;
+    },
 };
