@@ -30,26 +30,27 @@ export const NeynarService = {
             }
 
             return {
-                totalEarnedUSD: 0,
                 totalTasks: 0,
-                rank: 0,
-                isPro: user.power_badge || false, // Check for Power Badge (Farcaster Pro/Active)
+                totalEarned: 0,
+                verifications: user.verified_addresses?.eth_addresses || [],
+                username: user.username,
+                displayName: user.display_name,
+                pfpUrl: user.pfp_url,
                 followers: user.follower_count || 0,
-                neynarScore: calculatedScore,
-                verifications: user.verifications || [],
+                following: user.following_count || 0,
+                neynarScore: 0,
+                isSpam: false,
                 history: []
             };
         } catch (error) {
             console.error('Neynar API Error:', error);
             // Return empty stats on failure
             return {
-                totalEarnedUSD: 0,
                 totalTasks: 0,
-                rank: 0,
-                isPro: false,
+                totalEarned: 0,
+                verifications: [],
                 followers: 0,
                 neynarScore: 0,
-                verifications: [],
                 history: []
             };
         }
