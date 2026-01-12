@@ -90,21 +90,85 @@ export default function ProfilePage() {
                 {/* Farcaster user - no wallet connection needed */}
             </div>
 
-            {/* STATS GRID */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '3rem' }}>
-                <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Total Tasks</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.totalTasks || 0}</div>
+            {/* STATS GRID - HORIZONTAL COMPACT */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', overflowX: 'auto' }}>
+                <div className="glass-panel" style={{ padding: '0.75rem 1rem', textAlign: 'center', flex: '0 0 auto', minWidth: '90px' }}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.7rem', marginBottom: '0.25rem' }}>Tasks</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>{stats?.totalTasks || 0}</div>
                 </div>
-                <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Neynar Score</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)', color: '#a5a6f6' }}>{stats?.neynarScore || 0}%</div>
+                <div className="glass-panel" style={{ padding: '0.75rem 1rem', textAlign: 'center', flex: '0 0 auto', minWidth: '90px' }}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.7rem', marginBottom: '0.25rem' }}>Score</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#a5a6f6' }}>{stats?.neynarScore || 0}%</div>
                 </div>
-                <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Followers</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 700, fontFamily: 'var(--font-space)' }}>{stats?.followers || 0}</div>
+                <div className="glass-panel" style={{ padding: '0.75rem 1rem', textAlign: 'center', flex: '0 0 auto', minWidth: '90px' }}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.7rem', marginBottom: '0.25rem' }}>Followers</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>{stats?.followers || 0}</div>
+                </div>
+                <div className="glass-panel" style={{ padding: '0.75rem 1rem', textAlign: 'center', flex: '0 0 auto', minWidth: '90px' }}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.7rem', marginBottom: '0.25rem' }}>Spam</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700, color: stats?.isSpam ? '#ef4444' : '#2ecc71' }}>
+                        {stats?.isSpam ? 'Yes' : 'No'}
+                    </div>
                 </div>
             </div>
+
+            {/* ABOUT BUTTON */}
+            <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                <button
+                    onClick={() => (document.getElementById('about-modal') as HTMLDialogElement)?.showModal()}
+                    style={{
+                        background: 'transparent',
+                        border: '1px solid var(--border)',
+                        color: 'var(--muted-foreground)',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.5rem',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem'
+                    }}
+                >
+                    About Platform
+                </button>
+            </div>
+
+            <dialog id="about-modal" style={{
+                padding: '2rem',
+                borderRadius: '1rem',
+                border: '1px solid var(--border)',
+                background: 'var(--background)',
+                color: 'var(--foreground)',
+                maxWidth: '400px',
+                width: '90%'
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h3 style={{ margin: 0 }}>About Post Up</h3>
+                    <form method="dialog">
+                        <button style={{ background: 'none', border: 'none', color: 'var(--muted-foreground)', cursor: 'pointer' }}>✕</button>
+                    </form>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                    <div>
+                        <h4 style={{ margin: '0 0 0.5rem', color: 'var(--foreground)' }}>How it Works</h4>
+                        <p style={{ margin: 0, color: 'var(--muted-foreground)' }}>
+                            Post Up helps you grow onchain. Create tasks and reward real users for engagement.
+                        </p>
+                    </div>
+                    <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '0.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                            <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>Platform Fee</span>
+                            <span style={{ color: 'var(--primary)' }}>15%</span>
+                        </div>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                            We charge a 15% service fee upfront. 85% goes to users.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 style={{ margin: '0 0 0.5rem', color: 'var(--foreground)' }}>Fair Distribution</h4>
+                        <p style={{ margin: 0, color: 'var(--muted-foreground)' }}>
+                            Rewards based on <strong>Quality Score</strong>. High-quality users earn more.
+                        </p>
+                    </div>
+                </div>
+            </dialog>
 
             {/* HISTORY */}
             <section>
