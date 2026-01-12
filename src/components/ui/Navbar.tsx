@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Zap, Layers, User, TrendingUp } from 'lucide-react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import styles from './Navbar.module.css';
 
 export function Navbar() {
@@ -35,6 +36,11 @@ export function Navbar() {
                     <Link href="/profile" className={`${styles.navLink} ${isActive('/profile') ? styles.active : ''}`}>
                         <User size={18} style={{ marginRight: '6px' }} /> Profile
                     </Link>
+                </div>
+
+                {/* Wallet Connect Button */}
+                <div style={{ marginLeft: 'auto' }}>
+                    <ConnectButton showBalance={false} chainStatus="icon" />
                 </div>
             </nav>
         </div>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { parseEther, parseUnits, encodePacked, keccak256 } from 'viem';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
+import { useAccount, useWriteContract } from 'wagmi';
 import { DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/config';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
 import { ERC20_ABI } from '@/lib/erc20';
@@ -138,6 +138,12 @@ export default function NewCampaignPage() {
         }
     };
 
+    // Wallet and smart contract integration
+    const { address, isConnected } = useAccount();
+    const { writeContractAsync: writeApprove } = useWriteContract();
+    const { writeContractAsync: writeCreate } = useWriteContract();
+    const [isApproving, setIsApproving] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -146,6 +152,11 @@ export default function NewCampaignPage() {
         // Validation
         if (!isFarcasterUser || !userId) {
             alert('Please open this app in Farcaster to create campaigns');
+            return;
+        }
+
+        if (!isConnected || !address) {
+            alert('Please connect your wallet to pay for the campaign');
             return;
         }
 
@@ -177,6 +188,31 @@ export default function NewCampaignPage() {
         setIsSubmitting(true);
 
         try {
+            const budgetInUSDC = parseUnits(budget.toString(), 6); // USDC has 6 decimals
+
+            // Step 1: Approve USDC
+            setIsApproving(true);
+            const approveTx = await writeApprove({
+                address: USDC_ADDRESS as `0x${string}`,
+                abi: ERC20_ABI,
+                functionName: 'approve',
+                args: [DISTRIBUTOR_ADDRESS as `0x${string}`, budgetInUSDC],
+            });
+            setIsApproving(false);
+
+            // Step 2: Create campaign on contract
+            setIsCreating(true);
+            const mockMerkleRoot = keccak256(encodePacked(['string'], ['campaign-' + Date.now()])) as `0x${string}`;
+
+            const createTx = await writeCreate({
+                address: DISTRIBUTOR_ADDRESS as `0x${string}`,
+                abi: DISTRIBUTOR_ABI,
+                functionName: 'createCampaign',
+                args: [mockMerkleRoot, USDC_ADDRESS as `0x${string}`, budgetInUSDC],
+            });
+            setIsCreating(false);
+
+            // Step 3: Save to database
             const selectedCategoryObj = CATEGORIES.find(c => c.id === category);
             const finalTasks = category === 'Multi' ? selectedMultiTasks : (selectedCategoryObj?.tasks || []);
             const estRewardPerTask = netBudget / 50;
@@ -476,14 +512,22 @@ export default function NewCampaignPage() {
                     <button
                         type="submit"
                         className={styles.submitBtn}
-                        disabled={isSubmitting || !isFarcasterUser}
+                        disabled={isSubmitting || !isFarcasterUser || !isConnected}
                         style={{
-                            opacity: (isFarcasterUser && !isSubmitting) ? 1 : 0.5,
-                            cursor: (isFarcasterUser && !isSubmitting) ? 'pointer' : 'not-allowed'
+                            opacity: (isFarcasterUser && isConnected && !isSubmitting) ? 1 : 0.5,
+                            cursor: (isFarcasterUser && isConnected && !isSubmitting) ? 'pointer' : 'not-allowed'
                         }}
                     >
-                        {isSubmitting ? 'Creating Campaign...' : `Create Campaign (${totalBudget} ${rewardToken})`}
+                        {isApproving && 'Approving USDC...'}
+                        {isCreating && 'Creating on Blockchain...'}
+                        {!isApproving && !isCreating && !isSubmitting && `Pay ${totalBudget} ${rewardToken} & Create`}
+                        {!isApproving && !isCreating && isSubmitting && 'Saving...'}
                     </button>
+                    {!isConnected && (
+                        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>
+                            💳 Connect wallet (Metamask, OKX, Bitget, etc) to create campaigns
+                        </p>
+                    )}
                 </div>
 
                 {category === 'MiniApp' && (
