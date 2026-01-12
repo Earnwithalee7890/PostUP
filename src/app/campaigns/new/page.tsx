@@ -253,14 +253,12 @@ export default function NewCampaignPage() {
 
             <form onSubmit={handleSubmit} className={styles.form}>
 
-                {/* CATEGORY SELECTOR - Horizontal buttons in form */}
+                {/* CATEGORY SELECTOR - Compact single row grid */}
                 <div style={{
-                    display: 'flex',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
                     gap: '0.5rem',
-                    marginBottom: '2rem',
-                    flexWrap: 'wrap',
-                    justifyContent: 'flex-start',
-                    padding: '0 0.5rem'
+                    marginBottom: '1rem'
                 }}>
                     {CATEGORIES.map((cat) => {
                         const Icon = cat.icon;
@@ -277,24 +275,21 @@ export default function NewCampaignPage() {
                                 }}
                                 className={styles.platformCard}
                                 style={{
-                                    flex: '0 0 auto',
-                                    minWidth: '90px',
-                                    maxWidth: '105px',
-                                    padding: '1rem 0.5rem',
+                                    padding: '0.6rem 0.3rem',
                                     textAlign: 'center',
                                     border: isActive ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.2)',
                                     background: isActive ? 'rgba(165, 166, 246, 0.15)' : 'rgba(255,255,255,0.05)',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s ease',
-                                    borderRadius: '12px'
+                                    borderRadius: '10px'
                                 }}
                             >
-                                <Icon size={26} style={{
-                                    margin: '0 auto 0.6rem',
+                                <Icon size={20} style={{
+                                    margin: '0 auto 0.3rem',
                                     color: isActive ? 'var(--primary)' : 'rgba(255,255,255,0.7)'
                                 }} />
                                 <h3 style={{
-                                    fontSize: '0.95rem',
+                                    fontSize: '0.8rem',
                                     marginBottom: '0',
                                     color: isActive ? '#fff' : 'rgba(255,255,255,0.85)',
                                     fontWeight: isActive ? 600 : 500
@@ -381,30 +376,12 @@ export default function NewCampaignPage() {
                     </div>
                 )}
 
-                {/* REQUIREMENTS TOGGLES (FARCASTER ONLY) */}
-                {platform === 'Farcaster' && (
-                    <div className={styles.pillGroup}>
-                        <button
-                            type="button"
-                            className={`${styles.pill} ${require200Followers ? styles.pillActive : ''}`}
-                            onClick={() => setRequire200Followers(!require200Followers)}
-                        >
-                            {require200Followers && '✓ '}200+ Followers
-                        </button>
-                        <button
-                            type="button"
-                            className={`${styles.pill} ${requirePro ? styles.pillActive : ''}`}
-                            onClick={() => setRequirePro(!requirePro)}
-                        >
-                            {requirePro && '✓ '}Farcaster Pro
-                        </button>
-                    </div>
-                )}
+                {/* REQUIREMENTS TOGGLES - REMOVED FOR CLEANER UI */}
 
-                {/* BUDGET */}
-                <div className={styles.budgetSection}>
+                {/* BUDGET - COMPACT */}
+                <div className={styles.budgetSection} style={{ margin: '0.5rem 0' }}>
                     <div className={styles.budgetInput}>
-                        <span className={styles.currency}>$</span>
+                        <span className={styles.currency} style={{ fontSize: '1.8rem' }}>$</span>
                         <input
                             type="number"
                             value={totalBudget}
@@ -413,6 +390,7 @@ export default function NewCampaignPage() {
                             required
                             min="0.01"
                             className={styles.budgetField}
+                            style={{ fontSize: '2.5rem', width: '120px' }}
                         />
                     </div>
                     {budgetError && (
