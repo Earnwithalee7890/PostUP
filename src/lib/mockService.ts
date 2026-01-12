@@ -222,4 +222,35 @@ export const MockService = {
 
         return campaign;
     },
+    submitScreenshot: async (campaignId: string, taskId: string, screenshot: string, userFid: number, address: string) => {
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        const campaign = campaigns.find(c => c.id === campaignId);
+        if (!campaign) throw new Error('Campaign not found');
+
+        let participant = campaign.participants.find(p => p.fid === userFid);
+
+        if (!participant) {
+            participant = {
+                address: address,
+                fid: userFid,
+                joinedAt: Date.now(),
+                qualityScore: { total: 100, details: [] } as any,
+                screenshots: {},
+            };
+            campaign.participants.push(participant);
+        }
+
+        if (!participant.screenshots) participant.screenshots = {};
+        participant.screenshots[taskId] = screenshot;
+
+        return true;
+    },
+
+    getParticipants: async (campaignId: string) => {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const campaign = campaigns.find(c => c.id === campaignId);
+        if (!campaign) return [];
+        return campaign.participants;
+    },
 };

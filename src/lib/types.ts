@@ -13,6 +13,7 @@ export interface CampaignParticipant {
     reward?: number; // Calculated when campaign ends
     claimed?: boolean;
     proof?: string[]; // Merkle proof
+    screenshots?: Record<string, string>; // task -> url (proof)
 }
 
 export interface Campaign {

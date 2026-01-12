@@ -1,17 +1,19 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useCampaign, useCompleteTask } from '@/hooks/useCampaigns';
+import { useCampaign, useSubmitScreenshot } from '@/hooks/useCampaigns';
 import { useState } from 'react';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
+import { useAccount } from 'wagmi';
 import { Check, Loader2, ExternalLink, Camera } from 'lucide-react';
 import styles from './task.module.css';
 
 export default function TaskExecutionPage() {
     const { id } = useParams() as { id: string };
     const { data: campaign, isLoading } = useCampaign(id);
-    const completeMutation = useCompleteTask();
+    const { mutateAsync: submitScreenshot } = useSubmitScreenshot();
     const { context } = useFarcasterContext();
+    const { address } = useAccount();
 
     const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
     const [screenshots, setScreenshots] = useState<Record<string, string>>({});
@@ -43,10 +45,17 @@ export default function TaskExecutionPage() {
 
         setUploadingTask(task);
 
+        setUploadingTask(task);
+
         try {
-            // Here you would upload to your backend/storage
-            // For now, we'll just mark it as complete
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate upload
+            // Updated: Actually submit to backend (MockService)
+            await submitScreenshot({
+                campaignId: id,
+                taskId: task,
+                screenshot: screenshot,
+                userFid: context?.user?.fid!,
+                address: address || '0x0000000000000000000000000000000000000000'
+            });
 
             setCompletedTasks(prev => ({ ...prev, [task]: true }));
             alert('Screenshot submitted successfully! ✅');

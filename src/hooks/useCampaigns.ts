@@ -34,3 +34,18 @@ export function useCompleteTask() {
             MockService.completeTask(campaignId, taskType),
     });
 }
+
+export function useSubmitScreenshot() {
+    return useMutation({
+        mutationFn: ({ campaignId, taskId, screenshot, userFid, address }: { campaignId: string, taskId: string, screenshot: string, userFid: number, address: string }) =>
+            MockService.submitScreenshot(campaignId, taskId, screenshot, userFid, address),
+    });
+}
+
+export function useCampaignParticipants(campaignId: string) {
+    return useQuery({
+        queryKey: ['campaign', campaignId, 'participants'],
+        queryFn: () => MockService.getParticipants(campaignId),
+        enabled: !!campaignId,
+    });
+}
