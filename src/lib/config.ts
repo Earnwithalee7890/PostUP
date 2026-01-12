@@ -1,11 +1,31 @@
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { http, createConfig } from 'wagmi';
 import { base } from 'wagmi/chains';
+import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors';
+import { farcasterFrame } from '@farcaster/miniapp-wagmi-connector';
 
-export const config = getDefaultConfig({
-  appName: 'Post Up',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
+export const config = createConfig({
   chains: [base],
-  ssr: true, // FIXED: Must be true for Next.js App Router
+  connectors: [
+    farcasterFrame(), // Farcaster wallet (priority for Farcaster users)
+    injected(), // Metamask, OKX, Bitget, Trust Wallet, etc.
+    walletConnect({
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
+      metadata: {
+        name: 'Post Up',
+        description: 'Task-based onchain growth engine',
+        url: 'https://postup.app',
+        icons: ['https://postup.app/icon.png']
+      },
+      showQrModal: false, // No QR on mobile
+    }),
+    coinbaseWallet({
+      appName: 'Post Up',
+    }),
+  ],
+  transports: {
+    [base.id]: http(),
+  },
+  ssr: true, // Important for Next.js
 });
 
 export const DISTRIBUTOR_ADDRESS = '0x310a9F6f4ed24f390A2ef7552b6F0b2Dd914C342'; // Base Mainnet V2 (USDC Support)
