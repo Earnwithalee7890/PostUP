@@ -4,10 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { MockService } from '@/lib/mockService';
 import { NeynarService } from '@/lib/neynar';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { User, CheckCircle, History, Copy } from 'lucide-react';
+import { User, CheckCircle, History, Copy, Plus, Bell } from 'lucide-react';
+import sdk from '@farcaster/miniapp-sdk';
+import { useState } from 'react';
 
 export default function ProfilePage() {
     const { context } = useFarcasterContext();
+    const [addingApp, setAddingApp] = useState(false);
 
     const { data: stats } = useQuery({
         queryKey: ['userStats', context?.user?.fid],
@@ -32,6 +35,18 @@ export default function ProfilePage() {
         if (displayAddress) {
             navigator.clipboard.writeText(displayAddress);
             alert('Address copied!');
+        }
+    };
+
+    const handleAddMiniApp = async () => {
+        try {
+            setAddingApp(true);
+            await sdk.actions.addFrame();
+            alert('Mini App added! You can now receive notifications.');
+        } catch (error) {
+            console.error('Failed to add mini app:', error);
+        } finally {
+            setAddingApp(false);
         }
     };
 
@@ -87,7 +102,27 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* Farcaster user - no wallet connection needed */}
+                {/* Add Mini App Button */}
+                <button
+                    onClick={handleAddMiniApp}
+                    disabled={addingApp}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.6rem 1rem',
+                        borderRadius: '0.5rem',
+                        border: '1px solid rgba(139, 92, 246, 0.5)',
+                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))',
+                        color: '#8b5cf6',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        cursor: addingApp ? 'wait' : 'pointer'
+                    }}
+                >
+                    <Bell size={16} />
+                    {addingApp ? 'Adding...' : 'Enable Notifications'}
+                </button>
             </div>
 
             {/* STATS GRID - HORIZONTAL COMPACT */}
@@ -105,9 +140,17 @@ export default function ProfilePage() {
                     <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>{stats?.followers || 0}</div>
                 </div>
                 <div className="glass-panel" style={{ padding: '0.75rem 1rem', textAlign: 'center', flex: '0 0 auto', minWidth: '90px' }}>
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.7rem', marginBottom: '0.25rem' }}>Spam</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 700, color: stats?.isSpam ? '#ef4444' : '#2ecc71' }}>
-                        {stats?.isSpam ? 'Yes' : 'No'}
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: '0.7rem', marginBottom: '0.25rem' }}>Status</div>
+                    <div style={{
+                        fontSize: '0.9rem',
+                        fontWeight: 700,
+                        color: stats?.isSpam ? '#ef4444' : '#2ecc71',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.25rem'
+                    }}>
+                        {stats?.isSpam ? '⚠️ Spammy' : '✓ Safe'}
                     </div>
                 </div>
             </div>
@@ -155,10 +198,10 @@ export default function ProfilePage() {
                     <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '0.5rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                             <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>Platform Fee</span>
-                            <span style={{ color: 'var(--primary)' }}>15%</span>
+                            <span style={{ color: 'var(--primary)' }}>10%</span>
                         </div>
                         <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
-                            We charge a 15% service fee upfront. 85% goes to users.
+                            We charge a 10% service fee upfront. 90% goes to users.
                         </p>
                     </div>
                     <div>
