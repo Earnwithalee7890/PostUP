@@ -1,14 +1,14 @@
 import { Campaign } from '@/lib/types';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './CampaignCard.module.css';
 import { ExternalLink, Image, Camera, Check, Loader2, CheckCircle } from 'lucide-react';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useAccount } from 'wagmi';
 import { isAdmin } from '@/lib/admin';
-import { useState } from 'react';
 import { useSubmitScreenshot, useUserSubmissions } from '@/hooks/useCampaigns';
 import sdk from '@farcaster/miniapp-sdk';
+import { SuccessModal } from './SuccessModal';
 
 export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const { context } = useFarcasterContext();
@@ -24,6 +24,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const [screenshots, setScreenshots] = useState<Record<string, string>>({});
     const [uploadingTask, setUploadingTask] = useState<string | null>(null);
     const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
+    const [showSuccess, setShowSuccess] = useState(false);
 
     // Load completion state from Supabase submissions
     useEffect(() => {
@@ -82,10 +83,9 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                 address: address || '0x0000000000000000000000000000000000000000'
             });
             setCompletedTasks(prev => ({ ...prev, [task]: true }));
-            alert('Screenshot submitted successfully! ✅');
+            setShowSuccess(true);
         } catch (error) {
             console.error('Upload error:', error);
-            alert('Failed to submit screenshot.');
         } finally {
             setUploadingTask(null);
         }
@@ -271,6 +271,14 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                     </div>
                 </div>
             </div>
+
+            {/* Success Modal */}
+            <SuccessModal
+                isOpen={showSuccess}
+                onClose={() => setShowSuccess(false)}
+                title="Proof Submitted!"
+                message="Your screenshot has been submitted for review. You'll be notified once it's approved."
+            />
         </div >
     );
 }
