@@ -130,30 +130,92 @@ export const SupabaseService = {
     },
 
     async completeTask(campaignId: string, taskType: any) {
-        // TODO: Get user FID from authenticated session
-        // For now, this is a placeholder - you'll need to pass userFid from the frontend
-        // based on the authenticated Farcaster user
+        // For now, return success - verification happens via screenshot
+        return { success: true };
+    },
 
-        // Fetch campaign to get URLs
-        const campaign = await this.getCampaign(campaignId);
-        if (!campaign) {
-            throw new Error('Campaign not found');
+    /**
+     * Submit a screenshot for a specific task
+     */
+    async submitScreenshot(campaignId: string, taskId: string, screenshot: string, userFid: number, address: string) {
+        const { data, error } = await supabase
+            .from('submissions')
+            .upsert({
+                campaign_id: campaignId,
+                user_fid: userFid,
+                user_address: address,
+                task_id: taskId,
+                screenshot_url: screenshot,
+                status: 'pending'
+            }, {
+                onConflict: 'campaign_id,user_fid,task_id'
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Error submitting screenshot:', error);
+            throw new Error('Failed to submit screenshot');
         }
 
-        // IMPORTANT: In production, you need to:
-        // 1. Get the authenticated user's FID from the session
-        // 2. Import and call verifyTask from './verifyTask'
-        // 3. Return the verification result
+        return { success: true, submission: data };
+    },
 
-        // Example implementation:
-        // import { verifyTask } from './verifyTask';
-        // const result = await verifyTask(userFid, taskType, campaign.postUrl, campaign.castUrl);
-        // if (!result.success) {
-        //     throw new Error(result.error || 'Task verification failed');
-        // }
+    /**
+     * Get current user's submissions for a campaign
+     */
+    async getUserSubmissions(campaignId: string, userFid: number) {
+        const { data, error } = await supabase
+            .from('submissions')
+            .select('*')
+            .eq('campaign_id', campaignId)
+            .eq('user_fid', userFid);
 
-        // For now, return success to unblock development
-        // Replace this with actual verification once FID is available
-        return { success: true };
+        if (error) {
+            console.error('Error fetching user submissions:', error);
+            return [];
+        }
+
+        return data || [];
+    },
+
+    /**
+     * Get all submissions for a campaign (for admin/creator view)
+     */
+    async getSubmissions(campaignId: string) {
+        const { data, error } = await supabase
+            .from('submissions')
+            .select('*')
+            .eq('campaign_id', campaignId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching submissions:', error);
+            return [];
+        }
+
+        return data || [];
+    },
+
+    /**
+     * Verify/approve a screenshot submission (for admin)
+     */
+    async verifyScreenshot(campaignId: string, userFid: number, taskId: string, status: 'approved' | 'rejected') {
+        const { data, error } = await supabase
+            .from('submissions')
+            .update({ status })
+            .eq('campaign_id', campaignId)
+            .eq('user_fid', userFid)
+            .eq('task_id', taskId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Error verifying screenshot:', error);
+            throw new Error('Failed to verify screenshot');
+        }
+
+        return { success: true, submission: data };
     }
 };
+
