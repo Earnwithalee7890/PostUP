@@ -9,13 +9,42 @@ import { generateMerkleDistribution } from './merkle';
 let campaigns: Campaign[] = [];
 let claimedRewards = new Map<string, Set<string>>();
 
+// Helper to persist to localStorage
+const saveToStorage = () => {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('postup_campaigns', JSON.stringify(campaigns));
+        localStorage.setItem('postup_claims', JSON.stringify(Array.from(claimedRewards.entries()).map(([k, v]) => [k, Array.from(v)])));
+    }
+};
+
+// Helper to load from localStorage
+const loadFromStorage = () => {
+    if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('postup_campaigns');
+        if (stored) {
+            campaigns = JSON.parse(stored);
+        }
+
+        const storedClaims = localStorage.getItem('postup_claims');
+        if (storedClaims) {
+            const parsed = JSON.parse(storedClaims);
+            claimedRewards = new Map(parsed.map(([k, v]: [string, string[]]) => [k, new Set(v)]));
+        }
+    }
+};
+
+// Load immediately
+loadFromStorage();
+
 export const MockService = {
     getCampaigns: async (): Promise<Campaign[]> => {
         await new Promise(resolve => setTimeout(resolve, 500));
+        loadFromStorage(); // Ensure fresh
         return [...campaigns];
     },
     getCampaign: async (id: string): Promise<Campaign | undefined> => {
         await new Promise(resolve => setTimeout(resolve, 200));
+        loadFromStorage();
         return campaigns.find(c => c.id === id);
     },
 
@@ -30,6 +59,7 @@ export const MockService = {
             participants: [],
         };
         campaigns.unshift(newCampaign);
+        saveToStorage();
         return newCampaign;
     },
 
@@ -61,6 +91,7 @@ export const MockService = {
         };
 
         campaign.participants.push(participant);
+        saveToStorage();
         return { success: true, qualityScore };
     },
 
@@ -113,6 +144,7 @@ export const MockService = {
 
         // Initialize claim tracking
         claimedRewards.set(campaignId, new Set());
+        saveToStorage();
 
         return {
             merkleRoot: merkleData.root,
@@ -137,6 +169,7 @@ export const MockService = {
         // Mark as claimed
         participant.claimed = true;
         claimedRewards.get(campaignId)?.add(userAddress);
+        saveToStorage();
 
         return {
             success: true,
@@ -244,11 +277,13 @@ export const MockService = {
         if (!participant.screenshots) participant.screenshots = {};
         participant.screenshots[taskId] = screenshot;
 
+        saveToStorage();
         return true;
     },
 
     getParticipants: async (campaignId: string) => {
         await new Promise(resolve => setTimeout(resolve, 500));
+        loadFromStorage();
         const campaign = campaigns.find(c => c.id === campaignId);
         if (!campaign) return [];
         return campaign.participants;
@@ -262,6 +297,7 @@ export const MockService = {
 
         if (!participant.screenshotStatus) participant.screenshotStatus = {};
         participant.screenshotStatus[taskId] = status;
+        saveToStorage();
         return true;
     },
 };
