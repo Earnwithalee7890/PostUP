@@ -7,7 +7,7 @@ import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useAccount } from 'wagmi';
 import { isAdmin } from '@/lib/admin';
 import { useState } from 'react';
-import { useSubmitScreenshot } from '@/hooks/useCampaigns';
+import { useSubmitScreenshot, useUserSubmissions } from '@/hooks/useCampaigns';
 import sdk from '@farcaster/miniapp-sdk';
 
 export function CampaignCard({ campaign }: { campaign: Campaign }) {
@@ -16,32 +16,32 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const isUserAdmin = isAdmin(address, context?.user?.fid);
     const { mutateAsync: submitScreenshot } = useSubmitScreenshot();
 
+    const userFid = context?.user?.fid;
+
+    // Fetch this user's submissions for this campaign from Supabase
+    const { data: userSubmissions } = useUserSubmissions(campaign.id, userFid);
+
     const [screenshots, setScreenshots] = useState<Record<string, string>>({});
     const [uploadingTask, setUploadingTask] = useState<string | null>(null);
     const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
 
-    // Load state from persisted participant data on mount
+    // Load completion state from Supabase submissions
     useEffect(() => {
-        if (!context?.user?.fid || !campaign.participants) return;
+        if (!userSubmissions || userSubmissions.length === 0) return;
 
-        const participant = campaign.participants.find(p => p.fid === context.user?.fid);
-        if (participant) {
-            // Restore screenshots
-            if (participant.screenshots) {
-                setScreenshots(participant.screenshots);
-            }
+        const restored: Record<string, boolean> = {};
+        const restoredScreenshots: Record<string, string> = {};
 
-            // Restore completion status (if screenshot exists, we consider it locally 'done' or pending)
-            // In a real app we'd check status='approved', but for now 'submitted' is enough
-            const restoredCompleted: Record<string, boolean> = {};
-            if (participant.screenshots) {
-                Object.keys(participant.screenshots).forEach(taskId => {
-                    restoredCompleted[taskId] = true;
-                });
+        userSubmissions.forEach((sub: any) => {
+            restored[sub.task_id] = true;
+            if (sub.screenshot_url) {
+                restoredScreenshots[sub.task_id] = sub.screenshot_url;
             }
-            setCompletedTasks(restoredCompleted);
-        }
-    }, [campaign.participants, context?.user?.fid]);
+        });
+
+        setCompletedTasks(restored);
+        setScreenshots(restoredScreenshots);
+    }, [userSubmissions]);
 
     const isX = campaign.platform === 'X';
     const isEnded = campaign.status === 'completed' || campaign.status === 'claimable' || campaign.remainingBudget < campaign.rewardAmountPerTask;
