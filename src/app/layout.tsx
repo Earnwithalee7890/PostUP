@@ -58,6 +58,14 @@ export const metadata: Metadata = {
   },
   other: {
     'base:app_id': '695ecd383ee38216e9af4b12',
+    // Frame meta tags for cast embeds (when sharing URL)
+    'fc:frame': 'vNext',
+    'fc:frame:image': 'https://post-up-zeta.vercel.app/og-image.png',
+    'fc:frame:image:aspect_ratio': '1.91:1',
+    'fc:frame:button:1': 'Launch Post Up',
+    'fc:frame:button:1:action': 'link',
+    'fc:frame:button:1:target': 'https://post-up-zeta.vercel.app',
+    // Mini app manifest in meta
     'fc:miniapp': JSON.stringify({
       version: "1",
       name: "Post Up",
