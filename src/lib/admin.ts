@@ -1,11 +1,9 @@
 export const ADMIN_WALLETS = [
-    '0x123...456', // Replace with your actual wallet address
-    // Add more admin addresses here
+    '0xcf74bbbddbb7ed5129a715f20d1cc34fe1124fe4',
 ].map(addr => addr.toLowerCase());
 
 export const ADMIN_FIDS = [
-    // Add your FID here
-    1234, // PlaceHolder
+    338060,
 ];
 
 export function isAdmin(address?: string, fid?: number): boolean {
