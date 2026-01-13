@@ -75,6 +75,8 @@ const MULTI_ACTIONS = [
     { id: 'Cast' as TaskType, label: 'Cast' },
 ];
 
+import { SuccessModal } from '@/components/SuccessModal';
+
 export default function NewCampaignPage() {
     const router = useRouter();
     const { mutateAsync: createCampaign } = useCreateCampaign();
@@ -93,6 +95,10 @@ export default function NewCampaignPage() {
 
     // Multi-task selection
     const [selectedMultiTasks, setSelectedMultiTasks] = useState<TaskType[]>([]);
+
+    // Modal State
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [createdCampaignId, setCreatedCampaignId] = useState<string | null>(null);
 
     const budget = parseFloat(totalBudget) || 0;
     const platformFee = budget * 0.15;
@@ -236,16 +242,20 @@ export default function NewCampaignPage() {
                 endedAt: endedAt,
             } as any);
 
-            alert('Campaign created successfully! 🎉');
+            setCreatedCampaignId(newCampaign.id);
+            setShowSuccess(true);
 
-            // Redirect to the campaign tasks page with the correct ID
-            router.push(`/tasks/${newCampaign.id}`);
         } catch (error) {
             console.error('Error creating campaign:', error);
             alert('Failed to create campaign. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleSuccessClose = () => {
+        setShowSuccess(false);
+        router.push('/');
     };
 
     const visibleTokens = showAllTokens ? SUPPORTED_TOKENS : SUPPORTED_TOKENS.slice(0, 2);
@@ -276,6 +286,15 @@ export default function NewCampaignPage() {
     // Skip category selection - go directly to form with category buttons
     return (
         <div className={styles.container}>
+            <SuccessModal
+                isOpen={showSuccess}
+                onClose={handleSuccessClose}
+                title="Campaign Created!"
+                message={`Your ${platform} campaign is now live with a budget of ${budget} ${rewardToken}.`}
+                actionLabel="View Dashboard"
+                onAction={handleSuccessClose}
+            />
+
             <button onClick={() => router.push('/')} className={styles.backButton}>
                 <ArrowLeft size={16} /> Back
             </button>
