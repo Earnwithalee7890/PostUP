@@ -4,16 +4,11 @@ import styles from './page.module.css';
 import Link from 'next/link';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useEffect } from 'react';
-import { useCampaigns } from '@/hooks/useCampaigns';
-import { CampaignCard } from '@/components/CampaignCard';
+import { Rocket, Users, Trophy, TrendingUp } from 'lucide-react';
 
 export default function Home() {
   const { context } = useFarcasterContext();
   const isFarcasterConnected = !!context?.user;
-  const userId = context?.user?.fid ? String(context.user.fid) : undefined;
-
-  const { data: allCampaigns } = useCampaigns();
-  const userActiveCampaigns = allCampaigns?.filter(c => c.creator === userId && c.status === 'active') || [];
 
   // Call ready() AFTER UI renders - per official Farcaster docs
   useEffect(() => {
@@ -32,73 +27,129 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <div className={styles.hero}>
-        <h1 className={`${styles.title} gradient-text`}>
-          Post Up
-        </h1>
-        {isFarcasterConnected && (
-          <p className={styles.subtitle}>
-            Welcome, {context?.user?.displayName || 'User'}!
+        {/* Hero Section */}
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h1 className={`${styles.title} gradient-text`} style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+            Post Up
+          </h1>
+          <p style={{ color: 'var(--muted-foreground)', fontSize: '1.1rem', maxWidth: '400px', margin: '0 auto' }}>
+            Earn rewards by engaging with campaigns on Farcaster
           </p>
-        )}
-
-        {/* Active Campaigns Section - Displaying ALL active campaigns */}
-        <div style={{ marginTop: '3rem', width: '100%', maxWidth: '1200px' }}>
-          {allCampaigns && allCampaigns.length > 0 ? (
-            <>
-              <div style={{
-                background: 'rgba(255,255,255,0.03)',
-                padding: '1rem 1.5rem',
-                borderRadius: '0.75rem',
-                marginBottom: '1.5rem',
-                border: '1px solid rgba(255,255,255,0.1)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-                <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 600 }}>Active Campaigns</h2>
-                <Link href="/campaigns/new" style={{
-                  fontSize: '0.9rem',
-                  color: 'var(--primary)',
-                  textDecoration: 'none',
-                  fontWeight: 600
-                }}>
-                  + Create New
-                </Link>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
-                {allCampaigns.map(campaign => (
-                  <CampaignCard key={campaign.id} campaign={campaign} />
-                ))}
-              </div>
-            </>
-          ) : (
-            <div style={{
-              textAlign: 'center',
-              padding: '3rem 2rem',
-              background: 'rgba(255,255,255,0.03)',
-              borderRadius: '0.75rem',
-              border: '1px solid rgba(255,255,255,0.1)'
+          {isFarcasterConnected && (
+            <p style={{
+              marginTop: '1rem',
+              padding: '0.5rem 1rem',
+              background: 'rgba(139, 92, 246, 0.1)',
+              borderRadius: '2rem',
+              display: 'inline-block',
+              fontSize: '0.9rem'
             }}>
-              <p style={{ color: 'var(--muted-foreground)', marginBottom: '1rem' }}>
-                There are no active campaigns right now. Be the first!
-              </p>
-              {isFarcasterConnected ? (
-                <Link href="/campaigns/new" className="glass-button" style={{
-                  display: 'inline-block',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '0.5rem',
-                  textDecoration: 'none'
-                }}>
-                  Create Campaign
-                </Link>
-              ) : (
-                <p style={{ fontSize: '0.9rem', color: 'var(--muted-foreground)' }}>Connect wallet to create a campaign</p>
-              )}
-            </div>
+              👋 Welcome, <strong>{context?.user?.displayName || 'User'}</strong>!
+            </p>
           )}
+        </div>
+
+        {/* Quick Actions Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '1rem',
+          width: '100%',
+          maxWidth: '400px',
+          margin: '0 auto'
+        }}>
+          {/* Browse Campaigns */}
+          <Link href="/campaigns" style={{ textDecoration: 'none' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%)',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              borderRadius: '1rem',
+              padding: '1.5rem 1rem',
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
+            }}>
+              <Rocket size={32} style={{ color: '#8b5cf6', marginBottom: '0.5rem' }} />
+              <div style={{ fontWeight: 600, color: 'white', fontSize: '0.95rem' }}>Browse Campaigns</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '0.25rem' }}>Earn rewards</div>
+            </div>
+          </Link>
+
+          {/* Create Campaign */}
+          <Link href="/campaigns/new" style={{ textDecoration: 'none' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%)',
+              border: '1px solid rgba(34, 197, 94, 0.3)',
+              borderRadius: '1rem',
+              padding: '1.5rem 1rem',
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
+            }}>
+              <Users size={32} style={{ color: '#22c55e', marginBottom: '0.5rem' }} />
+              <div style={{ fontWeight: 600, color: 'white', fontSize: '0.95rem' }}>Create Campaign</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '0.25rem' }}>Grow audience</div>
+            </div>
+          </Link>
+
+          {/* Leaderboard */}
+          <Link href="/leaderboard" style={{ textDecoration: 'none' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(234, 88, 12, 0.2) 100%)',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              borderRadius: '1rem',
+              padding: '1.5rem 1rem',
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
+            }}>
+              <Trophy size={32} style={{ color: '#f59e0b', marginBottom: '0.5rem' }} />
+              <div style={{ fontWeight: 600, color: 'white', fontSize: '0.95rem' }}>Leaderboard</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '0.25rem' }}>Top earners</div>
+            </div>
+          </Link>
+
+          {/* Profile */}
+          <Link href="/profile" style={{ textDecoration: 'none' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.2) 100%)',
+              border: '1px solid rgba(236, 72, 153, 0.3)',
+              borderRadius: '1rem',
+              padding: '1.5rem 1rem',
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
+            }}>
+              <TrendingUp size={32} style={{ color: '#ec4899', marginBottom: '0.5rem' }} />
+              <div style={{ fontWeight: 600, color: 'white', fontSize: '0.95rem' }}>My Profile</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '0.25rem' }}>Task history</div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Stats Section */}
+        <div style={{
+          marginTop: '3rem',
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '2rem',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#8b5cf6' }}>10%</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>Platform Fee</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#22c55e' }}>90%</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>To Rewards</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#f59e0b' }}>Fair</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>Distribution</div>
+          </div>
         </div>
       </div>
     </main>
   );
 }
+
