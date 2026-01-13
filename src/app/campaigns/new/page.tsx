@@ -101,7 +101,7 @@ export default function NewCampaignPage() {
     const [createdCampaignId, setCreatedCampaignId] = useState<string | null>(null);
 
     const budget = parseFloat(totalBudget) || 0;
-    const platformFee = budget * 0.15;
+    const platformFee = budget * 0.10;
     const netBudget = budget - platformFee;
 
     const MINIMUM_BUDGET = 0.01;
