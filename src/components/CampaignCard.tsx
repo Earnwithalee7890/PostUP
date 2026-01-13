@@ -91,13 +91,26 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
         }
     };
 
+    // Determine budget tier
+    const getBudgetTier = (budget: number) => {
+        if (budget >= 30) return 'gold';
+        if (budget >= 20) return 'silver';
+        return 'bronze';
+    };
+    const tier = getBudgetTier(campaign.totalBudget);
+    const tierClass = tier === 'gold' ? styles.tierGold : tier === 'silver' ? styles.tierSilver : styles.tierBronze;
+    const tierLabelClass = tier === 'gold' ? styles.tierLabelGold : tier === 'silver' ? styles.tierLabelSilver : styles.tierLabelBronze;
+    const rewardClass = tier === 'gold' ? styles.rewardGold : tier === 'silver' ? styles.rewardSilver : styles.rewardBronze;
+    const tierLabel = tier === 'gold' ? '💎 PREMIUM' : tier === 'silver' ? '⭐ STANDARD' : '🥉 STARTER';
+
     return (
-        <div className={`glass-panel ${styles.card}`}>
+        <div className={`${styles.card} ${tierClass}`}>
             <div className={styles.header}>
                 <div className="flex-center" style={{ gap: '0.5rem' }}>
                     <span className={`${styles.platformBadge} ${isX ? styles.platform_X : styles.platform_Farcaster}`}>
                         {campaign.platform}
                     </span>
+                    <span className={`${styles.tierLabel} ${tierLabelClass}`}>{tierLabel}</span>
                     {isEnded ? (
                         <span style={{
                             fontSize: '0.7rem',
@@ -120,8 +133,8 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                         }}>ACTIVE</span>
                     )}
                 </div>
-                <span className={styles.reward}>
-                    {campaign.netBudget.toFixed(4)} {campaign.rewardToken}
+                <span className={`${styles.reward} ${rewardClass}`}>
+                    ${campaign.totalBudget.toFixed(0)}
                 </span>
             </div>
 

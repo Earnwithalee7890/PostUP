@@ -4,17 +4,88 @@
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Budget Tier: Bronze ($10-19.99) */
+.tierBronze {
+    background: linear-gradient(145deg, rgba(205, 127, 50, 0.1) 0%, rgba(139, 69, 19, 0.05) 100%);
+    border: 1px solid rgba(205, 127, 50, 0.3);
+}
+
+.tierBronze::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #cd7f32, #b8860b);
+}
+
+.tierBronze:hover {
+    border-color: rgba(205, 127, 50, 0.5);
+    box-shadow: 0 10px 40px rgba(205, 127, 50, 0.15);
+}
+
+/* Budget Tier: Silver ($20-29.99) */
+.tierSilver {
+    background: linear-gradient(145deg, rgba(192, 192, 192, 0.1) 0%, rgba(169, 169, 169, 0.05) 100%);
+    border: 1px solid rgba(192, 192, 192, 0.3);
+}
+
+.tierSilver::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #c0c0c0, #a8a8a8);
+}
+
+.tierSilver:hover {
+    border-color: rgba(192, 192, 192, 0.5);
+    box-shadow: 0 10px 40px rgba(192, 192, 192, 0.15);
+}
+
+/* Budget Tier: Gold ($30+) */
+.tierGold {
+    background: linear-gradient(145deg, rgba(255, 215, 0, 0.1) 0%, rgba(218, 165, 32, 0.05) 100%);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.tierGold::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ffd700, #f0c040, #ffd700);
+    animation: goldShimmer 2s ease-in-out infinite;
+}
+
+@keyframes goldShimmer {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.tierGold:hover {
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 10px 40px rgba(255, 215, 0, 0.15);
 }
 
 .card:hover {
-    border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-.card:hover::before {
-    opacity: 1;
 }
 
 .header {
@@ -46,12 +117,48 @@
     box-shadow: 0 0 10px rgba(133, 93, 205, 0.1);
 }
 
+/* Budget tier labels */
+.tierLabel {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+.tierLabelBronze {
+    background: rgba(205, 127, 50, 0.2);
+    color: #cd7f32;
+}
+
+.tierLabelSilver {
+    background: rgba(192, 192, 192, 0.2);
+    color: #c0c0c0;
+}
+
+.tierLabelGold {
+    background: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+}
+
 .reward {
     font-family: var(--font-space);
     font-weight: 700;
-    color: var(--primary-light);
     font-size: 1.25rem;
-    text-shadow: 0 0 15px rgba(123, 63, 228, 0.3);
+}
+
+.rewardBronze {
+    color: #cd7f32;
+}
+
+.rewardSilver {
+    color: #c0c0c0;
+}
+
+.rewardGold {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
 .content {
