@@ -11,8 +11,27 @@
         "homeUrl": "https://post-up-zeta.vercel.app",
         "imageUrl": "https://post-up-zeta.vercel.app/og-image.png",
         "buttonTitle": "Launch Post Up",
-        "splashImageUrl": "https://post-up-zeta.vercel.app/logos/postup_p.png",
+        "splashImageUrl": "https://post-up-zeta.vercel.app/splash.png",
         "splashBackgroundColor": "#000000",
-        "webhookUrl": "https://post-up-zeta.vercel.app/api/webhook"
+        "webhookUrl": "https://post-up-zeta.vercel.app/api/webhook",
+        "subtitle": "Grow your onchain audience",
+        "description": "The task-based onchain growth engine. Create campaigns, complete tasks, and earn crypto rewards.",
+        "primaryCategory": "social",
+        "tags": [
+            "postup",
+            "post",
+            "engage",
+            "earn",
+            "rewards"
+        ],
+        "screenshotUrls": [
+            "https://post-up-zeta.vercel.app/og-image.png"
+        ],
+        "heroImageUrl": "https://post-up-zeta.vercel.app/og-image.png",
+        "tagline": "Grow Raid Rise on Farcaster",
+        "ogTitle": "Grow your onchain audience",
+        "ogDescription": "Task-based onchain growth engine. Promote content, earn rewards",
+        "ogImageUrl": "https://post-up-zeta.vercel.app/og-image.png",
+        "castShareUrl": "https://post-up-zeta.vercel.app"
     }
 }
