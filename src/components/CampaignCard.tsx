@@ -1,5 +1,6 @@
 import { Campaign } from '@/lib/types';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import styles from './CampaignCard.module.css';
 import { ExternalLink, Image, Camera, Check, Loader2, CheckCircle } from 'lucide-react';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
@@ -18,6 +19,29 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const [screenshots, setScreenshots] = useState<Record<string, string>>({});
     const [uploadingTask, setUploadingTask] = useState<string | null>(null);
     const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
+
+    // Load state from persisted participant data on mount
+    useEffect(() => {
+        if (!context?.user?.fid || !campaign.participants) return;
+
+        const participant = campaign.participants.find(p => p.fid === context.user?.fid);
+        if (participant) {
+            // Restore screenshots
+            if (participant.screenshots) {
+                setScreenshots(participant.screenshots);
+            }
+
+            // Restore completion status (if screenshot exists, we consider it locally 'done' or pending)
+            // In a real app we'd check status='approved', but for now 'submitted' is enough
+            const restoredCompleted: Record<string, boolean> = {};
+            if (participant.screenshots) {
+                Object.keys(participant.screenshots).forEach(taskId => {
+                    restoredCompleted[taskId] = true;
+                });
+            }
+            setCompletedTasks(restoredCompleted);
+        }
+    }, [campaign.participants, context?.user?.fid]);
 
     const isX = campaign.platform === 'X';
     const isEnded = campaign.status === 'completed' || campaign.status === 'claimable' || campaign.remainingBudget < campaign.rewardAmountPerTask;
