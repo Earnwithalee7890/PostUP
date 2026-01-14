@@ -233,6 +233,105 @@ export const SupabaseService = {
         }
 
         return { success: true, submission: data };
+    },
+
+    /**
+     * Get ALL submissions by a user across ALL campaigns (for Task History)
+     */
+    async getAllUserSubmissions(userFid: number) {
+        // First get all submissions for this user
+        const { data: submissions, error: subError } = await supabase
+            .from('submissions')
+            .select('*')
+            .eq('user_fid', userFid)
+            .order('created_at', { ascending: false });
+
+        if (subError) {
+            console.error('Error fetching user submissions:', subError);
+            return [];
+        }
+
+        if (!submissions || submissions.length === 0) {
+            return [];
+        }
+
+        // Get unique campaign IDs
+        const campaignIds = [...new Set(submissions.map((s: any) => s.campaign_id))];
+
+        // Fetch campaign details
+        const { data: campaigns, error: campError } = await supabase
+            .from('campaigns')
+            .select('id, platform, category, reward_token, net_budget, tasks')
+            .in('id', campaignIds);
+
+        if (campError) {
+            console.error('Error fetching campaigns:', campError);
+        }
+
+        // Create campaign lookup
+        const campaignMap = new Map((campaigns || []).map((c: any) => [c.id, c]));
+
+        // Enrich submissions with campaign data
+        return submissions.map((sub: any) => {
+            const campaign = campaignMap.get(sub.campaign_id) || {};
+            return {
+                id: sub.id,
+                campaignId: sub.campaign_id,
+                taskId: sub.task_id,
+                status: sub.status, // pending, approved, rejected
+                createdAt: sub.created_at,
+                // Campaign info
+                platform: campaign.platform || 'Unknown',
+                category: campaign.category || 'Unknown',
+                rewardToken: campaign.reward_token || 'USDC',
+                // Estimated reward (net budget / total tasks)
+                estimatedReward: campaign.net_budget && campaign.tasks
+                    ? (parseFloat(campaign.net_budget) / campaign.tasks.length).toFixed(4)
+                    : '0'
+            };
+        });
+    },
+
+    /**
+     * Get campaign IDs where user has completed ALL tasks
+     */
+    async getUserCompletedCampaignIds(userFid: number): Promise<string[]> {
+        // Get all submissions for this user
+        const { data: submissions, error } = await supabase
+            .from('submissions')
+            .select('campaign_id, task_id')
+            .eq('user_fid', userFid);
+
+        if (error || !submissions) {
+            return [];
+        }
+
+        // Get campaigns to know total tasks per campaign
+        const campaignIds = [...new Set(submissions.map((s: any) => s.campaign_id))];
+
+        if (campaignIds.length === 0) return [];
+
+        const { data: campaigns } = await supabase
+            .from('campaigns')
+            .select('id, tasks')
+            .in('id', campaignIds);
+
+        if (!campaigns) return [];
+
+        // Check which campaigns have all tasks completed
+        const completedIds: string[] = [];
+
+        campaigns.forEach((campaign: any) => {
+            const campaignSubs = submissions.filter((s: any) => s.campaign_id === campaign.id);
+            const submittedTasks = new Set(campaignSubs.map((s: any) => s.task_id));
+
+            // If submitted tasks count equals total tasks, campaign is completed
+            if (campaign.tasks && submittedTasks.size >= campaign.tasks.length) {
+                completedIds.push(campaign.id);
+            }
+        });
+
+        return completedIds;
     }
 };
 

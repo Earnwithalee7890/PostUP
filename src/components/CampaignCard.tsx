@@ -46,6 +46,10 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
 
     const isX = campaign.platform === 'X';
     const isEnded = campaign.status === 'completed' || campaign.status === 'claimable' || campaign.remainingBudget < campaign.rewardAmountPerTask;
+
+    // Check if user has completed ALL tasks in this campaign
+    const completedTaskCount = Object.keys(completedTasks).filter(k => completedTasks[k]).length;
+    const hasCompletedAllTasks = completedTaskCount >= campaign.tasks.length && campaign.tasks.length > 0;
     const progress = ((campaign.totalBudget - campaign.remainingBudget) / campaign.totalBudget) * 100;
 
     // Use castUrl as fallback when postUrl is empty
@@ -231,75 +235,122 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                     </button>
                 </div>
 
-                {/* Inline Tasks & Submission */}
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '0.5rem' }}>
-                    {campaign.tasks.map(task => {
-                        const isDone = completedTasks[task];
-                        const hasScreenshot = !!screenshots[task];
+                {/* Inline Tasks & Submission - Hide for users who completed all tasks (unless admin) */}
+                {hasCompletedAllTasks && !isUserAdmin ? (
+                    // User completed all tasks - show joined message
+                    <div style={{
+                        width: '100%',
+                        padding: '1.5rem',
+                        background: 'linear-gradient(135deg, rgba(46, 204, 113, 0.15) 0%, rgba(39, 174, 96, 0.1) 100%)',
+                        borderRadius: '0.75rem',
+                        border: '1px solid rgba(46, 204, 113, 0.3)',
+                        marginTop: '0.5rem',
+                        textAlign: 'center'
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            marginBottom: '0.5rem'
+                        }}>
+                            <CheckCircle size={20} style={{ color: '#2ecc71' }} />
+                            <span style={{ fontSize: '1rem', fontWeight: 600, color: '#2ecc71' }}>
+                                You&apos;ve Joined This Campaign!
+                            </span>
+                        </div>
+                        <p style={{
+                            fontSize: '0.85rem',
+                            color: 'var(--muted-foreground)',
+                            margin: 0,
+                            lineHeight: 1.4
+                        }}>
+                            Your proof has been submitted for all {campaign.tasks.length} task{campaign.tasks.length > 1 ? 's' : ''}.
+                            Payment status: <span style={{
+                                color: '#f59e0b',
+                                fontWeight: 500
+                            }}>Pending Review</span>
+                        </p>
+                        <p style={{
+                            fontSize: '0.75rem',
+                            color: 'var(--muted-foreground)',
+                            marginTop: '0.75rem',
+                            opacity: 0.8
+                        }}>
+                            Check your Task History in Profile for updates
+                        </p>
+                    </div>
+                ) : (
+                    // Show tasks for admin OR users who haven't completed all tasks
+                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '0.5rem' }}>
+                        {campaign.tasks.map(task => {
+                            const isDone = completedTasks[task];
+                            const hasScreenshot = !!screenshots[task];
 
-                        return (
-                            <div key={task} style={{
-                                padding: '0.8rem',
-                                background: 'rgba(255,255,255,0.03)',
-                                borderRadius: '0.5rem',
-                                border: '1px solid rgba(255,255,255,0.05)'
-                            }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                    <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>{task}</span>
-                                    {isDone && <span style={{ color: '#2ecc71', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Check size={12} /> Done</span>}
+                            return (
+                                <div key={task} style={{
+                                    padding: '0.8rem',
+                                    background: 'rgba(255,255,255,0.03)',
+                                    borderRadius: '0.5rem',
+                                    border: '1px solid rgba(255,255,255,0.05)'
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                        <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>{task}</span>
+                                        {isDone && <span style={{ color: '#2ecc71', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Check size={12} /> Done</span>}
+                                    </div>
+
+                                    {!isDone && !isEnded && (
+                                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                            <label style={{
+                                                cursor: 'pointer',
+                                                padding: '0.4rem 0.8rem',
+                                                background: 'rgba(255,255,255,0.1)',
+                                                borderRadius: '0.4rem',
+                                                fontSize: '0.8rem',
+                                                display: 'flex', alignItems: 'center', gap: '0.4rem'
+                                            }}>
+                                                <Camera size={14} /> {hasScreenshot ? 'Change' : 'Upload Proof'}
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    style={{ display: 'none' }}
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) handleScreenshotUpload(task, file);
+                                                    }}
+                                                />
+                                            </label>
+
+                                            {hasScreenshot && (
+                                                <button
+                                                    onClick={() => handleSubmitScreenshot(task)}
+                                                    disabled={uploadingTask === task}
+                                                    style={{
+                                                        padding: '0.4rem 0.8rem',
+                                                        background: 'var(--accent)',
+                                                        border: 'none',
+                                                        borderRadius: '0.4rem',
+                                                        color: 'white',
+                                                        fontSize: '0.8rem',
+                                                        cursor: 'pointer',
+                                                        display: 'flex', alignItems: 'center', gap: '0.4rem'
+                                                    }}
+                                                >
+                                                    {uploadingTask === task ? <Loader2 size={14} className="spin" /> : <><CheckCircle size={14} /> Submit</>}
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                    {hasScreenshot && !isDone && (
+                                        <div style={{ marginTop: '0.5rem' }}>
+                                            <img src={screenshots[task]} alt="Preview" style={{ height: '40px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }} />
+                                        </div>
+                                    )}
                                 </div>
-
-                                {!isDone && !isEnded && (
-                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                        <label style={{
-                                            cursor: 'pointer',
-                                            padding: '0.4rem 0.8rem',
-                                            background: 'rgba(255,255,255,0.1)',
-                                            borderRadius: '0.4rem',
-                                            fontSize: '0.8rem',
-                                            display: 'flex', alignItems: 'center', gap: '0.4rem'
-                                        }}>
-                                            <Camera size={14} /> {hasScreenshot ? 'Change' : 'Upload Proof'}
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                style={{ display: 'none' }}
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) handleScreenshotUpload(task, file);
-                                                }}
-                                            />
-                                        </label>
-
-                                        {hasScreenshot && (
-                                            <button
-                                                onClick={() => handleSubmitScreenshot(task)}
-                                                disabled={uploadingTask === task}
-                                                style={{
-                                                    padding: '0.4rem 0.8rem',
-                                                    background: 'var(--accent)',
-                                                    border: 'none',
-                                                    borderRadius: '0.4rem',
-                                                    color: 'white',
-                                                    fontSize: '0.8rem',
-                                                    cursor: 'pointer',
-                                                    display: 'flex', alignItems: 'center', gap: '0.4rem'
-                                                }}
-                                            >
-                                                {uploadingTask === task ? <Loader2 size={14} className="spin" /> : <><CheckCircle size={14} /> Submit</>}
-                                            </button>
-                                        )}
-                                    </div>
-                                )}
-                                {hasScreenshot && !isDone && (
-                                    <div style={{ marginTop: '0.5rem' }}>
-                                        <img src={screenshots[task]} alt="Preview" style={{ height: '40px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }} />
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
+                )}
 
                 {isUserAdmin && (
                     <Link

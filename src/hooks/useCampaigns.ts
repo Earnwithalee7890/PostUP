@@ -71,3 +71,19 @@ export function useCampaignSubmissions(campaignId: string) {
     });
 }
 
+export function useAllUserSubmissions(userFid: number | undefined) {
+    return useQuery({
+        queryKey: ['allUserSubmissions', userFid],
+        queryFn: () => SupabaseService.getAllUserSubmissions(userFid!),
+        enabled: !!userFid,
+    });
+}
+
+export function useUserCompletedCampaignIds(userFid: number | undefined) {
+    return useQuery({
+        queryKey: ['userCompletedCampaignIds', userFid],
+        queryFn: () => SupabaseService.getUserCompletedCampaignIds(userFid!),
+        enabled: !!userFid,
+    });
+}
+

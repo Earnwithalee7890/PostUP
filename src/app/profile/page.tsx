@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { MockService } from '@/lib/mockService';
 import { NeynarService } from '@/lib/neynar';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { User, CheckCircle, History, Copy, Plus, Bell } from 'lucide-react';
+import { useAllUserSubmissions } from '@/hooks/useCampaigns';
+import { User, CheckCircle, History, Copy, Plus, Bell, Clock, XCircle } from 'lucide-react';
 import sdk from '@farcaster/miniapp-sdk';
 import { useState } from 'react';
 
@@ -22,6 +23,9 @@ export default function ProfilePage() {
         },
         enabled: !!context?.user?.fid
     });
+
+    // Fetch real submissions from Supabase for Task History
+    const { data: userSubmissions, isLoading: submissionsLoading } = useAllUserSubmissions(context?.user?.fid);
 
     // Determine identity from Farcaster
     const identityAddress = context?.user?.verifications?.[0] || stats?.verifications?.[0];
@@ -213,47 +217,97 @@ export default function ProfilePage() {
                 </div>
             </dialog>
 
-            {/* HISTORY */}
+            {/* HISTORY - Real data from Supabase */}
             <section>
                 <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <History size={18} /> Task History
                 </h3>
 
                 <div className="glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
-                    {stats?.history && stats.history.length > 0 ? (
-                        stats.history.map((item, i) => (
-                            <div key={i} style={{
+                    {submissionsLoading ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
+                            Loading your tasks...
+                        </div>
+                    ) : userSubmissions && userSubmissions.length > 0 ? (
+                        userSubmissions.map((item: any, i: number) => (
+                            <div key={item.id || i} style={{
                                 padding: '1.25rem',
                                 borderBottom: '1px solid var(--border)',
                                 display: 'flex',
                                 justifyContent: 'space-between',
-                                alignItems: 'center'
+                                alignItems: 'center',
+                                flexWrap: 'wrap',
+                                gap: '0.5rem'
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '180px' }}>
                                     <div style={{
                                         width: '36px', height: '36px',
                                         borderRadius: '8px',
-                                        background: 'rgba(255,255,255,0.05)',
+                                        background: item.status === 'approved'
+                                            ? 'rgba(46, 204, 113, 0.15)'
+                                            : item.status === 'rejected'
+                                                ? 'rgba(239, 68, 68, 0.15)'
+                                                : 'rgba(245, 158, 11, 0.15)',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                                     }}>
-                                        <CheckCircle size={18} color={i === 0 ? '#2ecc71' : 'var(--muted-foreground)'} />
+                                        {item.status === 'approved' ? (
+                                            <CheckCircle size={18} color="#2ecc71" />
+                                        ) : item.status === 'rejected' ? (
+                                            <XCircle size={18} color="#ef4444" />
+                                        ) : (
+                                            <Clock size={18} color="#f59e0b" />
+                                        )}
                                     </div>
                                     <div>
-                                        <div style={{ fontWeight: 600 }}>{item.task} on {item.platform}</div>
+                                        <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>
+                                            {item.taskId} on {item.platform}
+                                        </div>
                                         <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
-                                            {new Date(item.date).toLocaleDateString()}
+                                            {item.category} • {new Date(item.createdAt).toLocaleDateString()}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div style={{ fontWeight: 700, color: 'var(--secondary)' }}>
-                                    +{item.reward}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    {/* Status Badge */}
+                                    <span style={{
+                                        fontSize: '0.75rem',
+                                        padding: '0.25rem 0.6rem',
+                                        borderRadius: '4px',
+                                        fontWeight: 600,
+                                        background: item.status === 'approved'
+                                            ? 'rgba(46, 204, 113, 0.2)'
+                                            : item.status === 'rejected'
+                                                ? 'rgba(239, 68, 68, 0.2)'
+                                                : 'rgba(245, 158, 11, 0.2)',
+                                        color: item.status === 'approved'
+                                            ? '#2ecc71'
+                                            : item.status === 'rejected'
+                                                ? '#ef4444'
+                                                : '#f59e0b',
+                                        border: `1px solid ${item.status === 'approved'
+                                            ? 'rgba(46, 204, 113, 0.4)'
+                                            : item.status === 'rejected'
+                                                ? 'rgba(239, 68, 68, 0.4)'
+                                                : 'rgba(245, 158, 11, 0.4)'}`
+                                    }}>
+                                        {item.status === 'approved' ? 'APPROVED' : item.status === 'rejected' ? 'REJECTED' : 'PENDING'}
+                                    </span>
+
+                                    {/* Estimated Reward */}
+                                    <div style={{
+                                        fontWeight: 700,
+                                        color: item.status === 'approved' ? 'var(--secondary)' : 'var(--muted-foreground)',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        ~{item.estimatedReward} {item.rewardToken}
+                                    </div>
                                 </div>
                             </div>
                         ))
                     ) : (
                         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
-                            No history yet. Start a task!
+                            No tasks completed yet. Join a campaign to get started!
                         </div>
                     )}
                 </div>
