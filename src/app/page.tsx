@@ -76,7 +76,7 @@ export default function Home() {
           </Link>
 
           {/* Create Campaign */}
-          <Link href="/campaigns/new" style={{ textDecoration: 'none' }}>
+          <Link href="/campaigns/new" style={{ textDecoration: 'none' }} aria-label="Create a new campaign">
             <div style={{
               background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%)',
               border: '1px solid rgba(34, 197, 94, 0.3)',
@@ -93,7 +93,7 @@ export default function Home() {
           </Link>
 
           {/* Leaderboard */}
-          <Link href="/leaderboard" style={{ textDecoration: 'none' }}>
+          <Link href="/leaderboard" style={{ textDecoration: 'none' }} aria-label="View leaderboard">
             <div style={{
               background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(234, 88, 12, 0.2) 100%)',
               border: '1px solid rgba(245, 158, 11, 0.3)',
@@ -110,7 +110,7 @@ export default function Home() {
           </Link>
 
           {/* Profile */}
-          <Link href="/profile" style={{ textDecoration: 'none' }}>
+          <Link href="/profile" style={{ textDecoration: 'none' }} aria-label="View your profile">
             <div style={{
               background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.2) 100%)',
               border: '1px solid rgba(236, 72, 153, 0.3)',
