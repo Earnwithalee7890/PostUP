@@ -158,23 +158,6 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
             </div>
 
             <div className={styles.content} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
-                {/* Campaign URL Display - Only show if NOT a Follow task (since URL is in button) */}
-                {campaignUrl && !isFollowTask && (
-                    <div style={{
-                        width: '100%',
-                        padding: '0.5rem 0.75rem',
-                        background: 'rgba(139, 92, 246, 0.1)',
-                        borderRadius: '0.4rem',
-                        border: '1px solid rgba(139, 92, 246, 0.2)',
-                        fontSize: '0.8rem',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                    }}>
-                        <span style={{ color: 'var(--muted-foreground)' }}>🔗 </span>
-                        <span style={{ color: 'var(--primary)' }}>{campaignUrl}</span>
-                    </div>
-                )}
 
                 {/* Participant Count */}
                 <div style={{
@@ -265,41 +248,36 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                             margin: 0,
                             lineHeight: 1.4
                         }}>
-                            Your proof has been submitted for all {campaign.tasks.length} task{campaign.tasks.length > 1 ? 's' : ''}.
-                            Payment status: <span style={{
+                            Your proof has been submitted. Status: <span style={{
                                 color: '#f59e0b',
                                 fontWeight: 500
                             }}>Pending Review</span>
                         </p>
-                        <p style={{
-                            fontSize: '0.75rem',
-                            color: 'var(--muted-foreground)',
-                            marginTop: '0.75rem',
-                            opacity: 0.8
-                        }}>
-                            Check your Task History in Profile for updates
-                        </p>
                     </div>
                 ) : (
-                    // Show tasks for admin OR users who haven't completed all tasks
+                    // Show grouped tasks for admin OR users who haven't completed all tasks
                     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '0.5rem' }}>
-                        {campaign.tasks.map(task => {
-                            const isDone = completedTasks[task];
-                            const hasScreenshot = !!screenshots[task];
+                        {/* Group 1: Follow Task (if exists) - needs separate screenshot */}
+                        {campaign.tasks.includes('Follow') && (() => {
+                            const followDone = completedTasks['Follow'];
+                            const followScreenshot = screenshots['Follow'];
 
                             return (
-                                <div key={task} style={{
+                                <div style={{
                                     padding: '0.8rem',
                                     background: 'rgba(255,255,255,0.03)',
                                     borderRadius: '0.5rem',
                                     border: '1px solid rgba(255,255,255,0.05)'
                                 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                        <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>{task}</span>
-                                        {isDone && <span style={{ color: '#2ecc71', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Check size={12} /> Done</span>}
+                                        <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>📷 Follow Proof</span>
+                                        {followDone && <span style={{ color: '#2ecc71', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Check size={12} /> Done</span>}
                                     </div>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', margin: '0 0 0.5rem 0' }}>
+                                        Screenshot showing you followed the account
+                                    </p>
 
-                                    {!isDone && !isEnded && (
+                                    {!followDone && !isEnded && (
                                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                             <label style={{
                                                 cursor: 'pointer',
@@ -309,22 +287,22 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                                                 fontSize: '0.8rem',
                                                 display: 'flex', alignItems: 'center', gap: '0.4rem'
                                             }}>
-                                                <Camera size={14} /> {hasScreenshot ? 'Change' : 'Upload Proof'}
+                                                <Camera size={14} /> {followScreenshot ? 'Change' : 'Upload Proof'}
                                                 <input
                                                     type="file"
                                                     accept="image/*"
                                                     style={{ display: 'none' }}
                                                     onChange={(e) => {
                                                         const file = e.target.files?.[0];
-                                                        if (file) handleScreenshotUpload(task, file);
+                                                        if (file) handleScreenshotUpload('Follow', file);
                                                     }}
                                                 />
                                             </label>
 
-                                            {hasScreenshot && (
+                                            {followScreenshot && (
                                                 <button
-                                                    onClick={() => handleSubmitScreenshot(task)}
-                                                    disabled={uploadingTask === task}
+                                                    onClick={() => handleSubmitScreenshot('Follow')}
+                                                    disabled={uploadingTask === 'Follow'}
                                                     style={{
                                                         padding: '0.4rem 0.8rem',
                                                         background: 'var(--accent)',
@@ -336,19 +314,124 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                                                         display: 'flex', alignItems: 'center', gap: '0.4rem'
                                                     }}
                                                 >
-                                                    {uploadingTask === task ? <Loader2 size={14} className="spin" /> : <><CheckCircle size={14} /> Submit</>}
+                                                    {uploadingTask === 'Follow' ? <Loader2 size={14} className="spin" /> : <><CheckCircle size={14} /> Submit</>}
                                                 </button>
                                             )}
                                         </div>
                                     )}
-                                    {hasScreenshot && !isDone && (
+                                    {followScreenshot && !followDone && (
                                         <div style={{ marginTop: '0.5rem' }}>
-                                            <img src={screenshots[task]} alt="Preview" style={{ height: '40px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }} />
+                                            <img src={followScreenshot} alt="Preview" style={{ height: '40px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }} />
                                         </div>
                                     )}
                                 </div>
                             );
-                        })}
+                        })()}
+
+                        {/* Group 2: Cast Actions (Like, Recast, Reply, Comment) - ONE screenshot for all */}
+                        {(() => {
+                            const castActions = campaign.tasks.filter(t => ['Like', 'Repost', 'Recast', 'Comment', 'Reply'].includes(t));
+                            if (castActions.length === 0) return null;
+
+                            // Check if ALL cast actions are done (we mark all with one screenshot)
+                            const allCastDone = castActions.every(t => completedTasks[t]);
+                            const castScreenshot = screenshots['CastActions'] || screenshots[castActions[0]];
+
+                            const handleCastUpload = (file: File) => {
+                                // Upload once, apply to all cast actions
+                                handleScreenshotUpload('CastActions', file);
+                            };
+
+                            const handleCastSubmit = async () => {
+                                const screenshot = screenshots['CastActions'];
+                                if (!screenshot) return;
+
+                                setUploadingTask('CastActions');
+                                try {
+                                    // Submit for all cast actions at once
+                                    for (const task of castActions) {
+                                        await submitScreenshot({
+                                            campaignId: campaign.id,
+                                            taskId: task,
+                                            screenshot: screenshot,
+                                            userFid: context?.user?.fid!,
+                                            address: address || '0x0000000000000000000000000000000000000000'
+                                        });
+                                        setCompletedTasks(prev => ({ ...prev, [task]: true }));
+                                    }
+                                    setShowSuccess(true);
+                                } catch (error) {
+                                    console.error('Upload error:', error);
+                                } finally {
+                                    setUploadingTask(null);
+                                }
+                            };
+
+                            return (
+                                <div style={{
+                                    padding: '0.8rem',
+                                    background: 'rgba(255,255,255,0.03)',
+                                    borderRadius: '0.5rem',
+                                    border: '1px solid rgba(255,255,255,0.05)'
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                        <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>📷 Cast Proof</span>
+                                        {allCastDone && <span style={{ color: '#2ecc71', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Check size={12} /> Done</span>}
+                                    </div>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', margin: '0 0 0.5rem 0' }}>
+                                        One screenshot showing: {castActions.join(' + ')}
+                                    </p>
+
+                                    {!allCastDone && !isEnded && (
+                                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                            <label style={{
+                                                cursor: 'pointer',
+                                                padding: '0.4rem 0.8rem',
+                                                background: 'rgba(255,255,255,0.1)',
+                                                borderRadius: '0.4rem',
+                                                fontSize: '0.8rem',
+                                                display: 'flex', alignItems: 'center', gap: '0.4rem'
+                                            }}>
+                                                <Camera size={14} /> {castScreenshot ? 'Change' : 'Upload Proof'}
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    style={{ display: 'none' }}
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) handleCastUpload(file);
+                                                    }}
+                                                />
+                                            </label>
+
+                                            {castScreenshot && (
+                                                <button
+                                                    onClick={handleCastSubmit}
+                                                    disabled={uploadingTask === 'CastActions'}
+                                                    style={{
+                                                        padding: '0.4rem 0.8rem',
+                                                        background: 'var(--accent)',
+                                                        border: 'none',
+                                                        borderRadius: '0.4rem',
+                                                        color: 'white',
+                                                        fontSize: '0.8rem',
+                                                        cursor: 'pointer',
+                                                        display: 'flex', alignItems: 'center', gap: '0.4rem'
+                                                    }}
+                                                >
+                                                    {uploadingTask === 'CastActions' ? <Loader2 size={14} className="spin" /> : <><CheckCircle size={14} /> Submit All</>}
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                    {castScreenshot && !allCastDone && (
+                                        <div style={{ marginTop: '0.5rem' }}>
+                                            <img src={castScreenshot} alt="Preview" style={{ height: '40px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }} />
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })()}
                     </div>
                 )}
 
