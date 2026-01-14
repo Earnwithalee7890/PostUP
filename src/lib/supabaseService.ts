@@ -13,6 +13,22 @@ export const SupabaseService = {
             return [];
         }
 
+        // Fetch participant counts for all campaigns
+        const campaignIds = (data || []).map(row => row.id);
+        const { data: submissionCounts } = await supabase
+            .from('submissions')
+            .select('campaign_id, user_fid')
+            .in('campaign_id', campaignIds);
+
+        // Count unique participants per campaign
+        const participantCountMap: Record<string, Set<number>> = {};
+        (submissionCounts || []).forEach((sub: any) => {
+            if (!participantCountMap[sub.campaign_id]) {
+                participantCountMap[sub.campaign_id] = new Set();
+            }
+            participantCountMap[sub.campaign_id].add(sub.user_fid);
+        });
+
         // Transform database format to app format
         return (data || []).map(row => ({
             id: row.id,
@@ -35,7 +51,8 @@ export const SupabaseService = {
             totalWeight: row.total_weight ? parseFloat(row.total_weight) : undefined,
             createdAt: new Date(row.created_at).getTime(),
             endedAt: row.ended_at ? new Date(row.ended_at).getTime() : undefined,
-            participants: []
+            participants: [],
+            participantCount: participantCountMap[row.id]?.size || 0
         }));
     },
 
