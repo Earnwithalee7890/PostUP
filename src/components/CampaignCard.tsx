@@ -139,6 +139,36 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
             </div>
 
             <div className={styles.content} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
+                {/* Campaign URL Display */}
+                {campaign.postUrl && (
+                    <div style={{
+                        width: '100%',
+                        padding: '0.5rem 0.75rem',
+                        background: 'rgba(139, 92, 246, 0.1)',
+                        borderRadius: '0.4rem',
+                        border: '1px solid rgba(139, 92, 246, 0.2)',
+                        fontSize: '0.8rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    }}>
+                        <span style={{ color: 'var(--muted-foreground)' }}>🔗 </span>
+                        <span style={{ color: 'var(--primary)' }}>{campaign.postUrl}</span>
+                    </div>
+                )}
+
+                {/* Participant Count */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '0.85rem',
+                    color: 'var(--muted-foreground)'
+                }}>
+                    <span>👥</span>
+                    <span><strong style={{ color: 'white' }}>{campaign.participantCount || 0}</strong> participants joined</span>
+                </div>
+
                 {/* Action Link */}
                 {campaign.postUrl ? (
                     <button

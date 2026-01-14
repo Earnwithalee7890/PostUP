@@ -46,6 +46,7 @@ export interface Campaign {
     createdAt: number;
     endedAt?: number;
     status: CampaignStatus;
+    participantCount?: number; // Number of unique participants
 }
 
 export const SUPPORTED_TOKENS = [
