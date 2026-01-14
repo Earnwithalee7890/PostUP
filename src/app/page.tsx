@@ -59,7 +59,7 @@ export default function Home() {
           margin: '0 auto'
         }}>
           {/* Browse Campaigns */}
-          <Link href="/campaigns" style={{ textDecoration: 'none' }}>
+          <Link href="/campaigns" style={{ textDecoration: 'none' }} aria-label="Browse available campaigns">
             <div style={{
               background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%)',
               border: '1px solid rgba(139, 92, 246, 0.3)',
