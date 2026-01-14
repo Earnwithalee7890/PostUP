@@ -13,8 +13,8 @@ export const config = createConfig({
       metadata: {
         name: 'Post Up',
         description: 'Task-based onchain growth engine',
-        url: 'https://postup.app',
-        icons: ['https://postup.app/icon.png']
+        url: 'https://post-up-zeta.vercel.app',
+        icons: ['https://post-up-zeta.vercel.app/logos/postup_p.png']
       },
       showQrModal: false, // No QR on mobile
     }),

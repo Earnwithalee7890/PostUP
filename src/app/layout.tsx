@@ -58,31 +58,21 @@ export const metadata: Metadata = {
   },
   other: {
     'base:app_id': '695ecd383ee38216e9af4b12',
-    // Frame meta tags for cast embeds (when sharing URL)
-    'fc:frame': 'vNext',
-    'fc:frame:image': 'https://post-up-zeta.vercel.app/og-image.png',
-    'fc:frame:image:aspect_ratio': '1.91:1',
-    'fc:frame:button:1': 'Launch Post Up',
-    'fc:frame:button:1:action': 'link',
-    'fc:frame:button:1:target': 'https://post-up-zeta.vercel.app',
-    // Mini app manifest in meta
     'fc:miniapp': JSON.stringify({
       version: "1",
-      name: "Post Up",
-      iconUrl: "https://post-up-zeta.vercel.app/logos/postup_p.png",
-      homeUrl: "https://post-up-zeta.vercel.app",
       imageUrl: "https://post-up-zeta.vercel.app/og-image.png",
-      buttonTitle: "Launch Post Up",
       button: {
         title: "Launch Post Up",
         action: {
-          type: "link",
-          target: "https://post-up-zeta.vercel.app"
+          type: "launch_frame",
+          name: "Post Up",
+          url: "https://post-up-zeta.vercel.app/",
+          splashImageUrl: "https://post-up-zeta.vercel.app/splash.png",
+          splashBackgroundColor: "#1a1a2e"
         }
-      },
-      splashImageUrl: "https://post-up-zeta.vercel.app/logos/postup_p.png",
-      splashBackgroundColor: "#000000",
+      }
     }),
+    'fc:frame:manifest': 'https://post-up-zeta.vercel.app/.well-known/farcaster.json',
   },
 };
 
