@@ -28,6 +28,14 @@ export const metadata: Metadata = {
   authors: [{ name: 'Aleekhoso', url: 'https://warpcast.com/aleekhoso' }],
   keywords: ['Farcaster', 'Base', 'Crypto', 'Tasks', 'Rewards', 'Growth'],
   metadataBase: new URL('https://post-up-zeta.vercel.app'),
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
   openGraph: {
     title: "Post Up | Onchain Promotion Engine",
     description: "Task-based onchain growth engine. Promote content, earn rewards, and grow your Farcaster presence.",
