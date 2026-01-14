@@ -1,7 +1,5 @@
 // Type guard utilities
 
-import type { Campaign } from '@/types';
-
 /**
  * Type guard to check if value is not null or undefined
  */
