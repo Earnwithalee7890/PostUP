@@ -1,31 +1,109 @@
 # Post Up 🚀
 
-**Task-based onchain growth engine for Farcaster**
+<div align="center">
 
-Earn rewards by engaging with campaigns, create promotional campaigns, and grow your onchain audience.
+![Post Up Banner](https://img.shields.io/badge/Post%20Up-Farcaster%20Growth%20Engine-8b5cf6?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAACXBIWXMAAAsTAAALEwEAmpwYAAAA)
 
-## Features
+**The Task-Based Onchain Growth Engine for Farcaster**
 
-- 🎯 **Campaign Discovery** - Browse and complete tasks to earn rewards
-- 💰 **Fair Distribution** - 90% to rewards, 10% platform fee
-- 🔗 **Farcaster Native** - Built for the Farcaster ecosystem
-- ⚡ **Base Network** - Fast and low-cost transactions
-- 📊 **Leaderboard** - Compete with other users
-- 👤 **Profile** - Track your earnings and task history
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-16.1-black?logo=next.js)](https://nextjs.org/)
+[![Farcaster](https://img.shields.io/badge/Farcaster-Mini%20App-purple)](https://warpcast.com/)
 
-## Tech Stack
+[🌐 Live Demo](https://post-up-zeta.vercel.app) • [📖 Documentation](#features) • [🚀 Getting Started](#getting-started)
 
-- **Framework**: Next.js 14 (App Router)
-- **Styling**: Custom CSS with modern design system
-- **Blockchain**: Base (Ethereum L2)
-- **Wallet**: RainbowKit + wagmi
-- **Auth**: Farcaster Mini App SDK
+</div>
 
-## Getting Started
+---
+
+## 🎯 What is Post Up?
+
+Post Up is a **Web3 social engagement platform** built for the Farcaster ecosystem. Brands and creators can launch promotional campaigns, while users earn rewards by completing social tasks like following accounts, liking posts, and engaging with content.
+
+### The Problem We Solve
+
+- **For Creators**: Getting visibility and engagement on Farcaster is hard
+- **For Users**: No easy way to discover and earn from quality content
+- **For Brands**: Traditional advertising doesn't work in Web3
+
+### Our Solution
+
+A **fair, transparent reward system** where:
+- 90% of campaign budget goes directly to participants
+- 10% platform fee for sustainability
+- Quality-based distribution (higher quality users earn more)
+
+---
+
+## ✨ Features
+
+### 🎯 Campaign Discovery
+Browse and join promotional campaigns across categories:
+- **Follow** - Follow accounts to earn
+- **Boost** - Like, repost, and comment on casts
+- **Multi** - Complete multiple tasks for higher rewards
+- **MiniApp** - Try Farcaster mini apps
+- **Channel** - Join and engage with channels
+
+### 💰 Fair Reward Distribution
+- **Quality Scoring**: Based on account age, followers, verification status
+- **Weighted Distribution**: Higher quality = higher rewards
+- **Transparent**: See exactly how rewards are calculated
+
+### 📊 Leaderboard
+- **Top Earners**: Users who joined the most campaigns
+- **Top Spenders**: Creators who invested the most in campaigns
+- Real-time data from Supabase
+
+### 👤 Profile & History
+- View your task history
+- Track pending/approved/rejected submissions
+- See your wallet address and Farcaster stats
+
+### 🔔 Notifications
+- Daily check-in reminders
+- Campaign approval updates
+- Reward claim notifications
+
+---
+
+## 🛠 Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| **Next.js 16** | React framework with App Router |
+| **TypeScript** | Type-safe development |
+| **Supabase** | Database & real-time subscriptions |
+| **RainbowKit** | Wallet connection |
+| **wagmi** | Ethereum hooks |
+| **Farcaster SDK** | Mini App integration |
+| **Base Network** | L2 for fast, low-cost transactions |
+| **Neynar API** | Farcaster data & verification |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Supabase account
+- Neynar API key
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/Earnwithalee7890/PostUP.git
+cd PostUP
+
 # Install dependencies
 npm install
+
+# Copy environment variables
+cp .env.example .env.local
 
 # Run development server
 npm run dev
@@ -33,20 +111,115 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-## Environment Variables
+### Environment Variables
 
-Copy `.env.example` to `.env.local` and configure:
+Create a `.env.local` file with:
 
-- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` - WalletConnect project ID
-- `NEYNAR_API_KEY` - Neynar API key for verification
-- `SUPABASE_*` - Supabase configuration
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
-## Deployment
+# WalletConnect
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
 
-Deploy on Vercel for automatic CI/CD:
+# Neynar (Farcaster API)
+NEXT_PUBLIC_NEYNAR_API_KEY=your_neynar_key
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+# App URL
+NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
+```
 
-## License
+---
 
-MIT
+## 📁 Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── campaigns/          # Campaign listing & creation
+│   ├── leaderboard/        # Top earners & spenders
+│   ├── profile/            # User profile & history
+│   └── api/                # API routes
+├── components/             # React components
+│   ├── CampaignCard.tsx    # Campaign display with tasks
+│   ├── SuccessModal.tsx    # Task completion modal
+│   └── ui/                 # UI components (Navbar, etc.)
+├── lib/                    # Utilities & services
+│   ├── supabaseService.ts  # Database operations
+│   ├── qualityScore.ts     # User quality scoring
+│   └── neynar.ts           # Farcaster API integration
+├── hooks/                  # Custom React hooks
+└── providers/              # Context providers
+```
+
+---
+
+## 🗄 Database Schema
+
+### Campaigns Table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| creator | text | Creator wallet address |
+| platform | text | 'Farcaster' or 'X' |
+| category | text | Campaign category |
+| tasks | text[] | Array of task types |
+| total_budget | numeric | Total campaign budget |
+| status | text | 'active', 'completed', etc. |
+
+### Submissions Table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| campaign_id | uuid | Foreign key to campaigns |
+| user_fid | int | Farcaster ID |
+| task_id | text | Task type completed |
+| screenshot_url | text | Proof image URL |
+| status | text | 'pending', 'approved', 'rejected' |
+
+---
+
+## 🔒 Security
+
+- **Farcaster Auth**: Uses Farcaster Mini App SDK for authentication
+- **Admin Checks**: FID-based admin verification
+- **Screenshot Verification**: Manual review by campaign admins
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- [Farcaster](https://farcaster.xyz) - The decentralized social network
+- [Neynar](https://neynar.com) - Farcaster API infrastructure
+- [Base](https://base.org) - Ethereum L2 network
+- [Supabase](https://supabase.com) - Backend as a Service
+
+---
+
+<div align="center">
+
+**Built with 💜 for the Farcaster community**
+
+[⬆ Back to top](#post-up-)
+
+</div>
