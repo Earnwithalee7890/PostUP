@@ -332,6 +332,92 @@ export const SupabaseService = {
         });
 
         return completedIds;
+    },
+
+    /**
+     * Get top earners - users who joined the most campaigns
+     */
+    async getTopEarners(): Promise<{ rank: number, fid: number, address: string, value: number, campaigns: number }[]> {
+        const { data: submissions, error } = await supabase
+            .from('submissions')
+            .select('user_fid, user_address, campaign_id');
+
+        if (error || !submissions) {
+            return [];
+        }
+
+        // Group by user and count unique campaigns
+        const userStats: Record<number, { address: string, campaigns: Set<string> }> = {};
+
+        submissions.forEach((sub: any) => {
+            if (!userStats[sub.user_fid]) {
+                userStats[sub.user_fid] = { address: sub.user_address || '', campaigns: new Set() };
+            }
+            userStats[sub.user_fid].campaigns.add(sub.campaign_id);
+        });
+
+        // Convert to array and sort by campaign count
+        const leaderboard = Object.entries(userStats)
+            .map(([fid, data]) => ({
+                fid: parseInt(fid),
+                address: data.address,
+                campaigns: data.campaigns.size
+            }))
+            .sort((a, b) => b.campaigns - a.campaigns)
+            .slice(0, 20)
+            .map((item, index) => ({
+                rank: index + 1,
+                fid: item.fid,
+                address: item.address,
+                value: item.campaigns,
+                campaigns: item.campaigns
+            }));
+
+        return leaderboard;
+    },
+
+    /**
+     * Get top spenders - creators who spent the most on campaigns
+     */
+    async getTopSpenders(): Promise<{ rank: number, fid: number, address: string, value: number, campaigns: number }[]> {
+        const { data: campaigns, error } = await supabase
+            .from('campaigns')
+            .select('creator, total_budget');
+
+        if (error || !campaigns) {
+            return [];
+        }
+
+        // Group by creator and sum total budget
+        const creatorStats: Record<string, { totalSpent: number, campaigns: number }> = {};
+
+        campaigns.forEach((campaign: any) => {
+            const creator = campaign.creator || 'unknown';
+            if (!creatorStats[creator]) {
+                creatorStats[creator] = { totalSpent: 0, campaigns: 0 };
+            }
+            creatorStats[creator].totalSpent += parseFloat(campaign.total_budget) || 0;
+            creatorStats[creator].campaigns += 1;
+        });
+
+        // Convert to array and sort by total spent
+        const leaderboard = Object.entries(creatorStats)
+            .map(([address, data]) => ({
+                address,
+                totalSpent: data.totalSpent,
+                campaigns: data.campaigns
+            }))
+            .sort((a, b) => b.totalSpent - a.totalSpent)
+            .slice(0, 20)
+            .map((item, index) => ({
+                rank: index + 1,
+                fid: 0, // Creator might not have FID, use address
+                address: item.address,
+                value: item.totalSpent,
+                campaigns: item.campaigns
+            }));
+
+        return leaderboard;
     }
 };
 

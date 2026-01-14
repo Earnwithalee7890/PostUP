@@ -171,10 +171,10 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                     <span><strong style={{ color: 'white' }}>{campaign.participantCount || 0}</strong> participants joined</span>
                 </div>
 
-                {/* Action Buttons Row */}
+                {/* Action Buttons Row - Smart buttons based on task type */}
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {/* Action Link */}
-                    {campaignUrl ? (
+                    {/* Follow Button - if campaign has Follow task */}
+                    {campaign.tasks.includes('Follow') && campaignUrl && (
                         <button
                             onClick={handleOpenLink}
                             style={{
@@ -182,19 +182,93 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                                 alignItems: 'center',
                                 gap: '0.5rem',
                                 padding: '0.6rem 1.2rem',
-                                background: 'var(--primary)',
+                                background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
                                 color: 'white',
                                 borderRadius: '0.5rem',
                                 fontWeight: 600,
-                                fontSize: '0.9rem',
+                                fontSize: '0.85rem',
                                 border: 'none',
                                 cursor: 'pointer'
                             }}
                         >
-                            {isFollowTask ? 'FOLLOW' : 'OPEN LINK'} <ExternalLink size={14} />
+                            👤 Follow <ExternalLink size={12} />
                         </button>
-                    ) : (
-                        <span style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>No URL provided</span>
+                    )}
+
+                    {/* Cast Actions Button - if campaign has Like, Repost, Comment */}
+                    {(campaign.tasks.includes('Like') || campaign.tasks.includes('Repost') || campaign.tasks.includes('Comment')) && campaignUrl && (
+                        <button
+                            onClick={handleOpenLink}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                padding: '0.6rem 1.2rem',
+                                background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+                                color: 'white',
+                                borderRadius: '0.5rem',
+                                fontWeight: 600,
+                                fontSize: '0.85rem',
+                                border: 'none',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            🔥 Open Cast <ExternalLink size={12} />
+                        </button>
+                    )}
+
+                    {/* Mini App Button - if campaign category is MiniApp */}
+                    {campaign.category === 'MiniApp' && campaignUrl && (
+                        <button
+                            onClick={handleOpenLink}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                padding: '0.6rem 1.2rem',
+                                background: 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)',
+                                color: 'white',
+                                borderRadius: '0.5rem',
+                                fontWeight: 600,
+                                fontSize: '0.85rem',
+                                border: 'none',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            🎮 Open Mini App <ExternalLink size={12} />
+                        </button>
+                    )}
+
+                    {/* Fallback if no recognized task type but has URL */}
+                    {!campaign.tasks.includes('Follow') &&
+                        !campaign.tasks.includes('Like') &&
+                        !campaign.tasks.includes('Repost') &&
+                        !campaign.tasks.includes('Comment') &&
+                        campaign.category !== 'MiniApp' &&
+                        campaignUrl && (
+                            <button
+                                onClick={handleOpenLink}
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    padding: '0.6rem 1.2rem',
+                                    background: 'var(--primary)',
+                                    color: 'white',
+                                    borderRadius: '0.5rem',
+                                    fontWeight: 600,
+                                    fontSize: '0.85rem',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Open Link <ExternalLink size={12} />
+                            </button>
+                        )}
+
+                    {/* No URL message */}
+                    {!campaignUrl && (
+                        <span style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem' }}>No URL provided</span>
                     )}
 
                     {/* Share Button */}
@@ -328,9 +402,9 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                             );
                         })()}
 
-                        {/* Group 2: Cast Actions (Like, Recast, Reply, Comment) - ONE screenshot for all */}
+                        {/* Group 2: Cast Actions (Like, Repost, Comment) - ONE screenshot for all */}
                         {(() => {
-                            const castActions = campaign.tasks.filter(t => ['Like', 'Repost', 'Recast', 'Comment', 'Reply'].includes(t));
+                            const castActions = campaign.tasks.filter(t => ['Like', 'Repost', 'Comment'].includes(t));
                             if (castActions.length === 0) return null;
 
                             // Check if ALL cast actions are done (we mark all with one screenshot)
