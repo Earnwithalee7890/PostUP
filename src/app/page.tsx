@@ -3,26 +3,93 @@
 import styles from './page.module.css';
 import Link from 'next/link';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { useEffect } from 'react';
-import { Rocket, Users, Trophy, TrendingUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Rocket, Users, Trophy, TrendingUp, Share2, PlusCircle } from 'lucide-react';
 
 export default function Home() {
   const { context } = useFarcasterContext();
   const isFarcasterConnected = !!context?.user;
+  const [isAppAdded, setIsAppAdded] = useState(true); // Default true to avoid flash
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Call ready() AFTER UI renders - per official Farcaster docs
+  // Call ready() and check if app is added
   useEffect(() => {
-    async function signalReady() {
+    async function initApp() {
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
         await sdk.actions.ready();
         console.log('✅ ready() called after UI render');
+
+        // Check if app is already added (via context)
+        // For now, we'll trust the context - if user logged in, app is added
+        setIsAppAdded(!!context?.user);
       } catch (e) {
-        // Not in Farcaster environment
+        // Not in Farcaster environment - allow access
+        setIsAppAdded(true);
+      } finally {
+        setIsLoading(false);
       }
     }
-    signalReady();
-  }, []);
+    initApp();
+  }, [context?.user]);
+
+  const handleAddApp = async () => {
+    try {
+      const { sdk } = await import('@farcaster/miniapp-sdk');
+      await sdk.actions.addFrame();
+      // If no error, app was added successfully
+      setIsAppAdded(true);
+    } catch (e) {
+      console.log('Add app not available:', e);
+      setIsAppAdded(true); // Allow access if SDK not available
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const { sdk } = await import('@farcaster/miniapp-sdk');
+      await sdk.actions.composeCast({
+        text: 'Check out Post Up - earn rewards by engaging with campaigns on Farcaster! 🚀',
+        embeds: ['https://post-up-zeta.vercel.app']
+      });
+    } catch (e) {
+      console.log('Share not available');
+    }
+  };
+
+  // Show add app prompt if not added
+  if (!isLoading && !isAppAdded && isFarcasterConnected) {
+    return (
+      <main className={styles.main}>
+        <div className={styles.hero} style={{ textAlign: 'center' }}>
+          <h1 className={`${styles.title} gradient-text`} style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
+            Add Post Up
+          </h1>
+          <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', maxWidth: '300px', margin: '0 auto 2rem' }}>
+            Add Post Up to your Farcaster to get started earning rewards!
+          </p>
+          <button
+            onClick={handleAddApp}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '1rem 2rem',
+              background: 'var(--primary)',
+              color: 'white',
+              borderRadius: '1rem',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <PlusCircle size={20} /> Add to Farcaster
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.main}>
@@ -147,6 +214,28 @@ export default function Home() {
             <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#f59e0b' }}>Fair</div>
             <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>Distribution</div>
           </div>
+        </div>
+
+        {/* Share App Button */}
+        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+          <button
+            onClick={handleShare}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1.5rem',
+              background: 'rgba(139, 92, 246, 0.2)',
+              color: 'var(--primary)',
+              borderRadius: '2rem',
+              fontWeight: 500,
+              fontSize: '0.9rem',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              cursor: 'pointer'
+            }}
+          >
+            <Share2 size={16} /> Share Post Up
+          </button>
         </div>
       </div>
     </main>

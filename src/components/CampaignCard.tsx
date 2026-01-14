@@ -48,9 +48,24 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const isEnded = campaign.status === 'completed' || campaign.status === 'claimable' || campaign.remainingBudget < campaign.rewardAmountPerTask;
     const progress = ((campaign.totalBudget - campaign.remainingBudget) / campaign.totalBudget) * 100;
 
+    // Use castUrl as fallback when postUrl is empty
+    const campaignUrl = campaign.postUrl || campaign.castUrl || '';
+    const isFollowTask = campaign.tasks.includes('Follow');
+
     const handleOpenLink = () => {
-        if (campaign?.postUrl) {
-            sdk.actions.openUrl(campaign.postUrl);
+        if (campaignUrl) {
+            sdk.actions.openUrl(campaignUrl);
+        }
+    };
+
+    const handleShare = async () => {
+        try {
+            await sdk.actions.composeCast({
+                text: `Check out this campaign on Post Up! 🚀`,
+                embeds: ['https://post-up-zeta.vercel.app']
+            });
+        } catch (e) {
+            console.log('Share not available');
         }
     };
 
@@ -139,8 +154,8 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
             </div>
 
             <div className={styles.content} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
-                {/* Campaign URL Display */}
-                {campaign.postUrl && (
+                {/* Campaign URL Display - Only show if NOT a Follow task (since URL is in button) */}
+                {campaignUrl && !isFollowTask && (
                     <div style={{
                         width: '100%',
                         padding: '0.5rem 0.75rem',
@@ -153,7 +168,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                         whiteSpace: 'nowrap'
                     }}>
                         <span style={{ color: 'var(--muted-foreground)' }}>🔗 </span>
-                        <span style={{ color: 'var(--primary)' }}>{campaign.postUrl}</span>
+                        <span style={{ color: 'var(--primary)' }}>{campaignUrl}</span>
                     </div>
                 )}
 
@@ -169,29 +184,52 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                     <span><strong style={{ color: 'white' }}>{campaign.participantCount || 0}</strong> participants joined</span>
                 </div>
 
-                {/* Action Link */}
-                {campaign.postUrl ? (
+                {/* Action Buttons Row */}
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    {/* Action Link */}
+                    {campaignUrl ? (
+                        <button
+                            onClick={handleOpenLink}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                padding: '0.6rem 1.2rem',
+                                background: 'var(--primary)',
+                                color: 'white',
+                                borderRadius: '0.5rem',
+                                fontWeight: 600,
+                                fontSize: '0.9rem',
+                                border: 'none',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            {isFollowTask ? 'FOLLOW' : 'OPEN LINK'} <ExternalLink size={14} />
+                        </button>
+                    ) : (
+                        <span style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>No URL provided</span>
+                    )}
+
+                    {/* Share Button */}
                     <button
-                        onClick={handleOpenLink}
+                        onClick={handleShare}
                         style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '0.5rem',
-                            padding: '0.6rem 1.2rem',
-                            background: 'var(--primary)',
-                            color: 'white',
+                            padding: '0.6rem 1rem',
+                            background: 'rgba(139, 92, 246, 0.2)',
+                            color: 'var(--primary)',
                             borderRadius: '0.5rem',
-                            fontWeight: 600,
-                            fontSize: '0.9rem',
-                            border: 'none',
+                            fontWeight: 500,
+                            fontSize: '0.85rem',
+                            border: '1px solid rgba(139, 92, 246, 0.3)',
                             cursor: 'pointer'
                         }}
                     >
-                        {campaign.tasks.includes('Follow') ? 'FOLLOW' : 'OPEN LINK'} <ExternalLink size={14} />
+                        📤 Share
                     </button>
-                ) : (
-                    <span style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>No URL provided</span>
-                )}
+                </div>
 
                 {/* Inline Tasks & Submission */}
                 <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '0.5rem' }}>
