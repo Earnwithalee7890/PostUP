@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { Campaign } from './types';
+import { NeynarService } from './neynar';
 
 export const SupabaseService = {
     async getCampaigns(): Promise<Campaign[]> {
@@ -338,7 +339,7 @@ export const SupabaseService = {
     /**
      * Get top earners - users who joined the most campaigns
      */
-    async getTopEarners(): Promise<{ rank: number, fid: number, address: string, value: number, campaigns: number }[]> {
+    async getTopEarners(): Promise<{ rank: number, fid: number, address: string, value: number, campaigns: number, username?: string, pfpUrl?: string, displayName?: string }[]> {
         const { data: submissions, error } = await supabase
             .from('submissions')
             .select('user_fid, user_address, campaign_id');
@@ -365,22 +366,28 @@ export const SupabaseService = {
                 campaigns: data.campaigns.size
             }))
             .sort((a, b) => b.campaigns - a.campaigns)
-            .slice(0, 20)
-            .map((item, index) => ({
-                rank: index + 1,
-                fid: item.fid,
-                address: item.address,
-                value: item.campaigns,
-                campaigns: item.campaigns
-            }));
+            .slice(0, 20);
 
-        return leaderboard;
+        // Enrich with Neynar metadata
+        const fids = leaderboard.map(item => item.fid);
+        const userMap = await NeynarService.getUsersBulk(fids);
+
+        return leaderboard.map((item, index) => ({
+            rank: index + 1,
+            fid: item.fid,
+            address: item.address,
+            value: item.campaigns,
+            campaigns: item.campaigns,
+            username: userMap[item.fid.toString()]?.username,
+            pfpUrl: userMap[item.fid.toString()]?.pfpUrl,
+            displayName: userMap[item.fid.toString()]?.displayName
+        }));
     },
 
     /**
      * Get top spenders - creators who spent the most on campaigns
      */
-    async getTopSpenders(): Promise<{ rank: number, fid: number, address: string, value: number, campaigns: number }[]> {
+    async getTopSpenders(): Promise<{ rank: number, fid: number, address: string, value: number, campaigns: number, username?: string, pfpUrl?: string, displayName?: string }[]> {
         const { data: campaigns, error } = await supabase
             .from('campaigns')
             .select('creator, total_budget');
@@ -409,16 +416,25 @@ export const SupabaseService = {
                 campaigns: data.campaigns
             }))
             .sort((a, b) => b.totalSpent - a.totalSpent)
-            .slice(0, 20)
-            .map((item, index) => ({
+            .slice(0, 20);
+
+        // Enrich with Neynar metadata (by address)
+        const addresses = leaderboard.map(item => item.address);
+        const userMap = await NeynarService.getUsersBulk(addresses);
+
+        return leaderboard.map((item, index) => {
+            const userData = userMap[item.address.toLowerCase()];
+            return {
                 rank: index + 1,
-                fid: 0,
+                fid: 0, // We don't have FID easily here without a join, but Neynar might provide it if we joined earlier
                 address: item.address,
                 value: item.totalSpent,
-                campaigns: item.campaigns
-            }));
-
-        return leaderboard;
+                campaigns: item.campaigns,
+                username: userData?.username,
+                pfpUrl: userData?.pfpUrl,
+                displayName: userData?.displayName
+            };
+        });
     },
 
     /**

@@ -106,21 +106,29 @@ export default function LeaderboardPage() {
                                     {item.rank}
                                 </span>
 
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <span style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Users size={14} color="var(--primary)" />
-                                        {tab === 'earners' ? `FID ${item.fid}` : item.fid > 0 ? `FID ${item.fid}` : `Creator ${item.address.slice(0, 6)}`}
-                                    </span>
-                                    <span style={{
-                                        fontSize: '0.75rem',
-                                        color: 'var(--muted-foreground)',
-                                        fontFamily: 'monospace',
-                                        maxWidth: '180px',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis'
-                                    }}>
-                                        {item.address ? `${item.address.slice(0, 10)}...${item.address.slice(-6)}` : 'N/A'}
-                                    </span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    {item.pfpUrl ? (
+                                        <img src={item.pfpUrl} alt={item.username || 'user'} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
+                                    ) : (
+                                        <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <Users size={20} color="var(--muted-foreground)" />
+                                        </div>
+                                    )}
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}>
+                                            {item.username ? `@${item.username}` : (tab === 'earners' ? `FID ${item.fid}` : (item.fid > 0 ? `FID ${item.fid}` : `Creator ${item.address.slice(0, 6)}`))}
+                                        </span>
+                                        <span style={{
+                                            fontSize: '0.75rem',
+                                            color: 'var(--muted-foreground)',
+                                            fontFamily: 'monospace',
+                                            maxWidth: '180px',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
+                                            {item.address ? `${item.address.slice(0, 10)}...${item.address.slice(-6)}` : 'N/A'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 

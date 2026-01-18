@@ -54,5 +54,50 @@ export const NeynarService = {
                 history: []
             };
         }
+    },
+
+    getUsersBulk: async (identifiers: (number | string)[]): Promise<Record<string, { username: string, pfpUrl: string, displayName: string }>> => {
+        if (identifiers.length === 0) return {};
+
+        try {
+            // Split into fids and addresses
+            const fids = identifiers.filter(id => typeof id === 'number');
+            const addresses = identifiers.filter(id => typeof id === 'string');
+
+            let allUsers: any[] = [];
+
+            if (fids.length > 0) {
+                const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${fids.join(',')}`, {
+                    headers: { 'accept': 'application/json', 'api_key': NEYNAR_API_KEY }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    allUsers = [...allUsers, ...(data.users || [])];
+                }
+            }
+
+            if (addresses.length > 0) {
+                const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?addresses=${addresses.join(',')}`, {
+                    headers: { 'accept': 'application/json', 'api_key': NEYNAR_API_KEY }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    allUsers = [...allUsers, ...(data.users || [])];
+                }
+            }
+
+            const userMap: Record<string, { username: string, pfpUrl: string, displayName: string }> = {};
+            allUsers.forEach(user => {
+                if (user.fid) userMap[user.fid.toString()] = { username: user.username, pfpUrl: user.pfp_url, displayName: user.display_name };
+                user.verified_addresses?.eth_addresses?.forEach((addr: string) => {
+                    userMap[addr.toLowerCase()] = { username: user.username, pfpUrl: user.pfp_url, displayName: user.display_name };
+                });
+            });
+
+            return userMap;
+        } catch (error) {
+            console.error('Neynar Bulk API Error:', error);
+            return {};
+        }
     }
 };
