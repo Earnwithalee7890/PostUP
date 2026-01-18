@@ -97,10 +97,10 @@ export default function LeaderboardPage() {
                             cursor: 'default',
                             boxShadow: i < 3 ? '0 8px 32px 0 rgba(0, 0, 0, 0.37)' : 'none'
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: 0, flex: 1 }}>
                                 <span style={{
-                                    width: '32px',
-                                    height: '32px',
+                                    width: '28px',
+                                    height: '28px',
                                     borderRadius: '50%',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -111,59 +111,77 @@ export default function LeaderboardPage() {
                                             : i === 2 ? 'linear-gradient(135deg, #cd7f32 0%, #b87333 100%)'
                                                 : 'rgba(255,255,255,0.1)',
                                     color: i < 3 ? '#000' : 'var(--muted-foreground)',
-                                    fontSize: '0.9rem',
+                                    fontSize: '0.85rem',
                                     flexShrink: 0
                                 }}>
                                     {item.rank}
                                 </span>
 
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ position: 'relative' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0, flex: 1 }}>
+                                    <div style={{ position: 'relative', flexShrink: 0 }}>
                                         {item.pfpUrl ? (
-                                            <img src={item.pfpUrl} alt={item.username || 'user'} style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
+                                            <img src={item.pfpUrl} alt={item.username || 'user'} style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
                                         ) : (
-                                            <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.1)' }}>
-                                                <Users size={24} color="var(--muted-foreground)" />
+                                            <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.1)' }}>
+                                                <Users size={20} color="var(--muted-foreground)" />
                                             </div>
                                         )}
                                         {i < 3 && (
                                             <div style={{
                                                 position: 'absolute',
-                                                top: -5,
-                                                right: -5,
+                                                top: -4,
+                                                right: -4,
                                                 background: i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : '#cd7f32',
-                                                border: '2px solid #020205',
+                                                border: '1px solid #020205',
                                                 borderRadius: '50%',
-                                                width: '18px',
-                                                height: '18px',
+                                                width: '16px',
+                                                height: '16px',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 zIndex: 2
                                             }}>
-                                                <Star size={10} color="#000" fill="#000" />
+                                                <Star size={9} color="#000" fill="#000" />
                                             </div>
                                         )}
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'white', letterSpacing: '-0.01em' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+                                        <span style={{
+                                            fontWeight: 700,
+                                            fontSize: '1rem',
+                                            color: 'white',
+                                            letterSpacing: '-0.01em',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}>
                                             {item.displayName || (item.username ? `@${item.username}` : (tab === 'earners' ? `FID ${item.fid}` : (item.fid > 0 ? `FID ${item.fid}` : `Creator ${item.address.slice(0, 6)}`)))}
                                         </span>
                                         <span style={{
-                                            fontSize: '0.75rem',
+                                            fontSize: '0.7rem',
                                             color: 'var(--muted-foreground)',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '0.35rem'
+                                            gap: '0.35rem',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden'
                                         }}>
-                                            {item.username && <span style={{ color: 'var(--primary)' }}>@{item.username}</span>}
-                                            {item.address && <span style={{ opacity: 0.7 }}>• {item.address.slice(0, 6)}...{item.address.slice(-4)}</span>}
+                                            {item.username && (
+                                                <span style={{ color: 'var(--primary)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    @{item.username}
+                                                </span>
+                                            )}
+                                            {item.address && (
+                                                <span style={{ opacity: 0.6, flexShrink: 0 }}>
+                                                    • {item.address.slice(0, 4)}...{item.address.slice(-4)}
+                                                </span>
+                                            )}
                                         </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div style={{ textAlign: 'right' }}>
+                            <div style={{ textAlign: 'right', flexShrink: 0, minWidth: '85px', marginLeft: '0.5rem' }}>
                                 <div style={{
                                     fontWeight: 800,
                                     color: 'white',
