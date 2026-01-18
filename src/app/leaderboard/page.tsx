@@ -145,7 +145,7 @@ export default function LeaderboardPage() {
                                             </div>
                                         )}
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden', flex: 1, marginRight: '0.75rem' }}>
                                         <span style={{
                                             fontWeight: 700,
                                             fontSize: '1rem',
@@ -153,7 +153,8 @@ export default function LeaderboardPage() {
                                             letterSpacing: '-0.01em',
                                             whiteSpace: 'nowrap',
                                             overflow: 'hidden',
-                                            textOverflow: 'ellipsis'
+                                            textOverflow: 'ellipsis',
+                                            maxWidth: '100%'
                                         }}>
                                             {item.displayName || (item.username ? `@${item.username}` : (tab === 'earners' ? `FID ${item.fid}` : (item.fid > 0 ? `FID ${item.fid}` : `Creator ${item.address.slice(0, 6)}`)))}
                                         </span>
@@ -164,10 +165,11 @@ export default function LeaderboardPage() {
                                             alignItems: 'center',
                                             gap: '0.35rem',
                                             whiteSpace: 'nowrap',
-                                            overflow: 'hidden'
+                                            overflow: 'hidden',
+                                            maxWidth: '100%'
                                         }}>
                                             {item.username && (
-                                                <span style={{ color: 'var(--primary)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                <span style={{ color: 'var(--primary)', overflow: 'hidden', textOverflow: 'ellipsis', flexShrink: 1 }}>
                                                     @{item.username}
                                                 </span>
                                             )}
@@ -181,7 +183,7 @@ export default function LeaderboardPage() {
                                 </div>
                             </div>
 
-                            <div style={{ textAlign: 'right', flexShrink: 0, minWidth: '85px', marginLeft: '0.5rem' }}>
+                            <div style={{ textAlign: 'right', flexShrink: 0, minWidth: '95px' }}>
                                 <div style={{
                                     fontWeight: 800,
                                     color: 'white',

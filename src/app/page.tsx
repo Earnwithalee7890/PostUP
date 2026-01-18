@@ -15,12 +15,24 @@ export default function Home() {
 
   useEffect(() => {
     async function initApp() {
+      // Check localStorage first for instant bypass if already added
+      const persistedAdded = localStorage.getItem('tip2post_app_added') === 'true';
+      if (persistedAdded) {
+        setIsAppAdded(true);
+        setIsLoading(false);
+      }
+
       if (!context) return;
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
         // Initial state from context
-        setIsAppAdded(!!context?.client?.added);
+        const added = !!context?.client?.added;
+        setIsAppAdded(added || persistedAdded);
         setIsNotificationsEnabled(!!context?.client?.notificationDetails);
+
+        if (added) {
+          localStorage.setItem('tip2post_app_added', 'true');
+        }
 
         await sdk.actions.ready();
       } catch (e) {
@@ -39,9 +51,11 @@ export default function Home() {
       await sdk.actions.addFrame();
       // If no error, app was added successfully
       setIsAppAdded(true);
+      localStorage.setItem('tip2post_app_added', 'true');
     } catch (e) {
       console.log('Add app not available:', e);
       setIsAppAdded(true); // Allow access if SDK not available
+      localStorage.setItem('tip2post_app_added', 'true');
     }
   };
 
