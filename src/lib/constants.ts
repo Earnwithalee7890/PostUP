@@ -1,6 +1,6 @@
 /**
  * Application Constants
- * Centralized configuration for the Post Up platform
+ * Centralized configuration for the Tip2Post platform
  */
 
 // Platform Configuration

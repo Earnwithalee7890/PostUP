@@ -12,20 +12,20 @@ let claimedRewards = new Map<string, Set<string>>();
 // Helper to persist to localStorage
 const saveToStorage = () => {
     if (typeof window !== 'undefined') {
-        localStorage.setItem('postup_campaigns', JSON.stringify(campaigns));
-        localStorage.setItem('postup_claims', JSON.stringify(Array.from(claimedRewards.entries()).map(([k, v]) => [k, Array.from(v)])));
+        localStorage.setItem('tip2post_campaigns', JSON.stringify(campaigns));
+        localStorage.setItem('tip2post_claims', JSON.stringify(Array.from(claimedRewards.entries()).map(([k, v]) => [k, Array.from(v)])));
     }
 };
 
 // Helper to load from localStorage
 const loadFromStorage = () => {
     if (typeof window !== 'undefined') {
-        const stored = localStorage.getItem('postup_campaigns');
+        const stored = localStorage.getItem('tip2post_campaigns');
         if (stored) {
             campaigns = JSON.parse(stored);
         }
 
-        const storedClaims = localStorage.getItem('postup_claims');
+        const storedClaims = localStorage.getItem('tip2post_claims');
         if (storedClaims) {
             const parsed = JSON.parse(storedClaims);
             claimedRewards = new Map(parsed.map(([k, v]: [string, string[]]) => [k, new Set(v)]));

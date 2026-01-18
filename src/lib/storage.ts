@@ -1,6 +1,6 @@
 // Local storage utilities with type safety
 
-const STORAGE_PREFIX = 'postup_';
+const STORAGE_PREFIX = 'tip2post_';
 
 /**
  * Get item from localStorage with type safety

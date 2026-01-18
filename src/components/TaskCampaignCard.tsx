@@ -72,8 +72,10 @@ export function TaskCampaignCard({ campaign }: TaskCampaignCardProps) {
             if (url && /^\d+$/.test(url.trim())) {
                 url = `https://warpcast.com/~/profiles/${url.trim()}`;
             }
-        } else if (task === 'Like' || task === 'Repost' || task === 'Comment') {
+        } else if (task === 'Like' || task === 'Repost' || task === 'Comment' || task === 'Cast' || task === 'Quote') {
             url = campaign.castUrl || campaign.postUrl;
+        } else if (task === 'OpenMiniApp') {
+            url = campaign.postUrl;
         }
 
         return url;

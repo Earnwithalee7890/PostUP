@@ -49,7 +49,7 @@ export default function Home() {
     try {
       const { sdk } = await import('@farcaster/miniapp-sdk');
       await sdk.actions.composeCast({
-        text: 'Check out Post Up - earn rewards by engaging with campaigns on Farcaster! 🚀',
+        text: 'Check out Tip2Post - earn rewards by engaging with campaigns on Farcaster! 🚀',
         embeds: ['https://post-up-zeta.vercel.app']
       });
     } catch (e) {
@@ -63,10 +63,10 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.hero} style={{ textAlign: 'center' }}>
           <h1 className={`${styles.title} gradient-text`} style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
-            Add Post Up
+            Add Tip2Post
           </h1>
           <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', maxWidth: '300px', margin: '0 auto 2rem' }}>
-            Add Post Up to your Farcaster to get started earning rewards!
+            Add Tip2Post to your Farcaster to get started earning rewards!
           </p>
           <button
             onClick={handleAddApp}
@@ -97,7 +97,7 @@ export default function Home() {
         {/* Hero Section */}
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h1 className={`${styles.title} gradient-text`} style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
-            Post Up
+            Tip2Post
           </h1>
           <p style={{ color: 'var(--muted-foreground)', fontSize: '1.1rem', maxWidth: '400px', margin: '0 auto' }}>
             Earn rewards by engaging with campaigns on Farcaster
@@ -234,7 +234,7 @@ export default function Home() {
               cursor: 'pointer'
             }}
           >
-            <Share2 size={16} /> Share Post Up
+            <Share2 size={16} /> Share Tip2Post
           </button>
         </div>
       </div>

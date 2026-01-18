@@ -187,7 +187,7 @@ export default function ProfilePage() {
                 width: '90%'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h3 style={{ margin: 0 }}>About Post Up</h3>
+                    <h3 style={{ margin: 0 }}>About Tip2Post</h3>
                     <form method="dialog">
                         <button style={{ background: 'none', border: 'none', color: 'var(--muted-foreground)', cursor: 'pointer' }}>✕</button>
                     </form>
@@ -196,7 +196,7 @@ export default function ProfilePage() {
                     <div>
                         <h4 style={{ margin: '0 0 0.5rem', color: 'var(--foreground)' }}>How it Works</h4>
                         <p style={{ margin: 0, color: 'var(--muted-foreground)' }}>
-                            Post Up helps you grow onchain. Create tasks and reward real users for engagement.
+                            Tip2Post helps you grow onchain. Create tasks and reward real users for engagement.
                         </p>
                     </div>
                     <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '0.5rem' }}>

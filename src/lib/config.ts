@@ -11,7 +11,7 @@ export const config = createConfig({
     walletConnect({
       projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
       metadata: {
-        name: 'Post Up',
+        name: 'Tip2Post',
         description: 'Task-based onchain growth engine',
         url: 'https://post-up-zeta.vercel.app',
         icons: ['https://post-up-zeta.vercel.app/logos/postup_p.png']
@@ -19,7 +19,7 @@ export const config = createConfig({
       showQrModal: false, // No QR on mobile
     }),
     coinbaseWallet({
-      appName: 'Post Up',
+      appName: 'Tip2Post',
     }),
   ],
   transports: {

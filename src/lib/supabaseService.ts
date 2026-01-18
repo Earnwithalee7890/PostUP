@@ -6,6 +6,7 @@ export const SupabaseService = {
         const { data, error } = await supabase
             .from('campaigns')
             .select('*')
+            .or(`ended_at.is.null,ended_at.gt.${new Date().toISOString()}`)
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -411,13 +412,34 @@ export const SupabaseService = {
             .slice(0, 20)
             .map((item, index) => ({
                 rank: index + 1,
-                fid: 0, // Creator might not have FID, use address
+                fid: 0,
                 address: item.address,
                 value: item.totalSpent,
                 campaigns: item.campaigns
             }));
 
         return leaderboard;
+    },
+
+    /**
+     * Cleanup old campaigns (from Bug #3)
+     * Removes all campaigns not created today
+     */
+    async cleanupOldCampaigns() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const { data, error } = await supabase
+            .from('campaigns')
+            .delete()
+            .lt('created_at', today.toISOString());
+
+        if (error) {
+            console.error('Error cleaning up campaigns:', error);
+            throw error;
+        }
+
+        return { success: true };
     }
 };
 

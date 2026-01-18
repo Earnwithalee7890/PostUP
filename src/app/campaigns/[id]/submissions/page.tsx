@@ -3,7 +3,8 @@
 import { useParams } from 'next/navigation';
 import { useCampaign, useCampaignSubmissions, useVerifyScreenshot } from '@/hooks/useCampaigns';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { Loader2, ArrowLeft, ExternalLink, Image as ImageIcon, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, ExternalLink, Image as ImageIcon, CheckCircle, XCircle, Copy, Trash2 } from 'lucide-react';
+import { SupabaseService } from '@/lib/supabaseService';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -67,8 +68,27 @@ export default function CampaignSubmissionsPage() {
                             {campaign.category} Campaign on {campaign.platform}
                         </p>
                     </div>
-                    <div className="glass-panel" style={{ padding: '0.5rem 1rem' }}>
-                        <span style={{ fontWeight: 600 }}>{allSubmissions.length}</span> Total Submissions from <span style={{ fontWeight: 600 }}>{userFids.length}</span> Users
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <button
+                            onClick={async () => {
+                                if (confirm('Are you sure you want to delete all campaigns not created today? This cannot be undone.')) {
+                                    try {
+                                        await SupabaseService.cleanupOldCampaigns();
+                                        alert('Cleanup successful! 🎉');
+                                        window.location.reload();
+                                    } catch (err) {
+                                        alert('Cleanup failed. Check console.');
+                                    }
+                                }
+                            }}
+                            className="glass-button"
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderColor: '#e74c3c', color: '#e74c3c' }}
+                        >
+                            <Trash2 size={16} /> Cleanup Old
+                        </button>
+                        <div className="glass-panel" style={{ padding: '0.5rem 1rem' }}>
+                            <span style={{ fontWeight: 600 }}>{allSubmissions.length}</span> Total Submissions from <span style={{ fontWeight: 600 }}>{userFids.length}</span> Users
+                        </div>
                     </div>
                 </div>
             </div>
@@ -98,8 +118,18 @@ export default function CampaignSubmissionsPage() {
                                         </div>
                                         <div>
                                             <div style={{ fontWeight: 600 }}>FID: {fid}</div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                                 {firstSub.user_address?.slice(0, 6)}...{firstSub.user_address?.slice(-4)}
+                                                <button
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(firstSub.user_address || '');
+                                                        alert('Address copied!');
+                                                    }}
+                                                    style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', padding: 0 }}
+                                                    title="Copy Address"
+                                                >
+                                                    <Copy size={12} />
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

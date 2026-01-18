@@ -1,5 +1,5 @@
 /**
- * Utility helper functions for Post Up
+ * Utility helper functions for Tip2Post
  */
 
 /**

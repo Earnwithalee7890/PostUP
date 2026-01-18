@@ -109,7 +109,7 @@ export default function LeaderboardPage() {
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                     <span style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <Users size={14} color="var(--primary)" />
-                                        {tab === 'earners' ? `FID ${item.fid}` : 'Creator'}
+                                        {tab === 'earners' ? `FID ${item.fid}` : item.fid > 0 ? `FID ${item.fid}` : `Creator ${item.address.slice(0, 6)}`}
                                     </span>
                                     <span style={{
                                         fontSize: '0.75rem',

@@ -22,9 +22,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Post Up | Onchain Promotion Engine",
+  title: "Tip2Post | Onchain Promotion Engine",
   description: "Task-based onchain growth engine. Promote content, earn rewards, and grow your Farcaster presence.",
-  applicationName: 'Post Up',
+  applicationName: 'Tip2Post',
   authors: [{ name: 'Aleekhoso', url: 'https://warpcast.com/aleekhoso' }],
   keywords: ['Farcaster', 'Base', 'Crypto', 'Tasks', 'Rewards', 'Growth'],
   metadataBase: new URL('https://post-up-zeta.vercel.app'),
@@ -37,16 +37,16 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Post Up | Onchain Promotion Engine",
+    title: "Tip2Post | Onchain Promotion Engine",
     description: "Task-based onchain growth engine. Promote content, earn rewards, and grow your Farcaster presence.",
     url: 'https://post-up-zeta.vercel.app',
-    siteName: 'Post Up',
+    siteName: 'Tip2Post',
     images: [
       {
         url: '/og-image.png', // Uses the file we just copied
         width: 1200,
         height: 630,
-        alt: 'Post Up Preview',
+        alt: 'Tip2Post Preview',
       },
     ],
     locale: 'en_US',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Post Up",
+    title: "Tip2Post",
     description: "Task-based onchain growth engine.",
     images: ['/og-image.png'],
     creator: '@aleekhoso',
@@ -70,10 +70,10 @@ export const metadata: Metadata = {
       version: "1",
       imageUrl: "https://post-up-zeta.vercel.app/og-image.png",
       button: {
-        title: "Launch Post Up",
+        title: "Launch Tip2Post",
         action: {
           type: "launch_frame",
-          name: "Post Up",
+          name: "Tip2Post",
           url: "https://post-up-zeta.vercel.app/",
           splashImageUrl: "https://post-up-zeta.vercel.app/splash.png",
           splashBackgroundColor: "#1a1a2e"
