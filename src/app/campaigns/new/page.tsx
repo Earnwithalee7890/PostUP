@@ -539,11 +539,6 @@ export default function NewCampaignPage() {
                     )}
                 </div>
 
-                {category === 'MiniApp' && (
-                    <p className={styles.miniAppNote}>
-                        Users will open your mini app and submit a screenshot as proof
-                    </p>
-                )}
 
 
             </form>
