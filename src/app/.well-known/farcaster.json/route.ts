@@ -26,7 +26,7 @@ export async function GET() {
         },
         accountAssociation: {
             header: "eyJmaWQiOjMzODA2MCwidHlwZSI6ImF1dGgiLCJrZXkiOiIweEJDNzRlQTExNWY0ZjMwQ2U3MzdGMzk0YTkzNzAxQWJkMTY0MmQ3RDEifQ",
-            payload: "eyJkb21haW4iOiJ0aXAycG9zdC16ZXRhLnZlcmNlbC5hcHAifQ",
+            payload: "eyJkb21haW4iOiJwb3N0LXVwLXpldGEudmVyY2VsLmFwcCJ9",
             signature: "x4YKn7yBGVd1bSe+4tJusj8jGs3w5UfMUdgzlx+wRUF/B7PbtjF8nSak2zYv3AcxjAIlwHx+TO97rTPQYx8Tzhs="
         }
     };
