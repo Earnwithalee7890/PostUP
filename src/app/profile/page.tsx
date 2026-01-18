@@ -33,6 +33,10 @@ export default function ProfilePage() {
     const identityUsername = context?.user?.username || 'guest';
     const identityPfp = context?.user?.pfpUrl;
 
+    // Calculate dynamic task count from Tip2Post submissions
+    // We count unique campaign IDs the user has interacted with
+    const localTaskCount = userSubmissions ? new Set(userSubmissions.map((s: any) => s.campaignId)).size : 0;
+
     const displayAddress = identityAddress || '';
 
     const copyAddress = () => {
@@ -133,7 +137,7 @@ export default function ProfilePage() {
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', overflowX: 'auto' }}>
                 <div className="glass-panel" style={{ padding: '0.75rem 1rem', textAlign: 'center', flex: '0 0 auto', minWidth: '90px' }}>
                     <div style={{ color: 'var(--muted-foreground)', fontSize: '0.7rem', marginBottom: '0.25rem' }}>Tasks</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>{stats?.totalTasks || 0}</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>{localTaskCount}</div>
                 </div>
                 <div className="glass-panel" style={{ padding: '0.75rem 1rem', textAlign: 'center', flex: '0 0 auto', minWidth: '90px' }}>
                     <div style={{ color: 'var(--muted-foreground)', fontSize: '0.7rem', marginBottom: '0.25rem' }}>Score</div>
