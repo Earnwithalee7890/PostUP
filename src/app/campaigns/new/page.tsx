@@ -72,7 +72,6 @@ const MULTI_ACTIONS = [
     { id: 'Like' as TaskType, label: 'Like' },
     { id: 'Repost' as TaskType, label: 'Recast' },
     { id: 'Comment' as TaskType, label: 'Reply' },
-    { id: 'Cast' as TaskType, label: 'Cast' },
 ];
 
 import { SuccessModal } from '@/components/SuccessModal';
@@ -104,9 +103,9 @@ export default function NewCampaignPage() {
     const platformFee = budget * 0.10;
     const netBudget = budget - platformFee;
 
-    const MINIMUM_BUDGET = 0.01;
+    const MINIMUM_BUDGET = 3.0; // Updated to $3 as requested
     const isBudgetValid = budget >= MINIMUM_BUDGET;
-    const budgetError = totalBudget && budget < MINIMUM_BUDGET ? `Minimum budget is $${MINIMUM_BUDGET}` : '';
+    const budgetError = totalBudget && budget < MINIMUM_BUDGET ? `Minimum budget for today is $${MINIMUM_BUDGET}` : '';
 
     // Filter categories based on platform
     const visibleCategories = CATEGORIES.filter(cat => {
@@ -131,7 +130,9 @@ export default function NewCampaignPage() {
 
     const handleCategorySelect = (cat: typeof CATEGORIES[0]) => {
         setCategory(cat.id);
-        if (cat.id !== 'Multi') {
+        if (cat.id === 'Multi') {
+            setSelectedMultiTasks(['Follow', 'Like', 'Repost', 'Comment']);
+        } else {
             setSelectedMultiTasks([]);
         }
     };
@@ -332,32 +333,60 @@ export default function NewCampaignPage() {
                     </div>
                 </div>
 
-                {/* MULTI TASK SELECTOR */}
+                {/* MULTI TASK INFO */}
                 {category === 'Multi' && (
-                    <div className={styles.panel}>
-                        <div className={styles.multiGrid}>
-                            {MULTI_ACTIONS.map(action => {
-                                const isSelected = selectedMultiTasks.includes(action.id);
-                                return (
-                                    <button
-                                        key={action.id}
-                                        type="button"
-                                        onClick={() => toggleMultiTask(action.id)}
-                                        className={`${styles.multiActionBtn} ${isSelected ? styles.multiActionActive : ''}`}
-                                    >
-                                        {action.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                        {selectedMultiTasks.length > 0 && (
-                            <div className={styles.multiSummary} style={{ marginTop: '1rem' }}>
-                                <div>
-                                    <div className={styles.multiTitle}>{selectedMultiTasks.join(' + ')}</div>
-                                    <div className={styles.multiSubtitle}>Users must complete all actions</div>
-                                </div>
+                    <div className={styles.panel} style={{
+                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)',
+                        borderColor: 'rgba(139, 92, 246, 0.3)',
+                        padding: '1.5rem'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                            <div style={{
+                                width: 44,
+                                height: 44,
+                                borderRadius: '12px',
+                                background: 'var(--primary)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
+                            }}>
+                                <Zap size={24} color="white" />
                             </div>
-                        )}
+                            <div>
+                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>All-in-One Multi Task</h3>
+                                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>Maximum engagement for your growth</p>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+                            {['Follow', 'Like', 'Recast', 'Reply'].map(tag => (
+                                <span key={tag} style={{
+                                    padding: '0.4rem 0.8rem',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    borderRadius: '99px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 600,
+                                    border: '1px solid rgba(255,255,255,0.1)'
+                                }}>{tag}</span>
+                            ))}
+                        </div>
+
+                        <div style={{
+                            padding: '1rem',
+                            background: 'rgba(0,0,0,0.2)',
+                            borderRadius: '12px',
+                            fontSize: '0.85rem',
+                            lineHeight: 1.5,
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-light)', fontWeight: 600, marginBottom: '0.25rem' }}>
+                                <span>📸 2 Screenshots Proof</span>
+                            </div>
+                            <span style={{ color: 'var(--muted-foreground)' }}>
+                                Users will submit one screenshot for the <strong>Follow</strong> and one for the <strong>Like+Recast+Reply</strong> actions.
+                            </span>
+                        </div>
                     </div>
                 )}
 

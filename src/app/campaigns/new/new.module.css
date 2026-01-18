@@ -11,12 +11,14 @@
 }
 
 .header h1 {
-    font-size: 1.8rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #fff 0%, #a5a6f6 100%);
+    font-size: 2.2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #8b5cf6 50%, #d946ef 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.5rem;
 }
 
 .form {
@@ -125,13 +127,15 @@
 
 /* BUDGET SECTION */
 .budgetCard {
-    background: linear-gradient(135deg, rgba(30, 30, 40, 0.8) 0%, rgba(20, 20, 30, 0.8) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(20, 20, 30, 0.95) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 2rem 1.5rem;
     text-align: center;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
 .budgetCard::before {
@@ -141,7 +145,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
 .budgetInputWrapper {
@@ -162,11 +166,13 @@
     background: transparent;
     border: none;
     color: white;
-    font-size: 3.5rem;
-    font-weight: 800;
-    width: 140px;
+    font-size: 4.5rem;
+    font-weight: 900;
+    width: 200px;
     text-align: center;
     font-family: var(--font-space);
+    letter-spacing: -0.05em;
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
 }
 
 .budgetInput:focus {
@@ -174,7 +180,7 @@
 }
 
 .budgetInput::placeholder {
-    color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.05);
 }
 
 /* TOKENS & DURATION */
