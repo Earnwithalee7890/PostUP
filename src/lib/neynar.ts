@@ -60,14 +60,32 @@ export const NeynarService = {
         if (identifiers.length === 0) return {};
 
         try {
-            // Split into fids and addresses
-            const fids = identifiers.filter(id => typeof id === 'number');
-            const addresses = identifiers.filter(id => typeof id === 'string');
+            // Split into fids and addresses, while also parsing number-like strings as FIDs
+            const fids: number[] = [];
+            const addresses: string[] = [];
+
+            identifiers.forEach(id => {
+                if (typeof id === 'number') {
+                    fids.push(id);
+                } else if (typeof id === 'string') {
+                    // Check if it's a numeric string (FID)
+                    if (/^\d+$/.test(id)) {
+                        fids.push(parseInt(id));
+                    } else if (id.startsWith('0x')) {
+                        addresses.push(id.toLowerCase());
+                    } else {
+                        // Unknown string format, try as address
+                        addresses.push(id);
+                    }
+                }
+            });
 
             let allUsers: any[] = [];
 
             if (fids.length > 0) {
-                const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${fids.join(',')}`, {
+                // Remove duplicates
+                const uniqueFids = Array.from(new Set(fids));
+                const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${uniqueFids.join(',')}`, {
                     headers: { 'accept': 'application/json', 'api_key': NEYNAR_API_KEY }
                 });
                 if (response.ok) {
@@ -77,7 +95,9 @@ export const NeynarService = {
             }
 
             if (addresses.length > 0) {
-                const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?addresses=${addresses.join(',')}`, {
+                // Remove duplicates
+                const uniqueAddresses = Array.from(new Set(addresses));
+                const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?addresses=${uniqueAddresses.join(',')}`, {
                     headers: { 'accept': 'application/json', 'api_key': NEYNAR_API_KEY }
                 });
                 if (response.ok) {
