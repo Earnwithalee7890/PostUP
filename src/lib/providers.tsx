@@ -21,7 +21,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 <RainbowKitProvider
                     modalSize="compact"
                     appInfo={{
-                        appName: 'Post Up',
+                        appName: 'Tip2Post',
                         disclaimer: undefined,
                     }}
                     theme={darkTheme({

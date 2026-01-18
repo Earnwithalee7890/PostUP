@@ -3,19 +3,19 @@ import { NextResponse } from "next/server";
 export async function GET() {
     const manifest = {
         frame: {
-            name: "Post Up",
+            name: "Tip2Post",
             version: "1",
-            iconUrl: "https://post-up-zeta.vercel.app/logos/postup_p.png",
+            iconUrl: "https://post-up-zeta.vercel.app/tip2post_logo.png",
             homeUrl: "https://post-up-zeta.vercel.app",
             imageUrl: "https://post-up-zeta.vercel.app/og-image.png",
-            buttonTitle: "Launch Post Up",
-            splashImageUrl: "https://post-up-zeta.vercel.app/og-image.png",
+            buttonTitle: "Launch Tip2Post",
+            splashImageUrl: "https://post-up-zeta.vercel.app/splash.png",
             splashBackgroundColor: "#1a1a2e",
             webhookUrl: "https://post-up-zeta.vercel.app/api/webhook",
             subtitle: "Grow your onchain audience",
             description: "The task-based onchain growth engine. Create campaigns, complete tasks, and earn crypto rewards.",
             primaryCategory: "social",
-            tags: ["postup", "post", "engage", "earn", "rewards"],
+            tags: ["tip2post", "post", "engage", "earn", "rewards"],
             screenshotUrls: ["https://post-up-zeta.vercel.app/og-image.png"],
             heroImageUrl: "https://post-up-zeta.vercel.app/og-image.png",
             tagline: "grow",
@@ -26,7 +26,7 @@ export async function GET() {
         },
         accountAssociation: {
             header: "eyJmaWQiOjMzODA2MCwidHlwZSI6ImF1dGgiLCJrZXkiOiIweEJDNzRlQTExNWY0ZjMwQ2U3MzdGMzk0YTkzNzAxQWJkMTY0MmQ3RDEifQ",
-            payload: "eyJkb21haW4iOiJwb3N0LXVwLXpldGEudmVyY2VsLmFwcCJ9",
+            payload: "eyJkb21haW4iOiJ0aXAycG9zdC16ZXRhLnZlcmNlbC5hcHAifQ",
             signature: "x4YKn7yBGVd1bSe+4tJusj8jGs3w5UfMUdgzlx+wRUF/B7PbtjF8nSak2zYv3AcxjAIlwHx+TO97rTPQYx8Tzhs="
         }
     };

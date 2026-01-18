@@ -65,7 +65,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const handleShare = async () => {
         try {
             await sdk.actions.composeCast({
-                text: `Check out this campaign on Post Up! 🚀`,
+                text: `Check out this campaign on Tip2Post! 🚀`,
                 embeds: ['https://post-up-zeta.vercel.app']
             });
         } catch (e) {

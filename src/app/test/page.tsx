@@ -14,7 +14,7 @@ export default function TestPage() {
             padding: '2rem',
             textAlign: 'center'
         }}>
-            <h1 style={{ fontSize: '2rem' }}>Post Up</h1>
+            <h1 style={{ fontSize: '2rem' }}>Tip2Post</h1>
             <p>Mobile Test - If you see this, the app works!</p>
             <a href="/" style={{ color: '#7B3FE4', textDecoration: 'underline' }}>
                 Back to Home
