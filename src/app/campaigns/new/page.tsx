@@ -317,12 +317,7 @@ export default function NewCampaignPage() {
                                 <button
                                     key={cat.id}
                                     type="button"
-                                    onClick={() => {
-                                        setCategory(cat.id);
-                                        if (cat.id !== 'Multi') {
-                                            setSelectedMultiTasks([]);
-                                        }
-                                    }}
+                                    onClick={() => handleCategorySelect(cat)}
                                     className={`${styles.categoryBtn} ${isActive ? styles.categoryActive : ''}`}
                                 >
                                     <Icon size={20} className={styles.categoryIcon} />
@@ -374,17 +369,18 @@ export default function NewCampaignPage() {
 
                         <div style={{
                             padding: '1rem',
-                            background: 'rgba(0,0,0,0.2)',
+                            background: 'rgba(0,0,0,0.3)',
                             borderRadius: '12px',
-                            fontSize: '0.85rem',
+                            fontSize: '0.9rem',
                             lineHeight: 1.5,
-                            border: '1px solid rgba(255,255,255,0.05)'
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            textAlign: 'center'
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-light)', fontWeight: 600, marginBottom: '0.25rem' }}>
-                                <span>📸 2 Screenshots Proof</span>
+                            <div style={{ color: 'white', fontWeight: 700, marginBottom: '0.25rem' }}>
+                                ✨ All-in-One Multi Task
                             </div>
                             <span style={{ color: 'var(--muted-foreground)' }}>
-                                Users will submit one screenshot for the <strong>Follow</strong> and one for the <strong>Like+Recast+Reply</strong> actions.
+                                Complete all actions and get rewarded!
                             </span>
                         </div>
                     </div>
@@ -437,18 +433,33 @@ export default function NewCampaignPage() {
                 {/* BUDGET - COMPACT */}
                 {/* BUDGET SECTION */}
                 <div className={styles.budgetCard}>
-                    <div className={styles.inputLabel} style={{ textAlign: 'center', marginBottom: '0.5rem' }}>TOTAL BUDGET</div>
-                    <div className={styles.budgetInputWrapper}>
-                        <span className={styles.currencySymbol}>$</span>
-                        <input
-                            type="number"
-                            value={totalBudget}
-                            onChange={(e) => setTotalBudget(e.target.value)}
-                            placeholder="50"
-                            required
-                            min="0.01"
-                            className={styles.budgetInput}
-                        />
+                    <div className={styles.inputLabel} style={{ textAlign: 'center', marginBottom: '1rem', color: 'white' }}>SET CAMPAIGN BUDGET</div>
+                    <div className={styles.budgetInputContainer}>
+                        <div className={styles.budgetInputWrapper}>
+                            <span className={styles.currencySymbol}>$</span>
+                            <input
+                                type="number"
+                                value={totalBudget}
+                                onChange={(e) => setTotalBudget(e.target.value)}
+                                placeholder="10"
+                                required
+                                min="3"
+                                step="any"
+                                className={styles.budgetInput}
+                            />
+                        </div>
+                        <div style={{
+                            fontSize: '0.8rem',
+                            color: 'var(--primary-light)',
+                            fontWeight: 600,
+                            marginTop: '0.5rem',
+                            padding: '0.4rem 0.8rem',
+                            background: 'rgba(139, 92, 246, 0.1)',
+                            borderRadius: '8px',
+                            display: 'inline-block'
+                        }}>
+                            🚀 Minimum $3.00 for today
+                        </div>
                     </div>
 
                     {/* TOKEN SELECTION */}
@@ -464,7 +475,7 @@ export default function NewCampaignPage() {
                             </button>
                         ))}
                     </div>
-                    {budgetError && <div style={{ color: '#ef4444', marginTop: '0.5rem', fontSize: '0.85rem' }}>{budgetError}</div>}
+                    {budgetError && <div style={{ color: '#ef4444', marginTop: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>⚠️ {budgetError}</div>}
                 </div>
 
                 {/* DURATION */}
