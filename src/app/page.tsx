@@ -9,29 +9,29 @@ import { Rocket, Users, Trophy, TrendingUp, Share2, PlusCircle } from 'lucide-re
 export default function Home() {
   const { context } = useFarcasterContext();
   const isFarcasterConnected = !!context?.user;
-  const [isAppAdded, setIsAppAdded] = useState(true); // Default true to avoid flash
+  const [isAppAdded, setIsAppAdded] = useState(true);
+  const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Call ready() and check if app is added
   useEffect(() => {
     async function initApp() {
+      if (!context) return;
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
-        await sdk.actions.ready();
-        console.log('✅ ready() called after UI render');
+        // Initial state from context
+        setIsAppAdded(!!context?.client?.added);
+        setIsNotificationsEnabled(!!context?.client?.notificationDetails);
 
-        // Check if app is already added (via context)
-        // For now, we'll trust the context - if user logged in, app is added
-        setIsAppAdded(!!context?.user);
+        await sdk.actions.ready();
       } catch (e) {
-        // Not in Farcaster environment - allow access
         setIsAppAdded(true);
+        setIsNotificationsEnabled(true);
       } finally {
         setIsLoading(false);
       }
     }
     initApp();
-  }, [context?.user]);
+  }, [context]);
 
   const handleAddApp = async () => {
     try {
@@ -62,14 +62,16 @@ export default function Home() {
     return (
       <main className={styles.main}>
         <div className={styles.hero} style={{ textAlign: 'center' }}>
+          <Rocket size={48} color="var(--primary)" style={{ marginBottom: '1.5rem' }} />
           <h1 className={`${styles.title} gradient-text`} style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
             Add Tip2Post
           </h1>
           <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', maxWidth: '300px', margin: '0 auto 2rem' }}>
-            Add Tip2Post to your Farcaster to get started earning rewards!
+            Add Tip2Post to your Farcaster to start earning rewards!
           </p>
           <button
             onClick={handleAddApp}
+            className="glass-panel"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -77,14 +79,66 @@ export default function Home() {
               padding: '1rem 2rem',
               background: 'var(--primary)',
               color: 'white',
-              borderRadius: '1rem',
+              borderRadius: '99px',
               fontWeight: 600,
               fontSize: '1.1rem',
               border: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
             }}
           >
             <PlusCircle size={20} /> Add to Farcaster
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  // Show notifications prompt if added but notifications not enabled
+  if (!isLoading && isAppAdded && !isNotificationsEnabled && isFarcasterConnected) {
+    return (
+      <main className={styles.main}>
+        <div className={styles.hero} style={{ textAlign: 'center' }}>
+          <Share2 size={48} color="#22c55e" style={{ marginBottom: '1.5rem' }} />
+          <h1 className={`${styles.title} gradient-text`} style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
+            Stay Notified
+          </h1>
+          <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', maxWidth: '300px', margin: '0 auto 2rem' }}>
+            Enable notifications to get alerts when you earn rewards or new tasks are available!
+          </p>
+          <button
+            onClick={async () => {
+              const { sdk } = await import('@farcaster/miniapp-sdk');
+              try {
+                await sdk.actions.addFrame(); // This also prompts for notifications if already added
+                setIsNotificationsEnabled(true);
+              } catch (e) {
+                setIsNotificationsEnabled(true);
+              }
+            }}
+            className="glass-panel"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '1rem 2rem',
+              background: '#22c55e',
+              color: 'white',
+              borderRadius: '99px',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)'
+            }}
+          >
+            Enable Notifications
+          </button>
+          <button
+            onClick={() => setIsNotificationsEnabled(true)}
+            style={{ display: 'block', margin: '1rem auto', color: 'var(--muted-foreground)', fontSize: '0.8rem', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            Maybe Later
           </button>
         </div>
       </main>
