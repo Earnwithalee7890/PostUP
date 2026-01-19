@@ -37,10 +37,17 @@ const loadFromStorage = () => {
 loadFromStorage();
 
 export const MockService = {
-    getCampaigns: async (): Promise<Campaign[]> => {
+    async getCampaigns(): Promise<Campaign[]> {
         await new Promise(resolve => setTimeout(resolve, 500));
         loadFromStorage(); // Ensure fresh
         return [...campaigns];
+    },
+    ensureCampaign: (campaign: Campaign) => {
+        loadFromStorage();
+        if (!campaigns.find(c => c.id === campaign.id)) {
+            campaigns.push(campaign);
+            saveToStorage();
+        }
     },
     getCampaign: async (id: string): Promise<Campaign | undefined> => {
         await new Promise(resolve => setTimeout(resolve, 200));

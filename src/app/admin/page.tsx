@@ -15,7 +15,9 @@ export default function AdminPage() {
     const [stats, setStats] = useState<any>(null);
 
     const handleSimulate = async () => {
-        if (!selectedCampaign) return;
+        if (!selectedCampaign || !campaigns) return;
+        const campaignObj = campaigns.find(c => c.id === selectedCampaign);
+        if (campaignObj) MockService.ensureCampaign(campaignObj);
 
         setSimulating(true);
         try {
@@ -30,7 +32,9 @@ export default function AdminPage() {
     };
 
     const handleEnd = async () => {
-        if (!selectedCampaign) return;
+        if (!selectedCampaign || !campaigns) return;
+        const campaignObj = campaigns.find(c => c.id === selectedCampaign);
+        if (campaignObj) MockService.ensureCampaign(campaignObj);
 
         setEnding(true);
         try {
