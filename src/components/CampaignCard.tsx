@@ -13,7 +13,8 @@ import { SuccessModal } from './SuccessModal';
 export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const { context } = useFarcasterContext();
     const { address } = useAccount();
-    const isUserAdmin = isAdmin(address, context?.user?.fid);
+    const isCreator = campaign.creator === context?.user?.fid?.toString();
+    const isUserAdmin = isAdmin(address, context?.user?.fid) || isCreator;
     const { mutateAsync: submitScreenshot } = useSubmitScreenshot();
 
     const userFid = context?.user?.fid;

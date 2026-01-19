@@ -13,6 +13,16 @@ export const DISTRIBUTOR_ABI = [
     {
         "inputs": [
             { "internalType": "uint256", "name": "_campaignId", "type": "uint256" },
+            { "internalType": "bytes32", "name": "_merkleRoot", "type": "bytes32" }
+        ],
+        "name": "setMerkleRoot",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "_campaignId", "type": "uint256" },
             { "internalType": "uint256", "name": "_amount", "type": "uint256" },
             { "internalType": "bytes32[]", "name": "_proof", "type": "bytes32[]" }
         ],

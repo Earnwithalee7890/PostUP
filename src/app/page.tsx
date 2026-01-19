@@ -4,7 +4,8 @@ import styles from './page.module.css';
 import Link from 'next/link';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useEffect, useState } from 'react';
-import { Rocket, Users, Trophy, TrendingUp, Share2, PlusCircle } from 'lucide-react';
+import { Rocket, Users, Trophy, TrendingUp, Share2, PlusCircle, LayoutDashboard } from 'lucide-react';
+import { isAdmin } from '@/lib/admin';
 
 export default function Home() {
   const { context } = useFarcasterContext();
@@ -261,6 +262,40 @@ export default function Home() {
             </div>
           </Link>
         </div>
+
+        {/* Creator Dashboard Link - Visible to all for easy access to campaign management */}
+        {isFarcasterConnected && (
+          <div style={{ marginTop: '1.5rem', width: '100%', maxWidth: '400px', margin: '1.5rem auto 0' }}>
+            <Link href="/admin" style={{ textDecoration: 'none' }}>
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px border var(--border)',
+                borderRadius: '1rem',
+                padding: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                transition: 'all 0.3s ease'
+              }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <LayoutDashboard size={20} color="white" />
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 600, color: 'white', fontSize: '0.95rem' }}>Creator Dashboard</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>Manage your campaigns & rewards</div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        )}
 
         {/* Stats Section */}
         <div style={{

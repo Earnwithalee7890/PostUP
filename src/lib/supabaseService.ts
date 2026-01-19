@@ -438,6 +438,30 @@ export const SupabaseService = {
     },
 
     /**
+     * Finalize a campaign: update status, merkle root, and total weight
+     */
+    async finalizeCampaign(campaignId: string, merkleRoot: string, totalWeight: number) {
+        const { data, error } = await supabase
+            .from('campaigns')
+            .update({
+                status: 'claimable',
+                merkle_root: merkleRoot,
+                total_weight: totalWeight,
+                ended_at: new Date().toISOString()
+            })
+            .eq('id', campaignId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Error finalizing campaign:', error);
+            throw new Error('Failed to finalize campaign');
+        }
+
+        return { success: true, campaign: data };
+    },
+
+    /**
      * Cleanup old campaigns (from Bug #3)
      * Removes all campaigns not created today
      */

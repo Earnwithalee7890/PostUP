@@ -87,3 +87,16 @@ export function useUserCompletedCampaignIds(userFid: number | undefined) {
     });
 }
 
+export function useFinalizeCampaign() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ campaignId, merkleRoot, totalWeight }: { campaignId: string, merkleRoot: string, totalWeight: number }) =>
+            SupabaseService.finalizeCampaign(campaignId, merkleRoot, totalWeight),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['campaign', variables.campaignId] });
+            queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+        },
+    });
+}
+

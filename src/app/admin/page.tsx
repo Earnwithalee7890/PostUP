@@ -58,7 +58,7 @@ export default function AdminPage() {
     return (
         <main className="container" style={{ padding: '2rem 1rem' }}>
             <h1 className="gradient-text" style={{ fontSize: '2rem', marginBottom: '2rem' }}>
-                Campaign Admin & Simulation
+                Creator Dashboard
             </h1>
 
             <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem' }}>
@@ -168,27 +168,46 @@ export default function AdminPage() {
                 </div>
             )}
 
-            <div style={{ marginTop: '2rem' }}>
-                <h3 style={{ marginBottom: '1rem' }}>All Campaigns</h3>
+            <div style={{ marginTop: '3rem' }}>
+                <h3 style={{ marginBottom: '1.5rem' }}>Your Active & Ended Campaigns</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {campaigns?.map(c => (
-                        <div key={c.id} className="glass-panel" style={{ padding: '1rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div key={c.id} className="glass-panel" style={{ padding: '1.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                                 <div>
-                                    <div style={{ fontWeight: 600 }}>{c.category} - {c.id}</div>
+                                    <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.25rem' }}>{c.category} Campaign</div>
                                     <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>
-                                        {c.participants.length} participants | ${c.totalBudget} budget | {c.status}
+                                        ID: <code style={{ color: 'var(--primary-light)' }}>{c.id}</code> | {c.platform}
+                                    </div>
+                                    <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem', fontSize: '0.9rem' }}>
+                                        <span><strong>{c.participantCount || 0}</strong> Joined</span>
+                                        <span><strong>${c.totalBudget}</strong> Budget</span>
+                                        <span style={{
+                                            color: c.status === 'active' ? '#2ecc71' : '#f59e0b',
+                                            fontWeight: 600,
+                                            textTransform: 'uppercase',
+                                            fontSize: '0.75rem'
+                                        }}>{c.status}</span>
                                     </div>
                                 </div>
-                                {c.status === 'claimable' && (
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
                                     <Link
-                                        href={`/claim/${c.id}`}
+                                        href={`/campaigns/${c.id}/submissions`}
                                         className="glass-button"
-                                        style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                                        style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', background: 'var(--primary)', color: 'white', border: 'none' }}
                                     >
-                                        View Claims
+                                        Review Submissions
                                     </Link>
-                                )}
+                                    {c.status === 'claimable' && (
+                                        <Link
+                                            href={`/claim/${c.id}`}
+                                            className="glass-button"
+                                            style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}
+                                        >
+                                            View Claims
+                                        </Link>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))}
