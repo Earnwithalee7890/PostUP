@@ -9,6 +9,20 @@ export const CREATOR_FEE_PERCENT = 8;
 export const MAX_CAMPAIGN_DURATION_DAYS = 30;
 export const MIN_CAMPAIGN_BUDGET = 1; // $1 minimum
 
+// Brand Colors
+export const BRAND_COLORS = {
+    PRIMARY: '#8b5cf6', // Violet 500
+    SECONDARY: '#7c3aed', // Violet 600
+    ACCENT: '#ec4899', // Pink 500
+    SUCCESS: '#22c55e', // Green 500
+    WARNING: '#f59e0b', // Amber 500
+    ERROR: '#ef4444', // Red 500
+    BACKGROUND: '#000000',
+    SURFACE: '#121212',
+    TEXT: '#ffffff',
+    TEXT_MUTED: '#9ca3af' // Gray 400
+};
+
 // Task Types
 export const TASK_LABELS: Record<string, string> = {
     'Follow': '👤 Follow',
@@ -23,17 +37,17 @@ export const TASK_LABELS: Record<string, string> = {
 
 // Campaign Categories
 export const CATEGORY_COLORS: Record<string, string> = {
-    'Follow': '#8b5cf6',
-    'Boost': '#f59e0b',
+    'Follow': BRAND_COLORS.PRIMARY,
+    'Boost': BRAND_COLORS.WARNING,
     'Multi': '#2ecc71',
     'Channel': '#3b82f6',
-    'MiniApp': '#ec4899'
+    'MiniApp': BRAND_COLORS.ACCENT
 };
 
 // Quality Score Thresholds
 export const QUALITY_TIERS = {
     ELITE: { min: 85, label: '🏆 Elite', color: '#ffd700' },
-    PRO: { min: 65, label: '⭐ Pro', color: '#8b5cf6' },
+    PRO: { min: 65, label: '⭐ Pro', color: BRAND_COLORS.PRIMARY },
     VERIFIED: { min: 45, label: '✓ Verified', color: '#2ecc71' },
     BASIC: { min: 0, label: '📝 Basic', color: '#6b7280' }
 };

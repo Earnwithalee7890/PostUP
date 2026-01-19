@@ -247,8 +247,16 @@ async function verifyComment(userFid: number, castUrl: string): Promise<Verifica
 }
 
 /**
- * Main verification function
- * Routes to specific verification based on task type
+ * Main verification function that routes to specific verification logic based on task type.
+ * 
+ * @param userFid - The Farcaster ID of the user performing the task
+ * @param taskType - The type of task to verify (e.g., 'Follow', 'Like', 'Repost')
+ * @param profileUrl - The URL of the target profile (required for 'Follow' tasks)
+ * @param castUrl - The URL of the target cast (required for 'Like', 'Repost', 'Comment' tasks)
+ * @returns A promise resolving to a VerificationResult object
+ * 
+ * @example
+ * const result = await verifyTask(1234, 'Follow', 'https://warpcast.com/vitalik.eth');
  */
 export async function verifyTask(
     userFid: number,

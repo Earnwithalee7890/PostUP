@@ -22,9 +22,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Tip2Post | Onchain Promotion Engine",
-  description: "Task-based onchain growth engine. Promote content, earn rewards, and grow your Farcaster presence.",
-  applicationName: 'Tip2Post',
+  title: "PostUp | Farcaster Onchain Growth Engine",
+  description: "Boost your Farcaster presence with PostUp. Task-based onchain growth engine for creators and brands.",
+  applicationName: 'PostUp',
   authors: [{ name: 'Aleekhoso', url: 'https://warpcast.com/aleekhoso' }],
   keywords: ['Farcaster', 'Base', 'Crypto', 'Tasks', 'Rewards', 'Growth'],
   metadataBase: new URL('https://post-up-zeta.vercel.app'),

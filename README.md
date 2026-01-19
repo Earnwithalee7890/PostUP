@@ -114,20 +114,34 @@ npm run dev
 Create a `.env.local` file with:
 
 ```env
-# Supabase
+# Supabase (Required)
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
-# WalletConnect
+# WalletConnect (Required for Web3 features)
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
 
-# Neynar (Farcaster API)
+# Neynar (Farcaster API - Required for verification)
 NEXT_PUBLIC_NEYNAR_API_KEY=your_neynar_key
 
-# App URL
+# Hub URL (Optional: for direct Hub interaction)
+NEXT_PUBLIC_HUB_URL=https://hub-api.neynar.com
+
+# App Configuration
 NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 ```
+
+### Local Development
+
+1. **Setup Supabase**: Create a new project on [Supabase](https://supabase.com) and run the migrations/setup the tables as described in the [Database Schema](#database-schema) section.
+2. **Neynar API**: Get an API key from [Neynar](https://neynar.com) for Farcaster data access.
+3. **WalletConnect**: Get a project ID from [WalletConnect Cloud](https://cloud.walletconnect.com).
+4. **Run**: 
+   ```bash
+   npm run dev
+   ```
+   The app will be available at `http://localhost:3000`.
 
 ---
 

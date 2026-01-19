@@ -1,4 +1,6 @@
-// Input validation utilities
+/**
+ * Input validation utilities
+ */
 
 /**
  * Validate Ethereum address format
@@ -11,9 +13,10 @@ export const isValidEthAddress = (address: string): boolean => {
  * Validate URL format
  */
 export const isValidUrl = (url: string): boolean => {
+    if (!url) return false;
     try {
-        new URL(url);
-        return true;
+        const parsed = new URL(url);
+        return ['http:', 'https:'].includes(parsed.protocol);
     } catch {
         return false;
     }
@@ -27,8 +30,18 @@ export const isValidEmail = (email: string): boolean => {
 };
 
 /**
- * Validate Farcaster username (no @ symbol, alphanumeric)
+ * Validate Farcaster username
  */
 export const isValidFarcasterUsername = (username: string): boolean => {
-    return /^[a-zA-Z0-9_]{1,16}$/.test(username);
+    if (!username) return false;
+    const clean = username.startsWith('@') ? username.substring(1) : username;
+    return /^[a-z0-9_-]{1,16}$/.test(clean);
+};
+
+/**
+ * Validate number is positive
+ */
+export const isPositiveNumber = (val: any): boolean => {
+    const num = parseFloat(val);
+    return !isNaN(num) && num > 0;
 };

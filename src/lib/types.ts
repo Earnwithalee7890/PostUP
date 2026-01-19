@@ -1,9 +1,9 @@
 import { QualityScore } from './qualityScore';
 
 export type Platform = 'X' | 'Farcaster' | 'Base';
-export type TaskType = 'Like' | 'Repost' | 'Comment' | 'Follow' | 'Quote' | 'Cast' | 'JoinChannel' | 'OpenMiniApp';
-export type CampaignCategory = 'Follow' | 'Channel' | 'Boost' | 'Multi' | 'MiniApp';
-export type CampaignStatus = 'active' | 'paused' | 'completed' | 'claimable';
+export type TaskType = 'Like' | 'Repost' | 'Comment' | 'Follow' | 'Quote' | 'Cast' | 'JoinChannel' | 'OpenMiniApp' | 'CheckIn';
+export type CampaignCategory = 'Follow' | 'Channel' | 'Boost' | 'Multi' | 'MiniApp' | 'General';
+export type CampaignStatus = 'active' | 'paused' | 'completed' | 'claimable' | 'expired';
 
 export interface CampaignParticipant {
     address: string;

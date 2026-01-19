@@ -3,6 +3,29 @@
  */
 
 /**
+ * Combines multiple class names into a single string.
+ */
+export function cn(...inputs: (string | undefined | null | boolean | Record<string, boolean>)[]) {
+    const classes: string[] = [];
+
+    for (const input of inputs) {
+        if (!input) continue;
+
+        if (typeof input === 'string') {
+            classes.push(input);
+        } else if (typeof input === 'object') {
+            for (const [key, value] of Object.entries(input)) {
+                if (value) {
+                    classes.push(key);
+                }
+            }
+        }
+    }
+
+    return classes.join(' ');
+}
+
+/**
  * Truncate wallet address for display
  * @example truncateAddress("0x1234...") => "0x1234...5678"
  */
