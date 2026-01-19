@@ -56,7 +56,14 @@ export const NeynarService = {
         }
     },
 
-    getUsersBulk: async (identifiers: (number | string)[]): Promise<Record<string, { username: string, pfpUrl: string, displayName: string }>> => {
+    getUsersBulk: async (identifiers: (number | string)[]): Promise<Record<string, {
+        username: string,
+        pfpUrl: string,
+        displayName: string,
+        followerCount: number,
+        followingCount: number,
+        verifications: string[]
+    }>> => {
         if (identifiers.length === 0) return {};
 
         try {
@@ -106,11 +113,26 @@ export const NeynarService = {
                 }
             }
 
-            const userMap: Record<string, { username: string, pfpUrl: string, displayName: string }> = {};
+            const userMap: Record<string, {
+                username: string,
+                pfpUrl: string,
+                displayName: string,
+                followerCount: number,
+                followingCount: number,
+                verifications: string[]
+            }> = {};
             allUsers.forEach(user => {
-                if (user.fid) userMap[user.fid.toString()] = { username: user.username, pfpUrl: user.pfp_url, displayName: user.display_name };
+                const userData = {
+                    username: user.username,
+                    pfpUrl: user.pfp_url,
+                    displayName: user.display_name,
+                    followerCount: user.follower_count || 0,
+                    followingCount: user.following_count || 0,
+                    verifications: user.verified_addresses?.eth_addresses || []
+                };
+                if (user.fid) userMap[user.fid.toString()] = userData;
                 user.verified_addresses?.eth_addresses?.forEach((addr: string) => {
-                    userMap[addr.toLowerCase()] = { username: user.username, pfpUrl: user.pfp_url, displayName: user.display_name };
+                    userMap[addr.toLowerCase()] = userData;
                 });
             });
 

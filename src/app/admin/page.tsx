@@ -56,7 +56,7 @@ export default function AdminPage() {
     };
 
     return (
-        <main className="container" style={{ padding: '2rem 1rem' }}>
+        <main className="container">
             <h1 className="gradient-text" style={{ fontSize: '2rem', marginBottom: '2rem' }}>
                 Creator Dashboard
             </h1>
