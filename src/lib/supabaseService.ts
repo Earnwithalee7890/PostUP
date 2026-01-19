@@ -9,7 +9,7 @@ export const SupabaseService = {
             .select('*');
 
         if (!includeEnded) {
-            query = query.or(`ended_at.is.null,ended_at.gt.${new Date().toISOString()}`);
+            query = query.or(`ended_at.is.null,ended_at.gt.${new Date().toISOString()},status.eq.claimable`);
         }
 
         const { data, error } = await query.order('created_at', { ascending: false });

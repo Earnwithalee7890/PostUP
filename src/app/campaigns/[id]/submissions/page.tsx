@@ -143,7 +143,7 @@ export default function CampaignSubmissionsPage() {
                 address: DISTRIBUTOR_ADDRESS as `0x${string}`,
                 abi: DISTRIBUTOR_ABI,
                 functionName: 'setMerkleRoot',
-                args: [BigInt(campaign.id), root as `0x${string}`],
+                args: [BigInt(Math.round(Number(campaign.id))), root as `0x${string}`],
             });
 
             // Wait for tx

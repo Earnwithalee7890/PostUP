@@ -6,9 +6,18 @@ import { ExternalLink, Image, Camera, Check, Loader2, CheckCircle } from 'lucide
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useAccount } from 'wagmi';
 import { isAdmin } from '@/lib/admin';
-import { useSubmitScreenshot, useUserSubmissions } from '@/hooks/useCampaigns';
+import { useSubmitScreenshot, useUserSubmissions, useFinalizeCampaign } from '@/hooks/useCampaigns';
+import { SupabaseService } from '@/lib/supabaseService';
 import sdk from '@farcaster/miniapp-sdk';
 import { SuccessModal } from './SuccessModal';
+import { useWriteContract, useConfig } from 'wagmi';
+import { DISTRIBUTOR_ABI } from '@/lib/abi';
+import { DISTRIBUTOR_ADDRESS } from '@/lib/config';
+import { generateMerkleDistribution } from '@/lib/merkle';
+import { calculateWeightedDistribution, getDistributionStats } from '@/lib/distribution';
+import { calculateQualityScore } from '@/lib/qualityScore';
+import { NeynarService } from '@/lib/neynar';
+import { parseUnits, formatUnits } from 'viem';
 
 export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const { context } = useFarcasterContext();
@@ -45,6 +54,83 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
         setScreenshots(restoredScreenshots);
     }, [userSubmissions]);
 
+    const { writeContractAsync: writeClaim } = useWriteContract();
+    const [isClaiming, setIsClaiming] = useState(false);
+
+    const handleClaim = async () => {
+        if (!address) {
+            alert('Please connect your wallet to claim rewards');
+            return;
+        }
+
+        setIsClaiming(true);
+        try {
+            // 1. Fetch all approved submissions to re-calculate proof
+            const allSubs = await SupabaseService.getSubmissions(campaign.id);
+            const approvedSubs = allSubs.filter((s: any) => s.status === 'approved');
+
+            // Group by user
+            const subsByUser: Record<number, any> = {};
+            approvedSubs.forEach((s: any) => {
+                if (!subsByUser[s.user_fid]) subsByUser[s.user_fid] = [];
+                subsByUser[s.user_fid].push(s);
+            });
+
+            const userFids = Object.keys(subsByUser).map(Number);
+
+            // 2. Fetch metadata for all these users in bulk
+            const metadata = await NeynarService.getUsersBulk(userFids);
+
+            // 3. Construct participants list
+            const participants = userFids.map(fid => {
+                const sub = subsByUser[fid][0];
+                return {
+                    address: sub.user_address,
+                    fid,
+                    qualityScore: calculateQualityScore({
+                        fid,
+                        accountAge: 365,
+                        followerCount: metadata[fid]?.followerCount || 100,
+                        isVerified: true,
+                        hasEthActivity: true,
+                        completedTasks: 5,
+                        hasSpamFlags: false
+                    })
+                };
+            });
+
+            // 4. Calculate Distribution & Proof
+            const distribution = calculateWeightedDistribution(participants, campaign.netBudget, 0);
+            const { claims } = generateMerkleDistribution(distribution.claims);
+
+            // 5. Find current user's claim
+            const userClaim = claims.find(c => c.userAddress.toLowerCase() === address.toLowerCase());
+
+            if (!userClaim) {
+                alert('No rewards found for this wallet. Make sure your submissions were approved and you are using the correct wallet!');
+                return;
+            }
+
+            // 6. Call Contract
+            const amountInUSDCUnits = parseUnits(userClaim.amount.toFixed(6), 6);
+
+            const hash = await writeClaim({
+                address: DISTRIBUTOR_ADDRESS as `0x${string}`,
+                abi: DISTRIBUTOR_ABI,
+                functionName: 'claim',
+                args: [BigInt(Math.round(Number(campaign.id))), amountInUSDCUnits, userClaim.proof as `0x${string}`[]],
+            });
+
+            alert(`Claim transaction submitted! Hash: ${hash}`);
+        } catch (error: any) {
+            console.error('Claim error:', error);
+            alert(`Claim failed: ${error.message || 'Unknown error'}`);
+        } finally {
+            setIsClaiming(false);
+        }
+    };
+
+    const isFarcasterConnected = !!context?.user;
     const isX = campaign.platform === 'X';
     const isEnded = campaign.status === 'completed' || campaign.status === 'claimable' || campaign.remainingBudget < campaign.rewardAmountPerTask;
 
@@ -240,12 +326,38 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                         </button>
                     )}
 
+                    {/* Claim Button - if status is claimable */}
+                    {campaign.status === 'claimable' && (
+                        <button
+                            onClick={handleClaim}
+                            disabled={isClaiming}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                padding: '0.6rem 1.2rem',
+                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                color: 'white',
+                                borderRadius: '0.5rem',
+                                fontWeight: 700,
+                                fontSize: '0.9rem',
+                                border: 'none',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                                opacity: isClaiming ? 0.7 : 1
+                            }}
+                        >
+                            {isClaiming ? <Loader2 className="spin" size={16} /> : <span>💰 Claim Reward</span>}
+                        </button>
+                    )}
+
                     {/* Fallback if no recognized task type but has URL */}
                     {!campaign.tasks.includes('Follow') &&
                         !campaign.tasks.includes('Like') &&
                         !campaign.tasks.includes('Repost') &&
                         !campaign.tasks.includes('Comment') &&
                         campaign.category !== 'MiniApp' &&
+                        campaign.status !== 'claimable' &&
                         campaignUrl && (
                             <button
                                 onClick={handleOpenLink}
