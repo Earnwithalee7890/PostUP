@@ -8,7 +8,7 @@ import { Users, DollarSign, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminPage() {
-    const { data: campaigns } = useCampaigns();
+    const { data: campaigns } = useCampaigns(true);
     const [selectedCampaign, setSelectedCampaign] = useState<string>('');
     const [simulating, setSimulating] = useState(false);
     const [ending, setEnding] = useState(false);

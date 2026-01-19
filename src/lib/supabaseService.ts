@@ -3,12 +3,16 @@ import { Campaign } from './types';
 import { NeynarService } from './neynar';
 
 export const SupabaseService = {
-    async getCampaigns(): Promise<Campaign[]> {
-        const { data, error } = await supabase
+    async getCampaigns(includeEnded: boolean = false): Promise<Campaign[]> {
+        let query = supabase
             .from('campaigns')
-            .select('*')
-            .or(`ended_at.is.null,ended_at.gt.${new Date().toISOString()}`)
-            .order('created_at', { ascending: false });
+            .select('*');
+
+        if (!includeEnded) {
+            query = query.or(`ended_at.is.null,ended_at.gt.${new Date().toISOString()}`);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching campaigns:', error);
