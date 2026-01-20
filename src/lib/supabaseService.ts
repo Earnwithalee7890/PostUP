@@ -94,6 +94,7 @@ export const SupabaseService = {
             status: data.status,
             merkleRoot: data.merkle_root,
             totalWeight: data.total_weight ? parseFloat(data.total_weight) : undefined,
+            onchainId: data.onchain_id,
             createdAt: new Date(data.created_at).getTime(),
             endedAt: data.ended_at ? new Date(data.ended_at).getTime() : undefined,
             participants: []

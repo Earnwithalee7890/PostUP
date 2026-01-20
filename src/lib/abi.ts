@@ -61,5 +61,26 @@ export const DISTRIBUTOR_ABI = [
         "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
         "stateMutability": "view",
         "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "creator", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "totalBudget", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "netBudget", "type": "uint256" }
+        ],
+        "name": "CampaignCreated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "uint256", "name": "campaignId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "claimer", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "RewardClaimed",
+        "type": "event"
     }
 ] as const;
