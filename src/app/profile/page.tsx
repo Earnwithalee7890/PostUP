@@ -4,8 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { MockService } from '@/lib/mockService';
 import { NeynarService } from '@/lib/neynar';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { useAllUserSubmissions } from '@/hooks/useCampaigns';
-import { User, CheckCircle, History, Copy, Plus, Bell, Clock, XCircle } from 'lucide-react';
+import { useAllUserSubmissions, useCampaigns } from '@/hooks/useCampaigns';
+import { CampaignCard } from '@/components/CampaignCard';
+import { User, CheckCircle, History, Copy, Plus, Bell, Clock, XCircle, Wallet } from 'lucide-react';
 import sdk from '@farcaster/miniapp-sdk';
 import { useState } from 'react';
 
@@ -26,6 +27,9 @@ export default function ProfilePage() {
 
     // Fetch real submissions from Supabase for Task History
     const { data: userSubmissions, isLoading: submissionsLoading } = useAllUserSubmissions(context?.user?.fid);
+
+    // Fetch all campaigns to find claimable ones
+    const { data: allCampaigns } = useCampaigns(true);
 
     // Determine identity from Farcaster
     const identityAddress = context?.user?.verifications?.[0] || stats?.verifications?.[0];
@@ -220,6 +224,30 @@ export default function ProfilePage() {
                     </div>
                 </div>
             </dialog>
+
+            {/* CLAIMABLE REWARDS SECTION */}
+            {(() => {
+                const claimableCampaigns = allCampaigns?.filter((c: any) => {
+                    if (c.status !== 'claimable') return false;
+                    return userSubmissions?.some((s: any) => s.campaignId === c.id && s.status === 'approved');
+                });
+
+                if (claimableCampaigns && claimableCampaigns.length > 0) {
+                    return (
+                        <section style={{ marginBottom: '3rem' }}>
+                            <h3 style={{ marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#10b981' }}>
+                                <Wallet size={20} /> Claimable Rewards
+                            </h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {claimableCampaigns.map((campaign: any) => (
+                                    <CampaignCard key={campaign.id} campaign={campaign} />
+                                ))}
+                            </div>
+                        </section>
+                    );
+                }
+                return null;
+            })()}
 
             {/* HISTORY - Real data from Supabase, grouped by campaign */}
             <section>

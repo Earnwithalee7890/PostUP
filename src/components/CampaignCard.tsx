@@ -134,6 +134,8 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const isX = campaign.platform === 'X';
     const isEnded = campaign.status === 'completed' || campaign.status === 'claimable' || campaign.remainingBudget < campaign.rewardAmountPerTask;
 
+    const hasApprovedSubmission = userSubmissions?.some((s: any) => s.status === 'approved');
+
     // Check if user has completed ALL tasks in this campaign
     const completedTaskCount = Object.keys(completedTasks).filter(k => completedTasks[k]).length;
     const hasCompletedAllTasks = completedTaskCount >= campaign.tasks.length && campaign.tasks.length > 0;
@@ -327,7 +329,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                     )}
 
                     {/* Claim Button - if status is claimable */}
-                    {campaign.status === 'claimable' && (
+                    {campaign.status === 'claimable' && hasApprovedSubmission && (
                         <button
                             onClick={handleClaim}
                             disabled={isClaiming}
