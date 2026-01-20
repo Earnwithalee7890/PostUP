@@ -54,6 +54,7 @@ export const SupabaseService = {
             requirePro: row.require_pro,
             status: row.status,
             merkleRoot: row.merkle_root,
+            onchainId: row.onchain_id,
             totalWeight: row.total_weight ? parseFloat(row.total_weight) : undefined,
             createdAt: new Date(row.created_at).getTime(),
             endedAt: row.ended_at ? new Date(row.ended_at).getTime() : undefined,

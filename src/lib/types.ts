@@ -47,6 +47,7 @@ export interface Campaign {
     endedAt?: number;
     status: CampaignStatus;
     participantCount?: number; // Number of unique participants
+    onchainId?: number; // Numeric ID from the smart contract
 }
 
 export const SUPPORTED_TOKENS = [

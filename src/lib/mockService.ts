@@ -59,7 +59,8 @@ export const MockService = {
         await new Promise(resolve => setTimeout(resolve, 800));
         const newCampaign: Campaign = {
             ...campaignData,
-            id: Math.random().toString(36).substr(2, 9),
+            id: (campaigns.length + 101).toString(),
+            onchainId: campaigns.length + 101,
             createdAt: Date.now(),
             remainingBudget: campaignData.netBudget,
             status: 'active',
