@@ -10,7 +10,7 @@ export interface RewardClaim {
 
 export interface WeightedDistribution {
     totalWeight: number;
-    netBudget: number; // After 10% fee
+    netBudget: number; // After 15% fee
     claims: RewardClaim[];
 }
 
@@ -20,7 +20,7 @@ export interface WeightedDistribution {
 export function calculateWeightedDistribution(
     participants: Array<{ address: string; fid: number; qualityScore: QualityScore }>,
     totalBudget: number,
-    platformFeeRate: number = 0.10
+    platformFeeRate: number = 0.15
 ): WeightedDistribution {
     // Calculate net budget after platform fee
     const platformFee = totalBudget * platformFeeRate;
