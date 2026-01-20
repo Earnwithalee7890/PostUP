@@ -29,8 +29,8 @@ export interface Campaign {
 
     // Financials
     totalBudget: number;
-    platformFee: number; // 10%
-    netBudget: number;   // 82%
+    platformFee: number; // 15%
+    netBudget: number;   // 85%
     remainingBudget: number;
     rewardAmountPerTask: number;
 

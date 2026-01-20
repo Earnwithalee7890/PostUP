@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { parseEther, parseUnits, encodePacked, keccak256 } from 'viem';
-import { useAccount, useWriteContract } from 'wagmi';
+import { parseEther, parseUnits, encodePacked, keccak256, decodeEventLog } from 'viem';
+import { useAccount, useWriteContract, useConfig } from 'wagmi';
+import { waitForTransactionReceipt } from 'viem/actions';
 import { DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/config';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
 import { ERC20_ABI } from '@/lib/erc20';
@@ -100,7 +101,7 @@ export default function NewCampaignPage() {
     const [createdCampaignId, setCreatedCampaignId] = useState<string | null>(null);
 
     const budget = parseFloat(totalBudget) || 0;
-    const platformFee = budget * 0.10;
+    const platformFee = budget * 0.15;
     const netBudget = budget - platformFee;
 
     const MINIMUM_BUDGET = 3.0; // Updated to $3 as requested
@@ -147,6 +148,7 @@ export default function NewCampaignPage() {
 
     // Wallet and smart contract integration
     const { address, isConnected } = useAccount();
+    const wagmiConfig = useConfig();
     const { writeContractAsync: writeApprove } = useWriteContract();
     const { writeContractAsync: writeCreate } = useWriteContract();
     const [isApproving, setIsApproving] = useState(false);
@@ -199,7 +201,7 @@ export default function NewCampaignPage() {
 
             // Step 1: Approve USDC
             setIsApproving(true);
-            const approveTx = await writeApprove({
+            await writeApprove({
                 address: USDC_ADDRESS as `0x${string}`,
                 abi: ERC20_ABI,
                 functionName: 'approve',
@@ -211,12 +213,33 @@ export default function NewCampaignPage() {
             setIsCreating(true);
             const mockMerkleRoot = keccak256(encodePacked(['string'], ['campaign-' + Date.now()])) as `0x${string}`;
 
-            const createTx = await writeCreate({
+            const createTxHash = await writeCreate({
                 address: DISTRIBUTOR_ADDRESS as `0x${string}`,
                 abi: DISTRIBUTOR_ABI,
                 functionName: 'createCampaign',
                 args: [mockMerkleRoot, USDC_ADDRESS as `0x${string}`, budgetInUSDC],
             });
+
+            // Wait for receipt to get the Campaign ID
+            const receipt = await waitForTransactionReceipt(wagmiConfig as any, { hash: createTxHash });
+
+            let onchainId = 0;
+            // Decode the log to find CampaignCreated
+            for (const log of receipt.logs) {
+                try {
+                    const event = decodeEventLog({
+                        abi: DISTRIBUTOR_ABI,
+                        data: log.data,
+                        topics: log.topics,
+                    });
+                    if (event.eventName === 'CampaignCreated') {
+                        onchainId = Number((event.args as any).id);
+                        break;
+                    }
+                } catch (e) {
+                    // Not our event, skip
+                }
+            }
             setIsCreating(false);
 
             // Step 3: Save to database
@@ -240,6 +263,7 @@ export default function NewCampaignPage() {
                 rewardAmountPerTask: estRewardPerTask,
                 minFollowers: require200Followers ? 200 : 0,
                 requirePro: requirePro,
+                onchainId: onchainId,
                 endedAt: endedAt,
             } as any);
 
@@ -248,9 +272,11 @@ export default function NewCampaignPage() {
 
         } catch (error) {
             console.error('Error creating campaign:', error);
-            alert('Failed to create campaign. Please try again.');
+            alert(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setIsSubmitting(false);
+            setIsApproving(false);
+            setIsCreating(false);
         }
     };
 

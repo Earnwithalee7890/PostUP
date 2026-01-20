@@ -210,10 +210,10 @@ export default function ProfilePage() {
                     <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '0.5rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                             <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>Platform Fee</span>
-                            <span style={{ color: 'var(--primary)' }}>10%</span>
+                            <span style={{ color: 'var(--primary)' }}>15%</span>
                         </div>
                         <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
-                            We charge a 10% service fee upfront. 90% goes to users.
+                            We charge a 15% service fee upfront. 85% goes to users.
                         </p>
                     </div>
                     <div>

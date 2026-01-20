@@ -118,6 +118,7 @@ export const SupabaseService = {
                 remaining_budget: campaign.netBudget,
                 min_followers: campaign.minFollowers || 0,
                 require_pro: campaign.requirePro || false,
+                onchain_id: campaign.onchainId,
                 ended_at: campaign.endedAt ? new Date(campaign.endedAt).toISOString() : null
             }])
             .select()
@@ -142,6 +143,7 @@ export const SupabaseService = {
             netBudget: parseFloat(data.net_budget),
             rewardAmountPerTask: parseFloat(data.reward_amount_per_task),
             remainingBudget: parseFloat(data.remaining_budget),
+            onchainId: data.onchain_id,
             minFollowers: data.min_followers,
             requirePro: data.require_pro,
             status: data.status,
