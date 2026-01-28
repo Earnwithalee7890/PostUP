@@ -2,22 +2,22 @@ import { Campaign } from '@/lib/types';
 import Link from 'next/link';
 import { useEffect, useState, useMemo } from 'react';
 import styles from './CampaignCard.module.css';
-import { ExternalLink, Image, Camera, Check, Loader2, CheckCircle } from 'lucide-react';
+import { ExternalLink, Camera, Check, Loader2, CheckCircle } from 'lucide-react';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useAccount } from 'wagmi';
 import { isAdmin } from '@/lib/admin';
-import { useSubmitScreenshot, useUserSubmissions, useFinalizeCampaign } from '@/hooks/useCampaigns';
+import { useSubmitScreenshot, useUserSubmissions } from '@/hooks/useCampaigns';
 import { SupabaseService } from '@/lib/supabaseService';
 import sdk from '@farcaster/miniapp-sdk';
 import { SuccessModal } from './SuccessModal';
-import { useWriteContract, useConfig } from 'wagmi';
+import { useWriteContract } from 'wagmi';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
 import { DISTRIBUTOR_ADDRESS } from '@/lib/config';
 import { generateMerkleDistribution } from '@/lib/merkle';
-import { calculateWeightedDistribution, getDistributionStats } from '@/lib/distribution';
+import { calculateWeightedDistribution } from '@/lib/distribution';
 import { calculateQualityScore } from '@/lib/qualityScore';
 import { NeynarService } from '@/lib/neynar';
-import { parseUnits, formatUnits } from 'viem';
+import { parseUnits } from 'viem';
 
 export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const { context } = useFarcasterContext();
