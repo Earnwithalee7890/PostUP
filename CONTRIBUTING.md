@@ -53,8 +53,10 @@ We love new ideas! Open an issue describing:
 
 ## Questions?
 
-Feel free to open an issue or reach out on Farcaster!
+## Support
+ 
+Reach out to the maintainers at support@postup.xyz or join our [Discord Community](https://discord.gg/postup).
 
 ---
-
+ 
 **Thank you for contributing! 💜**
