@@ -1,4 +1,4 @@
-import { Campaign, Platform, TaskType, CampaignParticipant, UserStats } from './types';
+import { Campaign, CampaignParticipant, UserStats } from './types';
 import { MockNeynarService } from './mockNeynar';
 import { calculateQualityScore } from './qualityScore';
 import { calculateWeightedDistribution } from './distribution';
@@ -106,7 +106,7 @@ export const MockService = {
     /**
      * Complete a specific task for a campaign
      */
-    completeTask: async (campaignId: string, taskType: any) => {
+    completeTask: async (_campaignId: string, _taskType: any) => {
         await new Promise(resolve => setTimeout(resolve, 500));
         // For now, just return success. In a real app, this would verify the specific task action.
         return { success: true };
@@ -236,7 +236,7 @@ export const MockService = {
         };
     },
 
-    getLeaderboard: async (type: 'earners' | 'creators'): Promise<{ rank: number, address: string, fid: number, value: number }[]> => {
+    getLeaderboard: async (_type: 'earners' | 'creators'): Promise<{ rank: number, address: string, fid: number, value: number }[]> => {
         await new Promise(resolve => setTimeout(resolve, 400));
         return [];
     },
