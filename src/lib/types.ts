@@ -5,6 +5,10 @@ export type TaskType = 'Like' | 'Repost' | 'Comment' | 'Follow' | 'Quote' | 'Cas
 export type CampaignCategory = 'Follow' | 'Channel' | 'Boost' | 'Multi' | 'MiniApp' | 'General';
 export type CampaignStatus = 'active' | 'paused' | 'completed' | 'claimable' | 'expired';
 
+/**
+ * Represents a user participating in a campaign.
+ * Tracks their validation status, quality score, and rewards.
+ */
 export interface CampaignParticipant {
     address: string;
     fid: number;
