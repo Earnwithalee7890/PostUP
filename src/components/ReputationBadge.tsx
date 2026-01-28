@@ -6,7 +6,7 @@ interface ReputationBadgeProps {
 }
 
 export function ReputationBadge({ qualityScore, showBonus = false }: ReputationBadgeProps) {
-    const { score, tier, breakdown } = qualityScore;
+    const { score, tier } = qualityScore;
     const tierLabel = getTierLabel(tier);
     const tierColor = getTierColor(tier);
 
