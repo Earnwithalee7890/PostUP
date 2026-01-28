@@ -81,6 +81,10 @@ Browse and join promotional campaigns across categories:
 | **Base Network** | L2 for fast, low-cost transactions |
 | **Neynar API** | Farcaster data & verification |
 
+### Smart Contracts
+| Network | Contract | Address |
+|---------|----------|---------|
+| Base | Distributor | `0xcf74BbBDDBB7ed5129a715F20d1cC34Fe1124fe4` |
 ---
 
 ## 🚀 Getting Started
