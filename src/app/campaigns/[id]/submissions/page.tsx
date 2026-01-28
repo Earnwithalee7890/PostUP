@@ -3,10 +3,10 @@
 import { useParams } from 'next/navigation';
 import { useCampaign, useCampaignSubmissions, useVerifyScreenshot } from '@/hooks/useCampaigns';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { Loader2, ArrowLeft, ExternalLink, Image as ImageIcon, CheckCircle, XCircle, Copy, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Image as ImageIcon, Copy, Trash2 } from 'lucide-react';
 import { SupabaseService } from '@/lib/supabaseService';
 import Link from 'next/link';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 import { isAdmin } from '@/lib/admin';
 import { useAccount, useWriteContract, useConfig } from 'wagmi';
