@@ -70,7 +70,7 @@ contract Distributor is Ownable, ReentrancyGuard {
      */
     function setMerkleRoot(uint256 _campaignId, bytes32 _merkleRoot) external {
         Campaign storage c = campaigns[_campaignId];
-        require(msg.sender == c.creator, "Only creator can set root");
+        if (msg.sender != c.creator) revert OnlyCreator();
         c.merkleRoot = _merkleRoot;
     }
 
