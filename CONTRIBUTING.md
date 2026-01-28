@@ -28,6 +28,7 @@ npm run build
 - Follow the existing code patterns
 - Use meaningful variable and function names
 - Add comments for complex logic
+- Use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages
 
 ## Pull Request Process
 
