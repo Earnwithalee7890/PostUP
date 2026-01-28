@@ -82,21 +82,21 @@ contract Distributor is Ownable, ReentrancyGuard {
      */
     function claim(uint256 _campaignId, uint256 _amount, bytes32[] calldata _proof) external nonReentrant {
         Campaign storage c = campaigns[_campaignId];
-        require(c.isActive, "Campaign not active");
-        require(!c.hasClaimed[msg.sender], "Already claimed");
+        if (!c.isActive) revert CampaignNotActive();
+        if (c.hasClaimed[msg.sender]) revert AlreadyClaimed();
 
         // Verify Merkle Proof (Leaf: keccak256(abi.encodePacked(address, amount)))
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender, _amount));
-        require(MerkleProof.verify(_proof, c.merkleRoot, leaf), "Invalid Merkle proof");
+        if (!MerkleProof.verify(_proof, c.merkleRoot, leaf)) revert InvalidMerkleProof();
 
-        require(c.remainingBudget >= _amount, "Insufficient funds in campaign");
+        if (c.remainingBudget < _amount) revert InsufficientFunds();
         
         // Update state before transfer
         c.hasClaimed[msg.sender] = true;
         c.remainingBudget -= _amount;
         
         (bool sent, ) = payable(msg.sender).call{value: _amount}("");
-        require(sent, "Failed to send reward");
+        if (!sent) revert RewardTransferFailed();
 
         emit RewardClaimed(_campaignId, msg.sender, _amount);
     }
