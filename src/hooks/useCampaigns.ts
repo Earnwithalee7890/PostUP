@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SupabaseService } from '@/lib/supabaseService';
-import { Campaign } from '@/lib/types';
+
 
 export function useCampaigns(includeEnded: boolean = false) {
     return useQuery({
