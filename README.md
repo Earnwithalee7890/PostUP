@@ -87,7 +87,7 @@ Browse and join promotional campaigns across categories:
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+ (Recommended)
 - npm or yarn
 - Supabase account
 - Neynar API key
