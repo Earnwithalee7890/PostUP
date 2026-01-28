@@ -5,6 +5,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
+/**
+ * @title Distributor
+ * @notice A contract for distributing rewards to users based on Merkle proofs.
+ * @dev Implements fee collection and reentrancy protection.
+ */
 contract Distributor is Ownable, ReentrancyGuard {
     address public constant PLATFORM_WALLET = 0xcf74BbBDDBB7ed5129a715F20d1cC34Fe1124fe4;
     uint256 public constant PLATFORM_FEE_BPS = 1500; // 15% (1500 / 10000)
