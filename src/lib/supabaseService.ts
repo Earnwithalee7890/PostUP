@@ -156,7 +156,7 @@ export const SupabaseService = {
         };
     },
 
-    async completeTask(campaignId: string, taskType: any) {
+    async completeTask(_campaignId: string, _taskType: any) {
         // For now, return success - verification happens via screenshot
         return { success: true };
     },
@@ -477,7 +477,7 @@ export const SupabaseService = {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('campaigns')
             .delete()
             .lt('created_at', today.toISOString());
