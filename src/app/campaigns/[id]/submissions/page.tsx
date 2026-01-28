@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 
 import { isAdmin } from '@/lib/admin';
 import { useAccount, useWriteContract, useConfig } from 'wagmi';
-import { calculateWeightedDistribution, getDistributionStats } from '@/lib/distribution';
+import { calculateWeightedDistribution } from '@/lib/distribution';
 import { generateMerkleDistribution } from '@/lib/merkle';
 import { DISTRIBUTOR_ADDRESS } from '@/lib/config';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
