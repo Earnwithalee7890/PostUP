@@ -14,7 +14,7 @@ If you discover a security vulnerability, please report it by:
 2. Email the maintainers directly
 3. Include detailed steps to reproduce
 
-We take security seriously and will respond within 48 hours.
+We take security seriously and will respond within 24 hours.
 
 ## Security Best Practices
 
