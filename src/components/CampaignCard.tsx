@@ -1,6 +1,6 @@
 import { Campaign } from '@/lib/types';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styles from './CampaignCard.module.css';
 import { ExternalLink, Image, Camera, Check, Loader2, CheckCircle } from 'lucide-react';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
@@ -139,7 +139,12 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
     // Check if user has completed ALL tasks in this campaign
     const completedTaskCount = Object.keys(completedTasks).filter(k => completedTasks[k]).length;
     const hasCompletedAllTasks = completedTaskCount >= campaign.tasks.length && campaign.tasks.length > 0;
-    const progress = ((campaign.totalBudget - campaign.remainingBudget) / campaign.totalBudget) * 100;
+
+    // Calculate progress with simple memoization
+    const progress = useMemo(() => {
+        if (campaign.totalBudget === 0) return 0;
+        return ((campaign.totalBudget - campaign.remainingBudget) / campaign.totalBudget) * 100;
+    }, [campaign.totalBudget, campaign.remainingBudget]);
 
     // Use castUrl as fallback when postUrl is empty
     const campaignUrl = campaign.postUrl || campaign.castUrl || '';
