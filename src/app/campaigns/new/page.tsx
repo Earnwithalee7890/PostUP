@@ -1,65 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateCampaign } from '@/hooks/useCampaigns';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { parseEther, parseUnits, encodePacked, keccak256, decodeEventLog } from 'viem';
+import { decodeEventLog, parseUnits, encodePacked, keccak256 } from 'viem';
 import { useAccount, useWriteContract, useConfig } from 'wagmi';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/config';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
 import { ERC20_ABI } from '@/lib/erc20';
 import { SUPPORTED_TOKENS, TaskType, Platform, CampaignCategory } from '@/lib/types';
-import { UserPlus, Heart, Zap, Hash, Grid3x3, Smartphone, ArrowLeft, ChevronRight, Clock } from 'lucide-react';
+import { UserPlus, Zap, Grid3x3, Smartphone, ArrowLeft } from 'lucide-react';
 import styles from './new.module.css';
-
-// Platform Logos
-import Image from 'next/image';
-
-// Platform Logos
-const FarcasterLogo = () => (
-    <div style={{ position: 'relative', width: 32, height: 32 }}>
-        <Image
-            src="/logos/farcaster_v2.png"
-            alt="Farcaster"
-            fill
-            style={{ objectFit: 'contain' }}
-        />
-    </div>
-);
-
-const XLogo = () => (
-    <div style={{ position: 'relative', width: 32, height: 32 }}>
-        <Image
-            src="/logos/logo_1.png"
-            alt="X"
-            fill
-            style={{ objectFit: 'contain' }}
-        />
-    </div>
-);
-
-const BaseLogo = () => (
-    <div style={{ position: 'relative', width: 32, height: 32 }}>
-        <Image
-            src="/logos/base_v2.png"
-            alt="Base"
-            fill
-            style={{ objectFit: 'contain', borderRadius: '4px' }}
-        />
-    </div>
-);
-
-
-const SUPPORTED_PLATFORMS = [
-    {
-        id: 'Farcaster' as Platform,
-        label: 'Farcaster',
-        logo: FarcasterLogo,
-        description: 'Grow your Warpcast audience with follows, likes, and recasts.'
-    }
-];
+import { SuccessModal } from '@/components/SuccessModal';
 
 const CATEGORIES = [
     { id: 'Follow' as CampaignCategory, label: 'Follow', icon: UserPlus, tasks: ['Follow'] as TaskType[] },
@@ -68,66 +22,34 @@ const CATEGORIES = [
     { id: 'Multi' as CampaignCategory, label: 'Multi', icon: Grid3x3, tasks: [] as TaskType[] },
 ];
 
-const MULTI_ACTIONS = [
-    { id: 'Follow' as TaskType, label: 'Follow' },
-    { id: 'Like' as TaskType, label: 'Like' },
-    { id: 'Repost' as TaskType, label: 'Recast' },
-    { id: 'Comment' as TaskType, label: 'Reply' },
-];
-
-import { SuccessModal } from '@/components/SuccessModal';
-
 export default function NewCampaignPage() {
-    const router = useRouter();
+    const _router = useRouter();
     const { mutateAsync: createCampaign } = useCreateCampaign();
+    const { context } = useFarcasterContext();
+    const isFarcasterUser = !!context?.user;
+    const userId = context?.user?.fid ? String(context.user.fid) : undefined;
 
-    // Steps: 0 = Platform Selection, 1 = Campaign Details
-    const [platform, setPlatform] = useState<Platform>('Farcaster'); // Auto-select Farcaster
-    const [category, setCategory] = useState<CampaignCategory>('Follow'); // Auto-select Follow by default
+    const [platform] = useState<Platform>('Farcaster');
+    const [category, setCategory] = useState<CampaignCategory>('Follow');
     const [postUrl, setPostUrl] = useState('');
     const [castUrl, setCastUrl] = useState('');
     const [rewardToken, setRewardToken] = useState('USDC');
     const [totalBudget, setTotalBudget] = useState('');
-    const [require200Followers, setRequire200Followers] = useState(false);
-    const [requirePro, setRequirePro] = useState(false);
-    const [showAllTokens, setShowAllTokens] = useState(false);
-    const [duration, setDuration] = useState<1 | 2 | 3>(1);
+    const [_require200Followers] = useState(false);
+    const [_requirePro] = useState(false);
+    const [_showAllTokens] = useState(false);
+    const [duration] = useState<1 | 2 | 3>(1);
 
-    // Multi-task selection
     const [selectedMultiTasks, setSelectedMultiTasks] = useState<TaskType[]>([]);
-
-    // Modal State
     const [showSuccess, setShowSuccess] = useState(false);
-    const [createdCampaignId, setCreatedCampaignId] = useState<string | null>(null);
+    const [_createdCampaignId, _setCreatedCampaignId] = useState<string | null>(null);
 
     const budget = parseFloat(totalBudget) || 0;
     const platformFee = budget * 0.15;
     const netBudget = budget - platformFee;
-
-    const MINIMUM_BUDGET = 3.0; // Updated to $3 as requested
+    const MINIMUM_BUDGET = 3.0;
     const isBudgetValid = budget >= MINIMUM_BUDGET;
     const budgetError = totalBudget && budget < MINIMUM_BUDGET ? `Minimum budget for today is $${MINIMUM_BUDGET}` : '';
-
-    // Filter categories based on platform
-    const visibleCategories = CATEGORIES.filter(cat => {
-        if (!platform) return false;
-
-        // Farcaster: All categories
-        if (platform === 'Farcaster') return true;
-
-        // X: Follow, Boost, Multi
-        if (platform === 'X') return ['Follow', 'Boost', 'Multi'].includes(cat.id);
-
-        // Base: Follow, Channel (maybe community?), Boost, Multi. EXCLUDE Mini App
-        if (platform === 'Base') return ['Follow', 'Boost', 'Multi'].includes(cat.id);
-
-        return false;
-    });
-
-    const handlePlatformSelect = (p: Platform) => {
-        setPlatform(p);
-        setCategory('Follow'); // Reset to default
-    };
 
     const handleCategorySelect = (cat: typeof CATEGORIES[0]) => {
         setCategory(cat.id);
@@ -138,15 +60,6 @@ export default function NewCampaignPage() {
         }
     };
 
-    const toggleMultiTask = (task: TaskType) => {
-        if (selectedMultiTasks.includes(task)) {
-            setSelectedMultiTasks(selectedMultiTasks.filter(t => t !== task));
-        } else {
-            setSelectedMultiTasks([...selectedMultiTasks, task]);
-        }
-    };
-
-    // Wallet and smart contract integration
     const { address, isConnected } = useAccount();
     const wagmiConfig = useConfig();
     const { writeContractAsync: writeApprove } = useWriteContract();
@@ -155,51 +68,21 @@ export default function NewCampaignPage() {
     const [isCreating, setIsCreating] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const needsProfileUrl = category === 'Follow' || category === 'MiniApp' || (category === 'Multi' && selectedMultiTasks.includes('Follow'));
+    const needsCastUrl = category === 'Boost' || (category === 'Multi' && (selectedMultiTasks.includes('Like') || selectedMultiTasks.includes('Repost') || selectedMultiTasks.includes('Comment')));
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        // Validation
-        if (!isFarcasterUser || !userId) {
-            alert('Please open this app in Farcaster to create campaigns');
-            return;
-        }
-
-        if (!isConnected || !address) {
-            alert('Please connect your wallet to pay for the campaign');
-            return;
-        }
-
-        if (!platform || !category || !rewardToken || !budget) {
-            alert('Please complete all fields');
-            return;
-        }
-
-        if (needsProfileUrl && !postUrl.trim()) {
-            alert('Please provide a valid URL');
-            return;
-        }
-
-        if (needsCastUrl && !castUrl.trim()) {
-            alert('Please provide a Cast URL');
-            return;
-        }
-
-        if (!isBudgetValid) {
-            alert(budgetError || 'Invalid budget');
-            return;
-        }
-
-        if (category === 'Multi' && selectedMultiTasks.length === 0) {
-            alert('Please select at least one action for Multi campaign');
-            return;
-        }
+        if (!isFarcasterUser || !userId) { alert('Please open in Farcaster'); return; }
+        if (!isConnected || !address) { alert('Connect wallet'); return; }
+        if (!platform || !category || !rewardToken || !budget) { alert('Complete all fields'); return; }
+        if (needsProfileUrl && !postUrl.trim()) { alert('Provide URL'); return; }
+        if (needsCastUrl && !castUrl.trim()) { alert('Provide Cast URL'); return; }
+        if (!isBudgetValid) { alert(budgetError); return; }
 
         setIsSubmitting(true);
-
         try {
-            const budgetInUSDC = parseUnits(budget.toString(), 6); // USDC has 6 decimals
-
-            // Step 1: Approve USDC
+            const budgetInUSDC = parseUnits(budget.toString(), 6);
             setIsApproving(true);
             await writeApprove({
                 address: USDC_ADDRESS as `0x${string}`,
@@ -209,10 +92,8 @@ export default function NewCampaignPage() {
             });
             setIsApproving(false);
 
-            // Step 2: Create campaign on contract
             setIsCreating(true);
             const mockMerkleRoot = keccak256(encodePacked(['string'], ['campaign-' + Date.now()])) as `0x${string}`;
-
             const createTxHash = await writeCreate({
                 address: DISTRIBUTOR_ADDRESS as `0x${string}`,
                 abi: DISTRIBUTOR_ABI,
@@ -220,29 +101,16 @@ export default function NewCampaignPage() {
                 args: [mockMerkleRoot, USDC_ADDRESS as `0x${string}`, budgetInUSDC],
             });
 
-            // Wait for receipt to get the Campaign ID
             const receipt = await waitForTransactionReceipt(wagmiConfig as any, { hash: createTxHash });
-
             let onchainId = 0;
-            // Decode the log to find CampaignCreated
             for (const log of receipt.logs) {
                 try {
-                    const event = decodeEventLog({
-                        abi: DISTRIBUTOR_ABI,
-                        data: log.data,
-                        topics: log.topics,
-                    });
-                    if (event.eventName === 'CampaignCreated') {
-                        onchainId = Number((event.args as any).id);
-                        break;
-                    }
-                } catch (e) {
-                    // Not our event, skip
-                }
+                    const event = decodeEventLog({ abi: DISTRIBUTOR_ABI, data: log.data, topics: log.topics });
+                    if (event.eventName === 'CampaignCreated') { onchainId = Number((event.args as any).id); break; }
+                } catch (_e) { }
             }
             setIsCreating(false);
 
-            // Step 3: Save to database
             const selectedCategoryObj = CATEGORIES.find(c => c.id === category);
             const finalTasks = category === 'Multi' ? selectedMultiTasks : (selectedCategoryObj?.tasks || []);
             const estRewardPerTask = netBudget / 50;
@@ -261,18 +129,17 @@ export default function NewCampaignPage() {
                 platformFee: platformFee,
                 netBudget: netBudget,
                 rewardAmountPerTask: estRewardPerTask,
-                minFollowers: require200Followers ? 200 : 0,
-                requirePro: requirePro,
+                minFollowers: _require200Followers ? 200 : 0,
+                requirePro: _requirePro,
                 onchainId: onchainId,
                 endedAt: endedAt,
             } as any);
 
-            setCreatedCampaignId(newCampaign.id);
+            _setCreatedCampaignId(newCampaign.id);
             setShowSuccess(true);
-
         } catch (error) {
-            console.error('Error creating campaign:', error);
-            alert(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            console.error(error);
+            alert('Failed to create campaign');
         } finally {
             setIsSubmitting(false);
             setIsApproving(false);
@@ -282,35 +149,18 @@ export default function NewCampaignPage() {
 
     const handleSuccessClose = () => {
         setShowSuccess(false);
-        router.push('/');
+        _router.push('/');
     };
 
-    const visibleTokens = showAllTokens ? SUPPORTED_TOKENS : SUPPORTED_TOKENS.slice(0, 2);
+    const _visibleTokens = _showAllTokens ? SUPPORTED_TOKENS : SUPPORTED_TOKENS.slice(0, 2);
 
-    // Compute which URLs are needed
-    const needsProfileUrl = category === 'Follow' || category === 'MiniApp' || (category === 'Multi' && selectedMultiTasks.includes('Follow'));
-    const needsCastUrl = category === 'Boost' || (category === 'Multi' && (selectedMultiTasks.includes('Like') || selectedMultiTasks.includes('Repost') || selectedMultiTasks.includes('Comment')));
-
-    // Get input labels based on platform
     const getProfileLabel = () => {
         if (category === 'MiniApp') return 'Mini App URL';
-        if (platform === 'X') return 'X Username / Profile Link';
-        if (platform === 'Base') return 'Base Wallet / Profile';
         return 'Farcaster Profile URL';
     };
 
-    const getCastLabel = () => {
-        if (platform === 'X') return 'X Post Link';
-        return 'Cast URL';
-    };
+    const getCastLabel = () => 'Cast URL';
 
-    // RENDER: Check for Farcaster authentication
-    const { context } = useFarcasterContext();
-    const isFarcasterUser = !!context?.user;
-    // Use Farcaster FID as user identifier
-    const userId = context?.user?.fid ? String(context.user.fid) : undefined;
-
-    // Skip category selection - go directly to form with category buttons
     return (
         <div className={styles.container}>
             <SuccessModal
@@ -322,7 +172,7 @@ export default function NewCampaignPage() {
                 onAction={handleSuccessClose}
             />
 
-            <button onClick={() => router.push('/')} className={styles.backButton}>
+            <button onClick={() => _router.push('/')} className={styles.backButton}>
                 <ArrowLeft size={16} /> Back
             </button>
 
@@ -331,8 +181,6 @@ export default function NewCampaignPage() {
             </header>
 
             <form onSubmit={handleSubmit} className={styles.form}>
-
-                {/* CATEGORY SELECTOR */}
                 <div className={styles.inputGroup}>
                     <label className={styles.inputLabel}>Campaign Type</label>
                     <div className={styles.categoryGrid}>
@@ -354,70 +202,16 @@ export default function NewCampaignPage() {
                     </div>
                 </div>
 
-                {/* MULTI TASK INFO */}
                 {category === 'Multi' && (
-                    <div className={styles.panel} style={{
-                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)',
-                        borderColor: 'rgba(139, 92, 246, 0.3)',
-                        padding: '1.5rem'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                            <div style={{
-                                width: 44,
-                                height: 44,
-                                borderRadius: '12px',
-                                background: 'var(--primary)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
-                            }}>
-                                <Zap size={24} color="white" />
-                            </div>
-                            <div>
-                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>All-in-One Multi Task</h3>
-                                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>Maximum engagement for your growth</p>
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-                            {['Follow', 'Like', 'Recast', 'Reply'].map(tag => (
-                                <span key={tag} style={{
-                                    padding: '0.4rem 0.8rem',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    borderRadius: '99px',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 600,
-                                    border: '1px solid rgba(255,255,255,0.1)'
-                                }}>{tag}</span>
-                            ))}
-                        </div>
-
-                        <div style={{
-                            padding: '1rem',
-                            background: 'rgba(0,0,0,0.3)',
-                            borderRadius: '12px',
-                            fontSize: '0.9rem',
-                            lineHeight: 1.5,
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            textAlign: 'center'
-                        }}>
-                            <div style={{ color: 'white', fontWeight: 700, marginBottom: '0.25rem' }}>
-                                ✨ All-in-One Multi Task
-                            </div>
-                            <span style={{ color: 'var(--muted-foreground)' }}>
-                                Complete all actions and get rewarded!
-                            </span>
-                        </div>
+                    <div className={styles.panel}>
+                        <h3>All-in-One Multi Task</h3>
+                        <p>Complete all actions and get rewarded!</p>
                     </div>
                 )}
 
-                {/* URL INPUTS */}
                 {needsProfileUrl && (
                     <div className={styles.inputGroup}>
-                        <label className={styles.inputLabel}>
-                            {getProfileLabel()}
-                        </label>
+                        <label className={styles.inputLabel}>{getProfileLabel()}</label>
                         <input
                             className={styles.urlInput}
                             value={postUrl}
@@ -436,61 +230,26 @@ export default function NewCampaignPage() {
                             value={castUrl}
                             onChange={(e) => setCastUrl(e.target.value)}
                             placeholder="https://..."
-                            required={category === 'Boost' || selectedMultiTasks.some(t => ['Like', 'Repost', 'Comment'].includes(t))}
-                        />
-                    </div>
-                )}
-
-                {category === 'Channel' && (
-                    <div className={styles.inputGroup}>
-                        <label className={styles.inputLabel}>Channel ID</label>
-                        <input
-                            className={styles.urlInput}
-                            value={postUrl}
-                            onChange={(e) => setPostUrl(e.target.value)}
-                            placeholder="channelid"
                             required
                         />
                     </div>
                 )}
 
-                {/* REQUIREMENTS TOGGLES - REMOVED FOR CLEANER UI */}
-
-                {/* BUDGET - COMPACT */}
-                {/* BUDGET SECTION */}
                 <div className={styles.budgetCard}>
-                    <div className={styles.inputLabel} style={{ textAlign: 'center', marginBottom: '1rem', color: 'white' }}>SET CAMPAIGN BUDGET</div>
+                    <label className={styles.inputLabel}>SET CAMPAIGN BUDGET</label>
                     <div className={styles.budgetInputContainer}>
-                        <div className={styles.budgetInputWrapper}>
-                            <span className={styles.currencySymbol}>$</span>
-                            <input
-                                type="number"
-                                value={totalBudget}
-                                onChange={(e) => setTotalBudget(e.target.value)}
-                                placeholder="10"
-                                required
-                                min="3"
-                                step="any"
-                                className={styles.budgetInput}
-                            />
-                        </div>
-                        <div style={{
-                            fontSize: '0.8rem',
-                            color: 'var(--primary-light)',
-                            fontWeight: 600,
-                            marginTop: '0.5rem',
-                            padding: '0.4rem 0.8rem',
-                            background: 'rgba(139, 92, 246, 0.1)',
-                            borderRadius: '8px',
-                            display: 'inline-block'
-                        }}>
-                            🚀 Minimum $3.00 for today
-                        </div>
+                        <input
+                            type="number"
+                            value={totalBudget}
+                            onChange={(e) => setTotalBudget(e.target.value)}
+                            placeholder="10"
+                            required
+                            min="3"
+                            className={styles.budgetInput}
+                        />
                     </div>
-
-                    {/* TOKEN SELECTION */}
-                    <div className={styles.selectorGrid} style={{ marginTop: '1.5rem' }}>
-                        {visibleTokens.map(token => (
+                    <div className={styles.selectorGrid}>
+                        {_visibleTokens.map(token => (
                             <button
                                 key={token.symbol}
                                 type="button"
@@ -501,72 +260,18 @@ export default function NewCampaignPage() {
                             </button>
                         ))}
                     </div>
-                    {budgetError && <div style={{ color: '#ef4444', marginTop: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>⚠️ {budgetError}</div>}
+                    {budgetError && <div className={styles.errorText}>{budgetError}</div>}
                 </div>
 
-                {/* DURATION */}
-                <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Campaign Duration</label>
-                    <div className={styles.selectorGrid} style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-                        {[1, 2, 3].map(d => (
-                            <button
-                                key={d}
-                                type="button"
-                                onClick={() => setDuration(d as 1 | 2 | 3)}
-                                className={`${styles.selectorBtn} ${duration === d ? styles.selectorActive : ''}`}
-                            >
-                                <Clock size={16} /> {d} Day{d > 1 ? 's' : ''}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* FEE BREAKDOWN */}
-                {budget > 0 && (
-                    <div className={styles.breakdown}>
-                        <div className={styles.breakdownRow}>
-                            <span className={styles.breakdownLabel}>Total</span>
-                            <span className={styles.breakdownValue}>{budget.toFixed(6)} {rewardToken}</span>
-                        </div>
-                        <div className={styles.breakdownRow}>
-                            <span className={`${styles.breakdownLabel} ${styles.feeText}`}>Fee (15%)</span>
-                            <span className={`${styles.breakdownValue} ${styles.feeText}`}>-{platformFee.toFixed(6)} {rewardToken}</span>
-                        </div>
-                        <div className={`${styles.breakdownRow} ${styles.netRow}`}>
-                            <span className={styles.breakdownLabel}>Net Reward</span>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                                <span className={styles.netValue}>{netBudget.toFixed(6)} {rewardToken}</span>
-                                <span className={styles.usdValue}>${netBudget.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* SUBMIT */}
                 <div style={{ marginBottom: '100px' }}>
                     <button
                         type="submit"
                         className={styles.submitBtn}
                         disabled={isSubmitting || !isFarcasterUser || !isConnected}
-                        style={{
-                            opacity: (isFarcasterUser && isConnected && !isSubmitting) ? 1 : 0.5,
-                            cursor: (isFarcasterUser && isConnected && !isSubmitting) ? 'pointer' : 'not-allowed'
-                        }}
                     >
-                        {isApproving && 'Approving USDC...'}
-                        {isCreating && 'Creating on Blockchain...'}
-                        {!isApproving && !isCreating && !isSubmitting && `Pay ${totalBudget} ${rewardToken} & Create`}
-                        {!isApproving && !isCreating && isSubmitting && 'Saving...'}
+                        {isApproving ? 'Approving...' : isCreating ? 'Creating...' : isSubmitting ? 'Saving...' : `Pay ${totalBudget} ${rewardToken} & Create`}
                     </button>
-                    {!isConnected && (
-                        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>
-                            💳 Connect wallet (Metamask, OKX, Bitget, etc) to create campaigns
-                        </p>
-                    )}
                 </div>
-
-
-
             </form>
         </div>
     );
