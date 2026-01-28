@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { MockService } from '@/lib/mockService';
 import { getDistributionStats } from '@/lib/distribution';
-import { Users, DollarSign, TrendingUp } from 'lucide-react';
+import { Users } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminPage() {
