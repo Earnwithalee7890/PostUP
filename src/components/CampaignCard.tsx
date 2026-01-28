@@ -19,6 +19,7 @@ import { calculateWeightedDistribution } from '@/lib/distribution';
 import { calculateQualityScore } from '@/lib/qualityScore';
 import { NeynarService } from '@/lib/neynar';
 import { parseUnits } from 'viem';
+import { formatCurrency } from '@/lib/formatters';
 
 export function CampaignCard({ campaign }: { campaign: Campaign }) {
     const { context } = useFarcasterContext();
@@ -228,7 +229,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                     <CampaignStatusBadge isEnded={isEnded} />
                 </div>
                 <span className={`${styles.reward} ${rewardClass}`}>
-                    ${campaign.totalBudget.toFixed(0)}
+                    {formatCurrency(campaign.totalBudget)}
                 </span>
             </div>
 
