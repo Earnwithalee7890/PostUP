@@ -22,11 +22,11 @@ export interface CampaignParticipant {
 }
 
 export interface Campaign {
-    id: string;
-    creator: string;
-    platform: Platform;
-    category: CampaignCategory;
-    postUrl: string;
+    readonly id: string;
+    readonly creator: string;
+    readonly platform: Platform;
+    readonly category: CampaignCategory;
+    readonly postUrl: string;
     castUrl?: string;
     tasks: TaskType[];
     rewardToken: 'ETH' | 'USDC' | 'DEGEN' | 'OP' | 'ETH_BASE' | 'OP_USDC';
