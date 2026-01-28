@@ -6,7 +6,7 @@ import { NeynarService } from '@/lib/neynar';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useAllUserSubmissions, useCampaigns } from '@/hooks/useCampaigns';
 import { CampaignCard } from '@/components/CampaignCard';
-import { User, CheckCircle, History, Copy, Plus, Bell, Clock, XCircle, Wallet } from 'lucide-react';
+import { User, CheckCircle, History, Copy, Bell, Clock, XCircle, Wallet } from 'lucide-react';
 import sdk from '@farcaster/miniapp-sdk';
 import { useState } from 'react';
 
