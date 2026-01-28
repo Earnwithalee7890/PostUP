@@ -266,6 +266,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                     {campaign.tasks.includes('Follow') && campaignUrl && (
                         <button
                             onClick={handleOpenLink}
+                            aria-label={`Follow ${campaign.category}`}
                             style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
