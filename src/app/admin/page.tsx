@@ -21,7 +21,7 @@ export default function AdminPage() {
 
         setSimulating(true);
         try {
-            const campaign = await MockService.simulateCampaign(selectedCampaign, 150);
+            await MockService.simulateCampaign(selectedCampaign, 150);
             alert(`Simulated 150 participants joining campaign!`);
             window.location.reload();
         } catch (error: any) {
