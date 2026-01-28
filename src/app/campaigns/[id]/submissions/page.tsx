@@ -136,7 +136,7 @@ export default function CampaignSubmissionsPage() {
 
             // 2. Generate Merkle Root
             const distribution = calculateWeightedDistribution(participants, campaign.netBudget, 0); // Use net budget specifically
-            const { root, claims } = generateMerkleDistribution(distribution.claims);
+            const { root } = generateMerkleDistribution(distribution.claims);
 
             // 3. Update Smart Contract
             const hash = await writeSetRoot({
