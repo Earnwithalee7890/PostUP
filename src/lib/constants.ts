@@ -52,6 +52,11 @@ export const QUALITY_TIERS = {
     BASIC: { min: 0, label: '📝 Basic', color: '#6b7280' }
 };
 
+export const SUPPORTED_TOKENS = [
+    { symbol: 'USDC', label: 'USDC', chain: 'Base' },
+    { symbol: 'USDT', label: 'USDT', chain: 'Base' },
+];
+
 // API Endpoints
 export const API_ENDPOINTS = {
     VERIFY_TASK: '/api/verify-task',
