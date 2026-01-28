@@ -2,6 +2,13 @@
   "name": "post-up",
   "version": "0.1.0",
   "private": true,
+  "keywords": [
+    "farcaster",
+    "base",
+    "web3",
+    "social",
+    "growth"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
