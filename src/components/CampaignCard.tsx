@@ -10,6 +10,7 @@ import { useSubmitScreenshot, useUserSubmissions } from '@/hooks/useCampaigns';
 import { SupabaseService } from '@/lib/supabaseService';
 import sdk from '@farcaster/miniapp-sdk';
 import { SuccessModal } from './SuccessModal';
+import { CampaignStatusBadge } from './CampaignStatusBadge';
 import { useWriteContract } from 'wagmi';
 import { DISTRIBUTOR_ABI } from '@/lib/abi';
 import { DISTRIBUTOR_ADDRESS } from '@/lib/config';
@@ -224,27 +225,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
                         {campaign.platform}
                     </span>
                     <span className={`${styles.tierLabel} ${tierLabelClass}`}>{tierLabel}</span>
-                    {isEnded ? (
-                        <span style={{
-                            fontSize: '0.7rem',
-                            padding: '0.2rem 0.5rem',
-                            borderRadius: '4px',
-                            background: 'rgba(231, 15, 15, 0.2)',
-                            color: '#ff6b6b',
-                            border: '1px solid rgba(231, 15, 15, 0.4)',
-                            fontWeight: 600
-                        }}>ENDED</span>
-                    ) : (
-                        <span style={{
-                            fontSize: '0.7rem',
-                            padding: '0.2rem 0.5rem',
-                            borderRadius: '4px',
-                            background: 'rgba(46, 204, 113, 0.2)',
-                            color: '#2ecc71',
-                            border: '1px solid rgba(46, 204, 113, 0.4)',
-                            fontWeight: 600
-                        }}>ACTIVE</span>
-                    )}
+                    <CampaignStatusBadge isEnded={isEnded} />
                 </div>
                 <span className={`${styles.reward} ${rewardClass}`}>
                     ${campaign.totalBudget.toFixed(0)}
