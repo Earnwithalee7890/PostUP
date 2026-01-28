@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Zap, Layers, User, TrendingUp } from 'lucide-react';
+import { Home, Layers, User, TrendingUp } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import styles from './Navbar.module.css';
 
