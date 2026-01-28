@@ -11,7 +11,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16.1-black?logo=next.js)](https://nextjs.org/)
 [![Farcaster](https://img.shields.io/badge/Farcaster-Mini%20App-purple)](https://warpcast.com/)
 
-[🌐 Live Demo](https://post-up-zeta.vercel.app) • [📖 Documentation](#features) • [🚀 Getting Started](#getting-started)
+[🌐 Live Demo](https://post-up-zeta.vercel.app) • [📖 Documentation](#features) • [🚀 Getting Started](#getting-started) • [![Build Status](https://img.shields.io/github/actions/workflow/status/Earnwithalee7890/PostUP/ci.yml?branch=main)](https://github.com/Earnwithalee7890/PostUP/actions)
 
 </div>
 
