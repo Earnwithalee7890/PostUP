@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useFarcasterContext } from '@/providers/FarcasterProvider';
 import { useEffect, useState } from 'react';
 import { Rocket, Users, Trophy, TrendingUp, Share2, PlusCircle, LayoutDashboard } from 'lucide-react';
-import { isAdmin } from '@/lib/admin';
+
 
 export default function Home() {
   const { context } = useFarcasterContext();
