@@ -17,13 +17,13 @@ export function SuccessModal({ isOpen, onClose, title, message, actionLabel, onA
     if (!isOpen) return null;
 
     return (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <div className={styles.modal}>
                 <div className={styles.iconWrapper}>
                     <Check size={32} color="white" strokeWidth={3} />
                 </div>
 
-                <h2 className={styles.title}>{title}</h2>
+                <h2 className={styles.title} id="modal-title">{title}</h2>
                 <p className={styles.message}>{message}</p>
 
                 <div className={styles.actions}>
