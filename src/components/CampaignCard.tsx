@@ -132,7 +132,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
         }
     };
 
-    const isFarcasterConnected = !!context?.user;
+    // const isFarcasterConnected = !!context?.user;
     const isX = campaign.platform === 'X';
     const isEnded = campaign.status === 'completed' || campaign.status === 'claimable' || campaign.remainingBudget < campaign.rewardAmountPerTask;
 
@@ -150,7 +150,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
 
     // Use castUrl as fallback when postUrl is empty
     const campaignUrl = campaign.postUrl || campaign.castUrl || '';
-    const isFollowTask = campaign.tasks.includes('Follow');
+    // const isFollowTask = campaign.tasks.includes('Follow');
 
     const handleOpenLink = () => {
         if (campaignUrl) {

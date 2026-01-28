@@ -1,7 +1,6 @@
 'use client';
 
-import { useFarcasterContext } from '@/providers/FarcasterProvider';
-import { Check, X } from 'lucide-react';
+import { Check } from 'lucide-react';
 import styles from './SuccessModal.module.css';
 
 interface SuccessModalProps {
