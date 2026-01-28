@@ -29,6 +29,15 @@ contract Distributor is Ownable, ReentrancyGuard {
     event CampaignCreated(uint256 indexed id, address indexed creator, uint256 totalBudget, uint256 netBudget);
     event RewardClaimed(uint256 indexed campaignId, address indexed claimer, uint256 amount);
 
+    error NoBudgetProvided();
+    error PlatformFeeTransferFailed();
+    error OnlyCreator();
+    error CampaignNotActive();
+    error AlreadyClaimed();
+    error InvalidMerkleProof();
+    error InsufficientFunds();
+    error RewardTransferFailed();
+
     constructor() Ownable(msg.sender) {}
 
     /**
