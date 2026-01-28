@@ -75,6 +75,9 @@ export interface UserStats {
     pfpUrl?: string;
     followers?: number;
     following?: number;
+    /**
+     * Normalized score from 0-100 based on Neynar user score/activity.
+     */
     neynarScore?: number;
     isSpam?: boolean;  // Added for spam detection
     history?: Array<{
