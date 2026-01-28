@@ -45,13 +45,13 @@ contract Distributor is Ownable, ReentrancyGuard {
      * Merkle Root can be set 0x0 initially and updated later.
      */
     function createCampaign(bytes32 _merkleRoot) external payable nonReentrant {
-        require(msg.value > 0, "No budget provided");
+        if (msg.value == 0) revert NoBudgetProvided();
         
         uint256 fee = (msg.value * PLATFORM_FEE_BPS) / 10000;
         uint256 netBudget = msg.value - fee;
 
         (bool sent, ) = payable(PLATFORM_WALLET).call{value: fee}("");
-        require(sent, "Failed to send platform fee");
+        if (!sent) revert PlatformFeeTransferFailed();
 
         Campaign storage c = campaigns[nextCampaignId];
         c.creator = msg.sender;
